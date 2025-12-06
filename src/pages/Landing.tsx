@@ -664,7 +664,7 @@ export default function Landing() {
               What Our Users Say
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Join thousands of marketers and content creators who trust SocialEcho
+              Join thousands of marketers and content creators who trust SocialInsight
             </p>
           </div>
           
@@ -847,9 +847,9 @@ export default function Landing() {
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-                <BarChart3 className="w-5 h-5 text-primary-foreground" />
+                 <img src="/images/SocialInsightLogo.png" alt="Logo" />
               </div>
-              <span className="text-lg font-bold text-foreground">SocialEcho</span>
+              <span className="text-lg font-bold text-foreground">SocialInsight</span>
             </div>
             <div className="flex items-center gap-8 text-sm text-muted-foreground">
               <a href="#" className="hover:text-foreground transition-colors">Privacy</a>
@@ -857,7 +857,7 @@ export default function Landing() {
               <a href="#" className="hover:text-foreground transition-colors">Contact</a>
             </div>
             <p className="text-sm text-muted-foreground">
-              © 2025 SocialEcho. All rights reserved.
+              © 2025 SocialInsight. All rights reserved.
             </p>
           </div>
         </div>
