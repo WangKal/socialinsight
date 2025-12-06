@@ -1,31 +1,37 @@
 import { motion, useInView } from "motion/react";
-import { Upload, Cpu, LineChart, Sparkles } from "lucide-react";
+import { Upload, Cpu, LineChart, Sparkles, LinkIcon } from "lucide-react";
 import { useRef } from "react";
 
 const steps = [
   {
-    icon: Upload,
-    title: "Upload Your Data",
-    description: "Import posts from any social platform or paste text directly",
+    icon: Download, // Chrome extension download
+    title: "Install the Extension",
+    description: "Download our Chrome extension to capture posts directly from any social platform.",
     color: "violet",
   },
   {
-    icon: Cpu,
-    title: "AI Processing",
-    description: "Our advanced algorithms analyze sentiment, topics, and agreement",
+    icon: MousePointerSquare, // scrolling / auto-capture
+    title: "Open & Capture the Post",
+    description: "Open the post and scroll through it, or let Auto-Capture detect everything for you.",
     color: "blue",
   },
   {
-    icon: LineChart,
-    title: "Get Insights",
-    description: "Receive detailed analytics and visualizations instantly",
+    icon: Cpu,
+    title: "AI Analysis",
+    description: "Our AI processes sentiment, topics, engagement signals, and agreement patterns.",
     color: "purple",
   },
   {
-    icon: Sparkles,
-    title: "Take Action",
-    description: "Make data-driven decisions to improve engagement and strategy",
+    icon: LineChart,
+    title: "View Insights",
+    description: "Insights appear instantly both in the extension and on your dashboard here.",
     color: "indigo",
+  },
+  {
+    icon: LinkIcon, // coming soon
+    title: "Analyze by Link (Coming Soon)",
+    description: "Paste a post link and get instant analysis without needing the extension.",
+    color: "gray",
   },
 ];
 
