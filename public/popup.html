@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Social Analytics</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="extension-popup">
+    <!-- Header -->
+    <header class="header">
+      <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="20" x2="18" y2="10"></line>
+        <line x1="12" y1="20" x2="12" y2="4"></line>
+        <line x1="6" y1="20" x2="6" y2="14"></line>
+      </svg>
+      <h1>Social Analytics</h1>
+    </header>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <button class="btn btn-primary">
+        <svg class="icon-sm" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+          <polyline points="17 6 23 6 23 12"></polyline>
+        </svg>
+        Analyze
+      </button>
+      <button class="btn btn-secondary">Export</button>
+      <button class="btn btn-tertiary">Settings</button>
+    </div>
+
+    <!-- Loader Overlay -->
+    <div class="loader-overlay" id="loaderOverlay">
+      <div class="loader-content">
+        <div class="loader-spinner">
+          <div class="spinner-ring"></div>
+          <div class="spinner-ring"></div>
+          <div class="spinner-ring"></div>
+        </div>
+        <p class="loader-text" id="loaderText">Processing...</p>
+      </div>
+    </div>
+
+    <!-- Credits Section -->
+    <div class="credits-container">
+      <div class="credits-box">
+        <div class="credits-info">
+          <svg class="credits-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 6v6l4 2"></path>
+          </svg>
+          <div class="credits-text">
+            <p class="credits-label">Available Credits</p>
+            <p class="credits-amount">250</p>
+          </div>
+        </div>
+        <button class="btn btn-buy-credits">
+          <svg class="icon-sm" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="9" cy="21" r="1"></circle>
+            <circle cx="20" cy="21" r="1"></circle>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+          </svg>
+          Buy
+        </button>
+      </div>
+    </div>
+
+    <!-- Status/Progress Area -->
+    <div class="status-container">
+      <div class="status-box">
+        <div class="status-header">
+          <p class="status-text">Syncing data...</p>
+          <span class="status-percent">68%</span>
+        </div>
+        <div class="progress-bar-container">
+          <div class="progress-bar" style="width: 68%;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scrollable List -->
+    <div class="analytics-section">
+      <h2 class="section-title">Recent Activity</h2>
+      <div class="analytics-list">
+        <div class="analytics-card">
+          <div class="card-content">
+            <div class="card-text">
+              <h3 class="card-title">Instagram Engagement Up 24%</h3>
+              <p class="card-description">Your recent post gained 1.2k interactions</p>
+            </div>
+            <svg class="icon-link" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+              <polyline points="15 3 21 3 21 9"></polyline>
+              <line x1="10" y1="14" x2="21" y2="3"></line>
+            </svg>
+          </div>
+        </div>
+
+        <div class="analytics-card">
+          <div class="card-content">
+            <div class="card-text">
+              <h3 class="card-title">New Follower Milestone</h3>
+              <p class="card-description">You have reached 10,000 followers on Twitter</p>
+            </div>
+            <svg class="icon-link" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+              <polyline points="15 3 21 3 21 9"></polyline>
+              <line x1="10" y1="14" x2="21" y2="3"></line>
+            </svg>
+          </div>
+        </div>
+
+        <div class="analytics-card">
+          <div class="card-content">
+            <div class="card-text">
+              <h3 class="card-title">Best Posting Time Detected</h3>
+              <p class="card-description">Tuesday 2-4pm shows highest engagement</p>
+            </div>
+            <svg class="icon-link" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+              <polyline points="15 3 21 3 21 9"></polyline>
+              <line x1="10" y1="14" x2="21" y2="3"></line>
+            </svg>
+          </div>
+        </div>
+
+        <div class="analytics-card">
+          <div class="card-content">
+            <div class="card-text">
+              <h3 class="card-title">Content Performance Report</h3>
+              <p class="card-description">Weekly summary is ready for review</p>
+            </div>
+            <svg class="icon-link" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+              <polyline points="15 3 21 3 21 9"></polyline>
+              <line x1="10" y1="14" x2="21" y2="3"></line>
+            </svg>
+          </div>
+        </div>
+
+        <div class="analytics-card">
+          <div class="card-content">
+            <div class="card-text">
+              <h3 class="card-title">Audience Demographics Updated</h3>
+              <p class="card-description">Your audience is primarily 25-34 years old</p>
+            </div>
+            <svg class="icon-link" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+              <polyline points="15 3 21 3 21 9"></polyline>
+              <line x1="10" y1="14" x2="21" y2="3"></line>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-user">
+        <div class="user-avatar">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+        </div>
+        <div class="user-info">
+          <p class="user-name">Pro Account</p>
+          <p class="user-email">user@email.com</p>
+        </div>
+      </div>
+      <a href="#" class="footer-link">Dashboard →</a>
+    </footer>
+  </div>
+
+  <script>
+    // Loader functionality
+    const loaderOverlay = document.getElementById('loaderOverlay');
+    const loaderText = document.getElementById('loaderText');
+    const analyzeBtn = document.querySelector('.btn-primary');
+    const exportBtn = document.querySelectorAll('.btn-secondary')[0];
+
+    function showLoader(text) {
+      loaderText.textContent = text;
+      loaderOverlay.classList.add('active');
+    }
+
+    function hideLoader() {
+      loaderOverlay.classList.remove('active');
+    }
+
+    analyzeBtn.addEventListener('click', () => {
+      showLoader('Analyzing content...');
+      // Simulate loading - remove this in production
+      setTimeout(hideLoader, 3000);
+    });
+
+    exportBtn.addEventListener('click', () => {
+      showLoader('Exporting data...');
+      // Simulate loading - remove this in production
+      setTimeout(hideLoader, 2500);
+    });
+  </script>
+</body>
+</html>
