@@ -1,5 +1,5 @@
 import { motion, useInView } from "motion/react";
-import { Upload, Cpu, LineChart, Sparkles, LinkIcon } from "lucide-react";
+import { Upload, Cpu, LineChart, Sparkles, LinkIcon,Download,MousePointer } from "lucide-react";
 import { useRef } from "react";
 
 const steps = [
@@ -10,7 +10,7 @@ const steps = [
     color: "violet",
   },
   {
-    icon: MousePointerSquare, // scrolling / auto-capture
+    icon: MousePointer, // scrolling / auto-capture
     title: "Open & Capture the Post",
     description: "Open the post and scroll through it, or let Auto-Capture detect everything for you.",
     color: "blue",
@@ -19,19 +19,19 @@ const steps = [
     icon: Cpu,
     title: "AI Analysis",
     description: "Our AI processes sentiment, topics, engagement signals, and agreement patterns.",
-    color: "purple",
+    color: "red",
   },
   {
     icon: LineChart,
     title: "View Insights",
     description: "Insights appear instantly both in the extension and on your dashboard here.",
-    color: "indigo",
+    color: "green",
   },
   {
     icon: LinkIcon, // coming soon
     title: "Analyze by Link (Coming Soon)",
     description: "Paste a post link and get instant analysis without needing the extension.",
-    color: "gray",
+    color: "yellow",
   },
 ];
 
