@@ -138,7 +138,7 @@ const signUp = async (
 const autoSignIn = async (internalJwt: string) => {
   try {
     // Step 1: Send internal JWT to backend to exchange for Supabase tokens
-    const res = await fetch("http://127.0.0.1:8000/api/auth_app/get_temp_session/", {
+    const res = await fetch("https://socialinsightbackend.onrender.com/api/auth_app/get_temp_session/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

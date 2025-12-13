@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { LiveDemo } from "@/components/LiveDemo";
 import { AuthButtons } from "@/components/AuthButtons";
 import { HowItWorks } from "@/components/HowItWorks";
+import { GuideDialog } from "@/components/GuideDialog";
 import { Link } from "react-router-dom";
 import {
   BarChart3,
@@ -39,7 +40,7 @@ export default function Landing() {
   const [hoveredFeature, setHoveredFeature] = useState<number | null>(null);
   const [activeDemo, setActiveDemo] = useState(0);
   const [animatedStats, setAnimatedStats] = useState({ posts: 0, sentiment: 0, topics: 0 });
-
+  const [guideOpen, setGuideOpen] = useState(false)
   // Animate stats on load
   useEffect(() => {
     const duration = 2000;
@@ -311,12 +312,16 @@ export default function Landing() {
               
               <div className="flex flex-col sm:flex-row gap-4 animate-fade-in" style={{ animationDelay: "0.3s" }}>
                 <Link to="/auth">
-                  <Button size="lg" className="gap-2 text-lg px-8 py-6 shadow-xl shadow-primary/30 hover:shadow-primary/50 transition-all group">
+                  <Button size="lg" className="gap-2 text-lg px-8 py-6 shadow-xl shadow-primary/30 hover:shadow-primary/50 transition-all group"
+                    
+                  >
                     Start Analyzing Free
                     <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </Link>
-                <Button size="lg" variant="outline" className="gap-2 text-lg px-8 py-6 group">
+                <Button size="lg" variant="outline" className="gap-2 text-lg px-8 py-6 group"
+onClick={()=>{ setGuideOpen(true)}}
+                >
                   <Play className="w-5 h-5 group-hover:scale-110 transition-transform" />
                   Watch Demo
                 </Button>
@@ -862,6 +867,12 @@ export default function Landing() {
           </div>
         </div>
       </footer>
+
+      <GuideDialog
+    open={guideOpen}
+    setOpen ={() => setGuideOpen(false)}
+      />
+    
     </div>
   );
 }

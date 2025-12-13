@@ -37,7 +37,7 @@ export default function Payments() {
 
   // Payment states
   const [customAmount, setCustomAmount] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("mpesa");
+  const [paymentMethod, setPaymentMethod] = useState("paystack");
   const [isProcessing, setIsProcessing] = useState(false);
   const [activeTab, setActiveTab] = useState("custom");
   const [showMpesaDialog, setShowMpesaDialog] = useState(false);
@@ -160,7 +160,7 @@ const processPaystackPayment = async (amount: number) => {
 
   try {
     // 1. Call Django backend to create Paystack transaction
-    const res = await fetch("https://nonpublic-weightlessly-iona.ngrok-free.dev/api/payments/initiate-paystack-payment/", {
+    const res = await fetch("https://socialinsightbackend.onrender.com/api/payments/initiate-paystack-payment/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -291,7 +291,7 @@ useEffect(() => {
                 <div className="space-y-3">
                   <Label>Select Payment Method</Label>
                   <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
-                    <div className="flex items-center space-x-2 p-4 border border-border rounded-lg hover:border-primary cursor-pointer transition-colors">
+                  {/**  <div className="flex items-center space-x-2 p-4 border border-border rounded-lg hover:border-primary cursor-pointer transition-colors">
                       <RadioGroupItem value="mpesa" id="mpesa" />
                       <Label htmlFor="mpesa" className="flex items-center gap-2 cursor-pointer flex-1">
                         <Smartphone className="w-5 h-5 text-success" />
@@ -300,7 +300,7 @@ useEffect(() => {
                           <p className="text-xs text-muted-foreground">Pay via mobile money</p>
                         </div>
                       </Label>
-                    </div>
+                    </div>**/}
                     <div className="flex items-center space-x-2 p-4 border border-border rounded-lg hover:border-primary cursor-pointer transition-colors">
                       <RadioGroupItem value="paystack" id="paystack" />
                       <Label htmlFor="paystack" className="flex items-center gap-2 cursor-pointer flex-1">
@@ -376,8 +376,8 @@ useEffect(() => {
             <div className="mt-6 space-y-3">
               <Label>Select Payment Method</Label>
               <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
-                <div className="flex items-center space-x-2 p-4 border border-border rounded-lg hover:border-primary cursor-pointer transition-colors">
-                  <RadioGroupItem value="mpesa" id="mpesa-pkg" />
+                {/** <div className="flex items-center space-x-2 p-4 border border-border rounded-lg hover:border-primary cursor-pointer transition-colors">
+                 <RadioGroupItem value="mpesa" id="mpesa-pkg" />
                   <Label htmlFor="mpesa-pkg" className="flex items-center gap-2 cursor-pointer flex-1">
                     <Smartphone className="w-5 h-5 text-success" />
                     <div>
@@ -385,7 +385,7 @@ useEffect(() => {
                       <p className="text-xs text-muted-foreground">Pay via mobile money</p>
                     </div>
                   </Label>
-                </div>
+                </div>**/}
                 <div className="flex items-center space-x-2 p-4 border border-border rounded-lg hover:border-primary cursor-pointer transition-colors">
                   <RadioGroupItem value="paystack" id="paystack-pkg" />
                   <Label htmlFor="paystack-pkg" className="flex items-center gap-2 cursor-pointer flex-1">

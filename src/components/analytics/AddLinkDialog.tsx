@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { X, Link as LinkIcon, Plus } from "lucide-react";
 import { useState } from "react";
 import { Button } from "../ui/button";
+import { GuideDialog } from "@/components/GuideDialog";
 
 interface AddLinkDialogProps {
   isOpen: boolean;
@@ -11,8 +12,8 @@ interface AddLinkDialogProps {
 
 export function AddLinkDialog({ isOpen, onClose, onAdd }: AddLinkDialogProps) {
   const [url, setUrl] = useState("");
-  const [title, setTitle] = useState("");
   const [error, setError] = useState("");
+  const [extensionDialog, setExtensionDialog] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,26 +31,21 @@ export function AddLinkDialog({ isOpen, onClose, onAdd }: AddLinkDialogProps) {
       return;
     }
 
-    if (!title.trim()) {
-      setError("Title is required");
-      return;
-    }
 
     onAdd(url, title);
     setUrl("");
-    setTitle("");
     setError("");
     onClose();
   };
 
   const handleClose = () => {
     setUrl("");
-    setTitle("");
     setError("");
     onClose();
   };
 
   return (
+    <>
     <AnimatePresence>
       {isOpen && (
         <>
@@ -86,7 +82,7 @@ export function AddLinkDialog({ isOpen, onClose, onAdd }: AddLinkDialogProps) {
                     <LinkIcon className="w-6 h-6 text-white" />
                   </div>
                   <h2 className="text-3xl bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
-                    Add Link
+                    Analysis
                   </h2>
                 </div>
                 <p className="text-gray-600">
@@ -95,7 +91,7 @@ export function AddLinkDialog({ isOpen, onClose, onAdd }: AddLinkDialogProps) {
               </div>
 
               {/* Form */}
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form  className="space-y-4">
                 {/* URL Input */}
                 <div>
                   <label htmlFor="url" className="block text-sm text-gray-700 mb-2">
@@ -114,23 +110,6 @@ export function AddLinkDialog({ isOpen, onClose, onAdd }: AddLinkDialogProps) {
                   />
                 </div>
 
-                {/* Title Input */}
-                <div>
-                  <label htmlFor="title" className="block text-sm text-gray-700 mb-2">
-                    Analysis Title *
-                  </label>
-                  <input
-                    id="title"
-                    type="text"
-                    value={title}
-                    onChange={(e) => {
-                      setTitle(e.target.value);
-                      setError("");
-                    }}
-                    placeholder="e.g., Product Launch Analysis"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
-                  />
-                </div>
 
                 {/* Error Message */}
                 {error && (
@@ -146,10 +125,18 @@ export function AddLinkDialog({ isOpen, onClose, onAdd }: AddLinkDialogProps) {
                 {/* Info Box */}
                 <div className="p-4 bg-violet-50 border border-violet-200 rounded-lg">
                   <p className="text-sm text-violet-700">
-                    <strong>Note:</strong> Paste a link to a social media post (Twitter, LinkedIn, etc.) 
-                    and we'll analyze all the replies and engagement.
+                    <strong>Note:</strong> Currently we only support the use of our extension. Please use the guide below and embark on you post analysis journey
                   </p>
+                  <Button
+                    type="submit"
+                    onClick={()=>{handleClose;setExtensionDialog(true)}}
+                    className="flex-1 bg-gradient-to-r from-violet-600 to-purple-600 text-white hover:from-violet-700 hover:to-purple-700"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Analyze by Extension
+                  </Button>
                 </div>
+               
 
                 {/* Buttons */}
                 <div className="flex gap-3 pt-4">
@@ -161,19 +148,17 @@ export function AddLinkDialog({ isOpen, onClose, onAdd }: AddLinkDialogProps) {
                   >
                     Cancel
                   </Button>
-                  <Button
-                    type="submit"
-                    className="flex-1 bg-gradient-to-r from-violet-600 to-purple-600 text-white hover:from-violet-700 hover:to-purple-700"
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Add Link
-                  </Button>
-                </div>
+                </div>   
               </form>
             </div>
           </motion.div>
         </>
       )}
     </AnimatePresence>
+    <GuideDialog
+    open={extensionDialog}
+    setOpen ={() => setExtensionDialog(false)}
+      />
+      </>
   );
 }
