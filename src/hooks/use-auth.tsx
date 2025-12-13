@@ -94,7 +94,7 @@ const signUp = async (
   // -------------------------
   try {
     const { data: settings, error: settingsError } = await supabase
-      .from("app_settings")
+      .from("settings")
       .select("free_credits_enabled, free_credit_amount")
       .single();
 

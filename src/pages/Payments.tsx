@@ -32,6 +32,7 @@ export default function Payments() {
 
   const [searchParams] = useSearchParams();
   const [credits, setCredits] = useState(0);
+  const [usedCredits, setUsedCredits] = useState(0);
   const [transactions, setTransactions] = useState<any[]>([]);
   const [loadingData, setLoadingData] = useState(true);
 
@@ -67,7 +68,8 @@ export default function Payments() {
       const { data: transData, error: transError } = await getTransactions(user.id);
       if (transError) throw transError;
 
-      setCredits(creditsData?.[0]?.amount || 0);
+      setCredits(creditsData?.remaining_credits || 0);
+      setUsedCredits(creditsData?.used_credits || 0);
       setTransactions(transData || []);
 
     } catch (err) {
@@ -222,7 +224,7 @@ useEffect(() => {
             <CreditCard className="w-12 h-12 opacity-80" />
           </div>
           <div className="mt-6 pt-4 border-t border-primary-foreground/20">
-            <p className="text-sm opacity-90">Usage this month: 750 credits</p>
+            <p className="text-sm opacity-90">Usage : {usedCredits}</p>
             <div className="mt-2 bg-primary-foreground/20 rounded-full h-2 overflow-hidden">
               <div className="bg-primary-foreground h-full rounded-full" style={{ width: '60%' }} />
             </div>
