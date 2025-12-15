@@ -248,7 +248,7 @@ useEffect(() => {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full max-w-md grid-cols-2 mb-6">
             <TabsTrigger value="custom">Custom Amount</TabsTrigger>
-            <TabsTrigger value="packages">Quick Packages</TabsTrigger>
+           {/** <TabsTrigger value="packages">Quick Packages</TabsTrigger>**/}
           </TabsList>
 
           {/* Custom Amount - Dominant Option */}
@@ -336,7 +336,7 @@ useEffect(() => {
             </Card>
           </TabsContent>
 
-          {/* Credit Packages */}
+          {/* Credit Packages 
           <TabsContent value="packages">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               {[
@@ -388,7 +388,7 @@ useEffect(() => {
                     </div>
                   </Label>
                 </div>**/}
-                <div className="flex items-center space-x-2 p-4 border border-border rounded-lg hover:border-primary cursor-pointer transition-colors">
+                {/*<div className="flex items-center space-x-2 p-4 border border-border rounded-lg hover:border-primary cursor-pointer transition-colors">
                   <RadioGroupItem value="paystack" id="paystack-pkg" />
                   <Label htmlFor="paystack-pkg" className="flex items-center gap-2 cursor-pointer flex-1">
                     <CreditCard className="w-5 h-5 text-primary" />
@@ -400,7 +400,7 @@ useEffect(() => {
                 </div>
               </RadioGroup>
             </div>
-          </TabsContent>
+          </TabsContent>*/}
         </Tabs>
       </div>
 

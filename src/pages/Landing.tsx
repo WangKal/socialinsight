@@ -323,7 +323,7 @@ export default function Landing() {
 onClick={()=>{ setGuideOpen(true)}}
                 >
                   <Play className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                  Watch Demo
+                  How it works
                 </Button>
               </div>
               
@@ -857,9 +857,9 @@ onClick={()=>{ setGuideOpen(true)}}
               <span className="text-lg font-bold text-foreground">SocialInsight</span>
             </div>
             <div className="flex items-center gap-8 text-sm text-muted-foreground">
-              <a href="#" className="hover:text-foreground transition-colors">Privacy</a>
-              <a href="#" className="hover:text-foreground transition-colors">Terms</a>
-              <a href="#" className="hover:text-foreground transition-colors">Contact</a>
+              <a href="/terms" className="hover:text-foreground transition-colors">Privacy</a>
+              <a href="/terms" className="hover:text-foreground transition-colors">Terms</a>
+              <a href="/terms" className="hover:text-foreground transition-colors">Contact</a>
             </div>
             <p className="text-sm text-muted-foreground">
               © 2025 SocialInsight. All rights reserved.

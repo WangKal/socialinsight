@@ -84,7 +84,7 @@ export function Layout({ children }: LayoutProps) {
     const loadUserInfo = async () => {
       try {
         const result = await getCredits(user.id);
-        console.log(result.data)
+        
         setCredits(result.data);
       } catch (error) {
         

@@ -60,10 +60,11 @@ const downloadExtensionZip = async () => {
 
     //  Auto-open Chrome Extensions page
     setTimeout(() => {
-      const isChrome =
+      setStep(2);
+      /*const isChrome =
         /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
       if (isChrome) {
-        window.open("chrome://extensions", "_blank");
+        window.("chrome://extensions", "_blank");
         alert(
           "Chrome Extensions page opened. Enable Developer Mode and load the downloaded folder."
         );
@@ -71,8 +72,8 @@ const downloadExtensionZip = async () => {
         alert(
           "Download complete! Open your browser extensions page manually to load the extension."
         );
-      }
-    }, 500);
+      }*/
+    }, 2000);
   } catch (err) {
     console.error(err);
     alert("Failed to download extension");
@@ -145,10 +146,6 @@ const downloadExtensionZip = async () => {
 )}
 
 
-                {/* Image Placeholder */}
-                <div className="w-full h-40 bg-gray-200 rounded-xl flex items-center justify-center text-gray-500">
-                  Add Screenshot Here
-                </div>
 
                 <Button
                   onClick={() => setStep(2)}
@@ -162,15 +159,15 @@ const downloadExtensionZip = async () => {
             {step === 2 && (
               <div className="space-y-4">
                 <h2 className="text-xl font-semibold">Step 2: Load the Extension</h2>
-                <ul className="list-disc pl-5 text-gray-600 space-y-1">
+                <ul className=" mb-8 list-disc pl-5 text-gray-600 space-y-1">
                   <li>Open <strong>chrome://extensions</strong></li>
                   <li>Enable <strong>Developer Mode</strong></li>
                   <li>Click <strong>Load Unpacked</strong> and select the extracted folder</li>
                 </ul>
 
                 {/* Image Placeholder */}
-                <div className="w-full h-40 bg-gray-200 rounded-xl flex items-center justify-center text-gray-500">
-                  Add Screenshot Here
+                <div className="w-full mt-100 h-40 bg-gray-200 rounded-xl flex items-center justify-center text-gray-500">
+                  <img  className="mt-40 " src="/Screenshot1.png" alt="Logo" />
                 </div>
 
                 <div className="flex justify-between mt-4">
@@ -197,7 +194,8 @@ const downloadExtensionZip = async () => {
 </p>
                 {/* Image Placeholder */}
                 <div className="w-full h-40 bg-gray-200 rounded-xl flex items-center justify-center text-gray-500">
-                  Add Screenshot Here
+                 <img src="/Screenshot2.png" alt="Logo" />
+                 <img src="/Screenshot3.png" alt="Logo" />
                 </div>
 
                 <div className="flex justify-between mt-4">
