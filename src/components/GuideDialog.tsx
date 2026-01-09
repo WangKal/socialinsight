@@ -1,4 +1,6 @@
 import { useState } from "react";
+import fs from "fs";
+import path from "path";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, ArrowLeft, Download, Link as LinkIcon } from "lucide-react";
@@ -20,35 +22,23 @@ export  function GuideDialog({ open, setOpen }) {
     setOpen(false);
   };
 
+
 const downloadExtensionZip = async () => {
   try {
     setDownloading(true);
     setProgress(0);
 
-    const response = await fetch("/extension.zip"); 
+    const response = await fetch(
+      "https://socialinsight.render.com/api/insights/download/extension/"
+    );
+
     if (!response.ok) throw new Error("Download failed");
 
-    const contentLength = response.headers.get("content-length");
-    const total = contentLength ? parseInt(contentLength, 10) : null;
+    const blob = await response.blob();
 
-    const reader = response.body.getReader();
-    let received = 0;
-    const chunks = [];
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-
-      chunks.push(value);
-      received += value.length;
-
-      if (total) {
-        setProgress(Math.round((received / total) * 100));
-      }
-    }
-
-    const blob = new Blob(chunks);
-    const url = window.URL.createObjectURL(blob);
+    const url = URL.createObjectURL(
+      new Blob([blob], { type: "application/zip" })
+    );
 
     const a = document.createElement("a");
     a.href = url;
@@ -56,24 +46,9 @@ const downloadExtensionZip = async () => {
     document.body.appendChild(a);
     a.click();
     a.remove();
-    window.URL.revokeObjectURL(url);
 
-    //  Auto-open Chrome Extensions page
-    setTimeout(() => {
-      setStep(2);
-      /*const isChrome =
-        /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
-      if (isChrome) {
-        window.("chrome://extensions", "_blank");
-        alert(
-          "Chrome Extensions page opened. Enable Developer Mode and load the downloaded folder."
-        );
-      } else {
-        alert(
-          "Download complete! Open your browser extensions page manually to load the extension."
-        );
-      }*/
-    }, 2000);
+    URL.revokeObjectURL(url);
+    setStep(2);
   } catch (err) {
     console.error(err);
     alert("Failed to download extension");
@@ -82,9 +57,11 @@ const downloadExtensionZip = async () => {
   }
 };
 
+
   return (
     <Dialog open={open} onOpenChange={closeDialog}>
-      <DialogContent className="max-w-2xl p-6 rounded-2xl">
+      <DialogContent className="max-w-2xl p-6 rounded-2xl max-h-[80vh] overflow-y-auto">
+
         <DialogHeader>
           <DialogTitle className="text-2xl font-semibold">Capture Post for Analysis</DialogTitle>
         </DialogHeader>
@@ -166,9 +143,14 @@ const downloadExtensionZip = async () => {
                 </ul>
 
                 {/* Image Placeholder */}
-                <div className="w-full mt-100 h-40 bg-gray-200 rounded-xl flex items-center justify-center text-gray-500">
-                  <img  className="mt-40 " src="/Screenshot1.png" alt="Logo" />
-                </div>
+                <div className="w-full bg-gray-200 rounded-xl flex items-center justify-center p-4">
+  <img
+    className="max-w-full max-h-80 object-contain"
+    src="/Screenshot1.png"
+    alt="Screenshot 1"
+  />
+</div>
+
 
                 <div className="flex justify-between mt-4">
                   <Button variant="outline" onClick={() => setStep(1)} className="rounded-xl">
@@ -186,17 +168,18 @@ const downloadExtensionZip = async () => {
                 <h2 className="text-xl font-semibold">Step 3: Capture Posts Automatically or Manually</h2>
                 <p className="text-gray-600">
                   Visit the social media post you want to analyze, open the extension, and click
-                  <strong> Analyze(For Manual capture i.e You have to scroll on the post)</strong>.
+                  <strong> Analyze manually(For Manual capture i.e You have to scroll on the post)</strong>.
                   or
-                   <strong> Auto Capture (The capture is automated)</strong>
+                   <strong> Analyze Automatically (A window is opened for that post, analysis is done then closed automatically)</strong>
                 </p>
                 <p className="text-gray-600">Once the analysis is done it will be available both within the extension and on this site(For a more comprehensive view)
 </p>
                 {/* Image Placeholder */}
-                <div className="w-full h-40 bg-gray-200 rounded-xl flex items-center justify-center text-gray-500">
-                 <img src="/Screenshot2.png" alt="Logo" />
-                 <img src="/Screenshot3.png" alt="Logo" />
-                </div>
+<div className="w-full bg-gray-200 rounded-xl flex flex-col md:flex-row items-center justify-center gap-4 p-4">
+  <img className="max-w-full max-h-80 object-contain" src="/Screenshot2.png" alt="Screenshot 2" />
+  <img className="max-w-full max-h-80 object-contain" src="/Screenshot3.png" alt="Screenshot 3" />
+</div>
+
 
                 <div className="flex justify-between mt-4">
                   <Button variant="outline" onClick={() => setStep(2)} className="rounded-xl">

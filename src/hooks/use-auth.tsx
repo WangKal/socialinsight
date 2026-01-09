@@ -125,14 +125,43 @@ const signUp = async (
 
 
 
-  const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
+const signIn = async (email: string, password: string) => {
+  try {
+    const res = await fetch(
+      "https://socialinsightbackend.onrender.com/api/auth_app/login/",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+        credentials: "include",
+      }
+    );
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      return { error: data.error || "Login failed" };
+    }
+
+    const { supabase_session, jwt } = data;
+
+    // Store internal JWT if needed
+    localStorage.setItem("internal_jwt", jwt);
+
+    // Set Supabase session
+    const { error: sessionError } = await supabase.auth.setSession({
+      access_token: supabase_session.access_token,
+      refresh_token: supabase_session.refresh_token,
     });
-    
-    return { error };
-  };
+
+    if (sessionError) return { error: sessionError };
+
+    return { error: null };
+  } catch (err) {
+    return { error: err };
+  }
+};
+
 
 
 const autoSignIn = async (internalJwt: string) => {

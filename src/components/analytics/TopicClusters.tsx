@@ -45,9 +45,9 @@ export function TopicClusters({ groups }: TopicClustersProps) {
   };
 
   const tabs = [
-    { id: "agree" as const, label: "Agree", color: "green" },
-    { id: "neutral" as const, label: "Neutral", color: "amber" },
-    { id: "disagree" as const, label: "Disagree", color: "red" },
+    { id: "agree" as const, label: "Agree", color: "green", title:"Agreement Clusters" },
+    { id: "neutral" as const, label: "Neutral", color: "amber", title:"Neutral Clusters" },
+    { id: "disagree" as const, label: "Disagree", color: "red", title:"Disagreement Clusters" },
   ];
 
   const activeGroup = groups[activeTab] || { clusters: [], summary: "", percentage: 0 };
@@ -82,7 +82,7 @@ export function TopicClusters({ groups }: TopicClustersProps) {
       className="bg-white rounded-2xl shadow-xl border border-gray-200 p-8"
     >
       <h3 className="text-2xl mb-6 bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
-        Topic Clusters by Agreement
+        Topic Clusters
       </h3>
 
       {/* Tabs */}
@@ -111,6 +111,7 @@ export function TopicClusters({ groups }: TopicClustersProps) {
         className="mb-6 p-4 bg-gradient-to-r from-violet-50 to-purple-50 rounded-xl"
       >
         <div className="flex items-center justify-between mb-2">
+       
           <span className="text-gray-700">Group Summary</span>
           <span className="text-2xl bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
             {activeGroup.percentage}%
@@ -128,6 +129,9 @@ export function TopicClusters({ groups }: TopicClustersProps) {
           </div>
         ) : (
           <AnimatePresence mode="popLayout">
+           <h3 className="text-2xl mb-6 bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
+        {tabs.find(tab => tab.id === activeTab)?.title || ""}
+      </h3>
             {activeGroup.clusters.map((cluster, index) => {
               const isExpanded = expandedClusters.has(cluster.cluster_id);
 
@@ -163,6 +167,23 @@ export function TopicClusters({ groups }: TopicClustersProps) {
                       <ChevronDown className="w-5 h-5 text-gray-400" />
                     )}
                   </button>
+
+                  {/* Replyable / AI Suggestion */}
+                  {isExpanded && cluster.reply_suggestions && (
+                    <div className="p-4 mb-2 bg-indigo-50 border border-indigo-200 rounded-lg">
+                      <div className="flex justify-between items-center mb-1">
+                        <span className="text-indigo-700 font-semibold">Suggested Reply:</span>
+                        <span className="text-sm text-gray-500">
+                          {cluster.replyable ? "AI-generated" : "Your choice"}
+                        </span>
+                      </div>
+                      <p className="text-gray-800">{cluster.reply_suggestions.ai_reply}</p>
+                      {cluster.reply_suggestions.mention_list && (
+                        <p className="text-gray-500 text-xs mt-1">Mentions: {cluster.reply_suggestions.mention_list}</p>
+                      )}
+                    </div>
+                  )}
+
 
                   {/* Cluster Replies */}
                   <AnimatePresence>

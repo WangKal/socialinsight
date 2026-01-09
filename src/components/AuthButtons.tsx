@@ -33,7 +33,7 @@ export function AuthButtons() {
           {/* Get Started / Analytics */}
           <Link to="/analytics">
             <Button className="gap-2 shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all">
-              Start Analyzing
+              Analyze
               <ArrowRight className="w-4 h-4" />
             </Button>
           </Link>

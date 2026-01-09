@@ -5,7 +5,8 @@ import { LiveDemo } from "@/components/LiveDemo";
 import { AuthButtons } from "@/components/AuthButtons";
 import { HowItWorks } from "@/components/HowItWorks";
 import { GuideDialog } from "@/components/GuideDialog";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/use-auth";
 import {
   BarChart3,
   TrendingUp,
@@ -37,6 +38,8 @@ import {
 import { useState, useEffect } from "react";
 
 export default function Landing() {
+  const { user} = useAuth();
+  const navigate = useNavigate();
   const [hoveredFeature, setHoveredFeature] = useState<number | null>(null);
   const [activeDemo, setActiveDemo] = useState(0);
   const [animatedStats, setAnimatedStats] = useState({ posts: 0, sentiment: 0, topics: 0 });
@@ -307,20 +310,20 @@ export default function Landing() {
               </h1>
               
               <p className="text-lg text-muted-foreground max-w-xl animate-fade-in" style={{ animationDelay: "0.2s" }}>
-                Analyze social media posts and replies to uncover <span className="text-foreground font-medium">sentiments</span>, <span className="text-foreground font-medium">agreements</span>, <span className="text-foreground font-medium">emotions</span>, and <span className="text-foreground font-medium">trending topics</span> with powerful AI.
+                Analyze social media posts (Currently X formerly twitter is supported) and replies to uncover <span className="text-foreground font-medium">sentiments</span>, <span className="text-foreground font-medium">agreements</span>, <span className="text-foreground font-medium">emotions</span>, and <span className="text-foreground font-medium">trending topics</span> with powerful AI.
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 animate-fade-in" style={{ animationDelay: "0.3s" }}>
-                <Link to="/auth">
+                
                   <Button size="lg" className="gap-2 text-lg px-8 py-6 shadow-xl shadow-primary/30 hover:shadow-primary/50 transition-all group"
-                    
+                    onClick={()=>{ user?setGuideOpen(true):navigate("/auth")}}
                   >
-                    Start Analyzing Free
+                    {user ? "Analyze" : "Start Analyzing Free"}
                     <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </Button>
-                </Link>
+               
                 <Button size="lg" variant="outline" className="gap-2 text-lg px-8 py-6 group"
-onClick={()=>{ setGuideOpen(true)}}
+
                 >
                   <Play className="w-5 h-5 group-hover:scale-110 transition-transform" />
                   How it works
@@ -773,6 +776,7 @@ onClick={()=>{ setGuideOpen(true)}}
         </div>
       </section>
 
+      
       {/* Trust Badges */}
       <section className="container mx-auto px-6 py-12 border-y border-border/50">
         <div className="max-w-6xl mx-auto">
@@ -781,10 +785,7 @@ onClick={()=>{ setGuideOpen(true)}}
               <Globe className="w-5 h-5" />
               <span className="font-medium">Global Coverage</span>
             </div>
-            <div className="flex items-center gap-2 hover:text-foreground transition-colors">
-              <Lock className="w-5 h-5" />
-              <span className="font-medium">SOC 2 Certified</span>
-            </div>
+            
             <div className="flex items-center gap-2 hover:text-foreground transition-colors">
               <Shield className="w-5 h-5" />
               <span className="font-medium">GDPR Compliant</span>
@@ -815,12 +816,16 @@ onClick={()=>{ setGuideOpen(true)}}
               </div>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link to="/auth">
-                  <Button size="lg" className="gap-2 text-lg px-10 py-6 shadow-xl shadow-primary/30 hover:shadow-primary/50 transition-all group">
-                    Get Started Free
+                
+                  <Button size="lg" className="gap-2 text-lg px-10 py-6 shadow-xl shadow-primary/30 hover:shadow-primary/50 transition-all group"
+                  onClick={()=>{
+                    {user ? navigate("/analytics"): navigate("/auth")}
+                  }}
+                  >
+                    {user ? "Analyze" : "Get Started For Free"}
                     <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </Button>
-                </Link>
+               
                 <Button size="lg" variant="outline" className="gap-2 text-lg px-10 py-6">
                   <MessageSquare className="w-5 h-5" />
                   Contact Sales
