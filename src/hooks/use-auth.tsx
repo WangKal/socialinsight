@@ -132,8 +132,7 @@ const signIn = async (email: string, password: string) => {
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-        credentials: "include",
+        body: JSON.stringify({ email, password })
       }
     );
 
@@ -148,7 +147,7 @@ const signIn = async (email: string, password: string) => {
     // Store internal JWT if needed
     localStorage.setItem("internal_jwt", jwt);
 
-    // Set Supabase session
+    // 🔑 Set Supabase session
     const { error: sessionError } = await supabase.auth.setSession({
       access_token: supabase_session.access_token,
       refresh_token: supabase_session.refresh_token,
