@@ -1,17 +1,19 @@
 import { useState } from "react";
 import fs from "fs";
 import path from "path";
+import { Link, useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, ArrowLeft, Download, Link as LinkIcon } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
 
 export  function GuideDialog({ open, setOpen }) {
-  
+  const navigate = useNavigate();
   const [downloading, setDownloading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [mode, setMode] = useState(null); // "extension" | "link"
   const [step, setStep] = useState(1);
-
+    const { user } = useAuth();
   const reset = () => {
     setMode(null);
     setStep(1);
@@ -29,7 +31,7 @@ const downloadExtensionZip = async () => {
     setProgress(0);
 
     const response = await fetch(
-      "https://socialinsight.render.com/api/insights/download/extension/"
+      "https://socialinsightbackend.onrender.com/api/insights/download/extension/"
     );
 
     if (!response.ok) throw new Error("Download failed");
@@ -139,7 +141,8 @@ const downloadExtensionZip = async () => {
                 <ul className=" mb-8 list-disc pl-5 text-gray-600 space-y-1">
                   <li>Open <strong>chrome://extensions</strong></li>
                   <li>Enable <strong>Developer Mode</strong></li>
-                  <li>Click <strong>Load Unpacked</strong> and select the extracted folder</li>
+              <li>Click <strong>Load Unpacked</strong> and open the extracted folder. Make sure to select the <strong>SocialInsight</strong> folder inside it (<strong>Important</strong>), not the outer folder.</li>
+
                 </ul>
 
                 {/* Image Placeholder */}
@@ -236,7 +239,7 @@ const downloadExtensionZip = async () => {
                   <Button variant="outline" onClick={() => setStep(1)} className="rounded-xl">
                     <ArrowLeft className="mr-2 w-4 h-4" /> Back
                   </Button>
-                  <Button onClick={closeDialog} className="rounded-xl">
+                  <Button onClick={()=>{ closeDialog; user?navigate("/analytics"):navigate("/auth")}} className="rounded-xl">
                     Finish
                   </Button>
                 </div>

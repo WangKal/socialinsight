@@ -214,7 +214,7 @@ export default function Landing() {
      {
     name: "Early Access",
     price: "TBA",
-    credits: "100",
+    credits: "5",
     pricePerCredit: "TBA",
     features: [
       "Full AI analysis",
@@ -835,7 +835,7 @@ export default function Landing() {
               <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-success" />
-                  50 free credits
+                   free credits
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-success" />
