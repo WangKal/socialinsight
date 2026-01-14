@@ -1,6 +1,6 @@
 import { useState,useEffect, } from "react";
 
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams,useNavigate  } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
@@ -29,7 +29,7 @@ import { getCredits, getTransactions } from "@/services/socialEcho";
 export default function Payments() {
   const { toast } = useToast();
   const { user, session, autoSignIn } = useAuth();
-
+   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [credits, setCredits] = useState(0);
   const [usedCredits, setUsedCredits] = useState(0);
@@ -55,7 +55,9 @@ export default function Payments() {
   // Fetch user's credits and transaction history from backend
 
   const fetchPaymentsData = async () => {
-    if (!user) return;
+      if (!user?.id) {
+    navigate("/auth")
+  }
 
     try {
       setLoadingData(true);

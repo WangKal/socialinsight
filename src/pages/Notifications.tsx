@@ -1,4 +1,5 @@
 import { motion } from "motion/react";
+import { useNavigate } from "react-router-dom";
 import {useState, useEffect} from "react"
 import { getNotifications, markAsRead, markAllAsRead, Notification } from "@/services/socialEcho";
 import { useAuth } from "@/hooks/use-auth";
@@ -19,10 +20,13 @@ interface Notification {
 
 export default function Notifications() {
   const { user } = useAuth();
+    const navigate = useNavigate();
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
   useEffect(() => {
-    if (!user?.id) return;
+      if (!user?.id) {
+    navigate("/auth")
+  }
 
     const loadNotifications = async () => {
       try {

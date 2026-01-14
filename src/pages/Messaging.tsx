@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "motion/react";
 import { fetchMessages, sendMessage } from "@/services/socialEcho";
 import { MessageSquare, Send, Paperclip, Image as ImageIcon, Search } from "lucide-react";
@@ -19,11 +20,15 @@ interface Message {
 
 export default function Messaging() {
   const {user} = useAuth();
+    const navigate = useNavigate();
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
 
 
   useEffect(() => {
+         if (!user?.id) {
+    navigate("/auth")
+  }
     loadMessages();
   }, []);
 

@@ -23,7 +23,7 @@ export default function Analytics() {
   const location = useLocation();
   const [mode, setMode] = useState<"Recent Post" | "Selected Post">("Recent Post");
 useEffect(() => {
-  if (!user) return;
+  
 
   (async () => {
     setLoading(true);
@@ -57,7 +57,7 @@ useEffect(() => {
       // CASE 2: No valid ?id= → Fetch most recent completed post
       // -----------------------------
       try {
-        const recent = await fetchRecentPost(user.id);
+        const recent = (!user?await fetchPostAnalytics("cfa7aa44-99f6-4b41-9e48-37b104cb6d9f"):await fetchRecentPost(user.id));
 
         if (recent) {
           setData(recent);
@@ -101,6 +101,17 @@ useEffect(() => {
     // In a real app, this would trigger the analysis process
     alert(`Link added successfully!\nURL: ${url}\nTitle: ${title}\n\nAnalysis will begin shortly...`);
   };
+  const formatDate = (dateString: string) => {
+  return new Date(dateString).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+};
+
+// usage
+<p>{formatDate(data.created_at)}</p>
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-violet-50 via-white to-blue-50">
       <div className="max-w-7xl mx-auto px-6 py-12">
@@ -151,8 +162,8 @@ useEffect(() => {
         <div className="mb-8">
           <AnalyticsHeader
             postInfo={ post || "" }
-            detectedType={data.detected_post_type || "Unknown"}
-            timestamp="December 3, 2025"
+            detectedType={data.detected_type || "Unknown"}
+            timestamp={formatDate(data.created_at)}
           />
         </div>
 

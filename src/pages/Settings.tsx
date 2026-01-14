@@ -25,7 +25,9 @@ export default function Settings() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (!user) return;
+      if (!user?.id) {
+    navigate("/auth")
+  }
 
     (async () => {
       setLoading(true);
