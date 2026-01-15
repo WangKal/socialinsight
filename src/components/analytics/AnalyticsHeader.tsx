@@ -5,26 +5,23 @@ import { Button } from "../ui/button";
 interface TweetNode {
   displayName?: string;
   username?: string;
-  content?: string;
+  content?: string | { url?: string; thumbnail?: string; embed?: string };
   quoted?: TweetNode;
 }
 
 interface AnalyticsHeaderProps {
-  postInfo: {
-    isRepost?: boolean;
-    displayName?: string;
-    username?: string;
-    content?: string;
-    quoted?: TweetNode;
-  };
+  postInfo: any; // can be JSON object or string
   detectedType?: string;
   timestamp?: string;
+  platform?: string; // optional, e.g., "tiktok"
   onBack?: () => void;
 }
 
-export function AnalyticsHeader({ postInfo, detectedType, timestamp, onBack }: AnalyticsHeaderProps) {
- 
-const postData =JSON.parse(postInfo);
+export function AnalyticsHeader({ postInfo, detectedType, timestamp, platform, onBack }: AnalyticsHeaderProps) {
+
+  // Parse JSON string if necessary
+  const postData = typeof postInfo === "string" ? JSON.parse(postInfo) : postInfo;
+
   const renderTweetChain = (node: TweetNode, isQuoted = false) => {
     if (!node) return null;
 
@@ -39,9 +36,32 @@ const postData =JSON.parse(postInfo);
               <span className="text-gray-900">{node.displayName || 'Unknown User'}</span>
               <span className="text-gray-500">{node.username || 'username'}</span>
             </div>
-            <p className="text-gray-700 whitespace-pre-wrap">{node.content || ''}</p>
+
+            {/* Content rendering */}
+            {node.content ? (
+              typeof node.content === "object" ? (
+                node.content.embed ? (
+                  <div className="mt-2">
+                    <iframe
+                      src={node.content.embed.match(/src="([^"]+)"/)?.[1] || node.content.url}
+                      width="325"
+                      height="575"
+                      frameBorder="0"
+                      allowFullScreen
+                      className="rounded-xl overflow-hidden"
+                    ></iframe>
+                  </div>
+                ) : (
+                  <p className="text-gray-700 whitespace-pre-wrap">{node.content.url || ""}</p>
+                )
+              ) : (
+                <p className="text-gray-700 whitespace-pre-wrap">{node.content}</p>
+              )
+            ) : null}
           </div>
         </div>
+
+        {/* Render quoted / nested posts */}
         {node.quoted && renderTweetChain(node.quoted, true)}
       </div>
     );
@@ -67,7 +87,7 @@ const postData =JSON.parse(postInfo);
             Post Analysis
           </h2>
         </div>
-        
+
         <div className="flex items-center gap-4 text-sm text-gray-600">
           {timestamp && (
             <div className="flex items-center gap-2">

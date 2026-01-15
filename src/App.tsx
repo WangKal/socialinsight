@@ -14,6 +14,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import Messaging from "./pages/Messaging";
 import Notifications from "./pages/Notifications";
 import ResetPassword from "./pages/ResetPassword";
+import GeneralAnalysis from "./pages/GeneralAnalysis";
 import Terms from "./pages/Terms";
 import NotFound from "./pages/NotFound";
 import { AuthProvider } from "./hooks/use-auth";
@@ -30,6 +31,7 @@ const App = () => (
         <Routes>
             <Route path="/" element={<Landing />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/general-analysis" element={<GeneralAnalysis />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/admin" element={<Layout><AdminDashboard /></Layout>} />

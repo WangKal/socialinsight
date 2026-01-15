@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { decryptId } from "@/hooks/encrypt";
 import { motion } from "motion/react";
 import { AnalyticsHeader } from "@/components/analytics/AnalyticsHeader";
@@ -14,62 +14,43 @@ import { Link as LinkIcon } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { fetchPostAnalytics,fetchRecentPost } from "@/services/socialEcho";
 import {useAuth } from "@/hooks/use-auth"
+import { AuthButtons } from "@/components/AuthButtons";
 
 export default function Analytics() {
   const { user } = useAuth();
+  const navigate =useNavigate();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isAddLinkOpen, setIsAddLinkOpen] = useState(false);
   const location = useLocation();
   const [mode, setMode] = useState<"Recent Post" | "Selected Post">("Recent Post");
 useEffect(() => {
-  
-
   (async () => {
     setLoading(true);
 
     try {
       const params = new URLSearchParams(location.search);
-      const encryptedId = params.get("id");
+      const generalPost = params.get("post");
 
-      // -----------------------------
-      // CASE 1: Has ?id= → decrypt + fetch that post
-      // -----------------------------
-      if (encryptedId) {
-        const decryptedId = decryptId(encryptedId);
-
-        if (decryptedId) {
-          try {
-            const result = await fetchPostAnalytics(decryptedId);
-
-            if (result) {
-              setData(result);
-              setMode("Selected Post");
-              return; // Stop here — do NOT load recent post
-            }
-          } catch (err) {
-            console.error("Error fetching selected post analytics:", err);
-          }
-        }
+      // If no post in URL, navigate home
+      if (!generalPost) {
+        navigate("/");
+        return; // stop further execution
       }
 
-      // -----------------------------
-      // CASE 2: No valid ?id= → Fetch most recent completed post
-      // -----------------------------
+      // Decrypt ID if needed
+      
+      // Fetch analytics for the selected post
       try {
-        const recent = (!user?await fetchPostAnalytics("cfa7aa44-99f6-4b41-9e48-37b104cb6d9f"):await fetchRecentPost(user.id));
+        const result = await fetchPostAnalytics(generalPost);
 
-        if (recent) {
-          setData(recent);
-          setMode("Recent Post");
-        } else {
-          setData(null);
-          setMode("No Posts Found");
+        if (result) {
+          setData(result);
+          setMode("Selected Post");
+          return; // stop here, do NOT load recent posts
         }
       } catch (err) {
-        console.error("Error fetching recent post:", err);
-        setData(null);
-        setMode("Error");
+        console.error("Error fetching selected post analytics:", err);
       }
 
     } finally {
@@ -77,7 +58,6 @@ useEffect(() => {
     }
   })();
 }, [location.search, user?.id]);
-
 
 
   if (loading) return <p>Loading analytics...</p>;
@@ -114,6 +94,44 @@ useEffect(() => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-violet-50 via-white to-blue-50">
+      {/* Animated Background */}
+      <div className="fixed inset-0 -z-10 overflow-hidden">
+        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px] animate-float" />
+        <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-accent/5 rounded-full blur-[100px] animate-float" style={{ animationDelay: "3s" }} />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/3 rounded-full blur-[120px] animate-pulse-slow" />
+      </div>
+
+      {/* Header */}
+      <header className="border-b border-border/50 bg-background/80 backdrop-blur-xl sticky top-0 z-50">
+        <div className="container mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3 group cursor-pointer">
+            <div className="relative">
+              <div className="w-11 h-11 rounded-xl  flex items-center justify-center shadow-lg shadow-primary/25 group-hover:shadow-primary/40 transition-shadow">
+              <img src="/images/SocialInsightLogo.png" alt="Logo" /> </div>
+              <div className="absolute -top-1 -right-1 w-3 h-3 bg-success rounded-full animate-pulse" />
+            </div>
+            <div>
+              <span className="text-xl font-bold text-foreground">SocialInsight</span>
+              <span className="block text-[10px] text-muted-foreground -mt-1">Analytics Platform</span>
+            </div>
+          </div>
+          <nav className="hidden md:flex items-center gap-8">
+            <a href="/" className="text-muted-foreground hover:text-foreground transition-colors relative group">
+              Home
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300" />
+            </a>
+            <a href={!user?"/login":"/analytics"} className="text-muted-foreground hover:text-foreground transition-colors relative group">
+              {!user?"Sign In":"Analyze"}
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300" />
+            </a>
+            
+          </nav>
+          <div className="flex items-center gap-3">
+            <AuthButtons/>
+          </div>
+        </div>
+      </header>
+
       <div className="max-w-7xl mx-auto px-6 py-12">
         {/* Page Title with Action Buttons */}
         <motion.div
