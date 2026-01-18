@@ -272,8 +272,8 @@ export default function Landing() {
               Features
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300" />
             </a>
-            <a href="#demo" className="text-muted-foreground hover:text-foreground transition-colors relative group">
-              Demo
+            <a href="/guide" className="text-muted-foreground hover:text-foreground transition-colors relative group">
+              Guide
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300" />
             </a>
             <a href="#pricing" className="text-muted-foreground hover:text-foreground transition-colors relative group">
@@ -310,7 +310,7 @@ export default function Landing() {
               </h1>
               
               <p className="text-lg text-muted-foreground max-w-xl animate-fade-in" style={{ animationDelay: "0.2s" }}>
-                Analyze social media posts (Currently X formerly twitter is supported) and replies to uncover <span className="text-foreground font-medium">sentiments</span>, <span className="text-foreground font-medium">agreements</span>, <span className="text-foreground font-medium">emotions</span>, and <span className="text-foreground font-medium">trending topics</span> with powerful AI.
+                Analyze social media posts and replies to uncover <span className="text-foreground font-medium">sentiments</span>, <span className="text-foreground font-medium">agreements</span>, <span className="text-foreground font-medium">emotions</span>, and <span className="text-foreground font-medium">trending topics</span> with powerful AI.
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 animate-fade-in" style={{ animationDelay: "0.3s" }}>

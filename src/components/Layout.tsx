@@ -15,7 +15,7 @@ import {
   ChevronDown,
   Bell,
   MessageCircle,
-  Home
+  Home,BookOpen
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -40,6 +40,7 @@ const navigation = [
 { name: "Home", href: "/", icon: Home },
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Analytics", href: "/analytics", icon: BarChart3 },
+  { name: "Tutorial", href: "/guide", icon: BookOpen },
   { name: "Messages", href: "/messages", icon: MessageCircle},
   { name: "Notifications", href: "/notifications", icon: Bell },
   { name: "Payments", href: "/payments", icon: CreditCard },

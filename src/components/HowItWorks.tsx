@@ -6,7 +6,7 @@ const steps = [
   {
     icon: Download, // Chrome extension download
     title: "Install the Extension",
-    description: "Download our Chrome extension to capture posts directly from social media platforms (Currently X formely twitter is supported).",
+    description: "Download our Chrome extension to capture posts directly from social media platforms.",
     color: "violet",
   },
   {
