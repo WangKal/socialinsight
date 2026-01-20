@@ -535,9 +535,23 @@ useEffect(() => {
               <h1 className="text-5xl mb-3 bg-gradient-to-r from-violet-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
                 Analytics Dashboard
               </h1>
-              <p className="text-xl text-gray-600">
-                Manage and analyze all your social media posts
-              </p>
+             <p className="mt-2 text-gray-600 max-w-3xl">
+  Track how people respond to your posts, group conversations into campaigns,
+  and understand sentiment and agreement trends at a glance.
+</p>
+
+<div className="mt-4 flex flex-wrap gap-2 text-sm">
+  <span className="px-3 py-1 bg-green-50 text-green-700 rounded-full">
+    ✔ Analyze public reactions
+  </span>
+  <span className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full">
+    ✔ Organize posts into campaigns
+  </span>
+  <span className="px-3 py-1 bg-purple-50 text-purple-700 rounded-full">
+    ✔ Identify sentiment & agreement patterns
+  </span>
+</div>
+
             </div>
 
             <Button

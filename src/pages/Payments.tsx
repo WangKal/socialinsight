@@ -1,6 +1,5 @@
-import { useState,useEffect, } from "react";
-
-import { useSearchParams,useNavigate  } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
@@ -12,7 +11,6 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CreditCard, Download, Plus, Smartphone, Loader2, Phone } from "lucide-react";
-
 import {
   Dialog,
   DialogContent,
@@ -21,22 +19,21 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { getCredits, getTransactions } from "@/services/socialEcho";
-
-
-
-
+import { supabase } from '@/intergrations/supabase/client';
 
 export default function Payments() {
   const { toast } = useToast();
   const { user, session, autoSignIn } = useAuth();
-   const navigate = useNavigate();
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+
+  // --- User data ---
   const [credits, setCredits] = useState(0);
   const [usedCredits, setUsedCredits] = useState(0);
   const [transactions, setTransactions] = useState<any[]>([]);
   const [loadingData, setLoadingData] = useState(true);
 
-  // Payment states
+  // --- Payment states ---
   const [customAmount, setCustomAmount] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("paystack");
   const [isProcessing, setIsProcessing] = useState(false);
@@ -45,58 +42,73 @@ export default function Payments() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [pendingAmount, setPendingAmount] = useState<number | null>(null);
 
-  const CREDIT_RATE = 10;
+  // --- Currency & Credit Rate ---
+  const [currency, setCurrency] = useState<"USD" | "KES">("USD");
+  const [KES_PER_CREDIT, setKESPerCredit] = useState(10); // default 10
 
-  const calculateCredits = (amount: string) => {
+  // --- Constants ---
+  const USD_PER_CREDIT = 10; // 1 USD = 10 credits
+
+  const calculateCredits = (amount: string, cur: "USD" | "KES") => {
     const numAmount = parseFloat(amount) || 0;
-    return Math.floor(numAmount * CREDIT_RATE);
+    if (cur === "USD") return Math.floor(numAmount * USD_PER_CREDIT);
+    if (cur === "KES") return Math.floor(numAmount / KES_PER_CREDIT);
+    return 0;
   };
 
-  // Fetch user's credits and transaction history from backend
+  // --- Fetch KES per credit from Supabase ---
+  const fetchSettings = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("settings")
+        .select("setting_value")
+        .eq("key", "KES_PER_CREDIT")
+        .single();
+      if (!error && data?.value) {
+        setKESPerCredit(Number(data.value));
+      }
+    } catch (err) {
+      console.error("Failed to fetch settings", err);
+    }
+  };
 
+  // --- Fetch user credits & transactions ---
   const fetchPaymentsData = async () => {
-      if (!user?.id) {
-    navigate("/auth")
-  }
+    if (!user?.id) {
+      navigate("/auth");
+      return;
+    }
 
     try {
       setLoadingData(true);
+      await fetchSettings(); // fetch KES rate
 
-      // Fetch credits
       const { data: creditsData, error: creditsError } = await getCredits(user.id);
       if (creditsError) throw creditsError;
 
-      // Fetch transactions
       const { data: transData, error: transError } = await getTransactions(user.id);
       if (transError) throw transError;
 
       setCredits(creditsData?.remaining_credits || 0);
       setUsedCredits(creditsData?.used_credits || 0);
       setTransactions(transData || []);
-
     } catch (err) {
       console.error("Failed to load payments data:", err);
-
       toast({
         title: "Error",
         description: "Could not load your payment details.",
         variant: "destructive",
       });
-
     } finally {
       setLoadingData(false);
     }
   };
 
-
-
-  // Auto-sign in if not authenticated
+  // --- Auto sign-in / load data ---
   useEffect(() => {
-    if (session === null ) return;
-    console.log(session.length)
+    if (session === null) return;
     if (!user) {
-      const token = searchParams.get("jwt"); // or internal JWT
-      console.log(token)
+      const token = searchParams.get("jwt");
       if (token) {
         autoSignIn(token).then(({ error }) => {
           if (!error) {
@@ -113,13 +125,13 @@ export default function Payments() {
     }
   }, [user, searchParams]);
 
-  // --- Payment handling functions ---
+  // --- Payment handling ---
   const initiatePayment = (amount: number) => {
     if (paymentMethod === "mpesa") {
       setPendingAmount(amount);
       setShowMpesaDialog(true);
     } else {
-      processPaystackPayment(amount);
+      processPaystackPayment(amount, currency);
     }
   };
 
@@ -146,70 +158,52 @@ export default function Payments() {
       setIsProcessing(false);
       setPhoneNumber("");
       setPendingAmount(null);
-      toast({ title: "STK Push Sent", description: `Check your phone (${phoneNumber}) to complete the M-Pesa payment of $${pendingAmount}` });
+      toast({ 
+        title: "STK Push Sent", 
+        description: `Check your phone (${phoneNumber}) to complete the payment of ${currency === "USD" ? "$" : "KSh"}${pendingAmount}` 
+      });
     }, 2000);
   };
 
-const processPaystackPayment = async (amount: number) => {
-  if (!user) {
-    toast({
-      title: "Not logged in",
-      description: "Please log in before making a payment.",
-      variant: "destructive",
-    });
-    return;
-  }
-
-  setIsProcessing(true);
-
-  try {
-    // 1. Call Django backend to create Paystack transaction
-    const res = await fetch("https://socialinsightbackend.onrender.com/api/payments/initiate-paystack-payment/", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        user_id: user.id,
-        amount: amount,
-      }),
-    });
-
-    const data = await res.json();
-
-    if (!res.ok || !data.authorization_url) {
-      throw new Error(data.error || "Could not start payment");
+  const processPaystackPayment = async (amount: number, cur: "USD" | "KES") => {
+    if (!user) {
+      toast({ title: "Not logged in", description: "Please log in before making a payment.", variant: "destructive" });
+      return;
     }
 
-    toast({
-      title: "Redirecting to Paystack",
-      description: `Processing payment of $${amount}.`,
-    });
+    setIsProcessing(true);
+    try {
+      const res = await fetch("https://socialinsightbackend.onrender.com/api/payments/initiate-paystack-payment/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id: user.id, amount, currency: cur }),
+      });
 
-    // 2. Redirect user to Paystack in same tab
-    window.location.href = data.authorization_url;
+      const data = await res.json();
+      if (!res.ok || !data.authorization_url) throw new Error(data.error || "Could not start payment");
 
-  } catch (err: any) {
-    console.error("Paystack Error:", err);
-    toast({
-      title: "Payment Error",
-      description: err.message || "Failed to initialize payment.",
-      variant: "destructive",
-    });
-  } finally {
-    setIsProcessing(false);
-  }
-};
+      toast({ title: "Redirecting to Paystack", description: `Processing payment of ${cur === "USD" ? "$" : "KSh"}${amount}.` });
+      window.location.href = data.authorization_url;
+    } catch (err: any) {
+      console.error("Paystack Error:", err);
+      toast({ title: "Payment Error", description: err.message || "Failed to initialize payment.", variant: "destructive" });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
-useEffect(() => {
-  const reference = searchParams.get("reference");
-  const status = searchParams.get("status");
+  // --- Handle Paystack success redirect ---
+  useEffect(() => {
+    const reference = searchParams.get("reference");
+    const status = searchParams.get("status");
 
-  if (reference && status === "success") {
-    toast({ title: "Payment Verified!", description: "Credits updated." });
-    fetchPaymentsData();
-  }
-}, [searchParams]);
+    if (reference && status === "success") {
+      toast({ title: "Payment Verified!", description: "Credits updated." });
+      fetchPaymentsData();
+    }
+  }, [searchParams]);
 
-
+  // --- Render UI ---
   return (
     <div className="p-8">
       <h1 className="text-3xl font-bold text-foreground mb-6">Payments & Credits</h1>
@@ -241,19 +235,30 @@ useEffect(() => {
         </div>
       </div>
 
-      {/* Tabs and Payment UI ... same as your current implementation ... */}
-
       {/* Buy Credits Section */}
       <div className="mb-8">
         <h2 className="text-2xl font-bold text-foreground mb-6">Buy Credits</h2>
-        
+
+        {/* Currency Selector */}
+        <div className="mb-4">
+          <Label>Select Currency</Label>
+          <RadioGroup value={currency} onValueChange={(val) => setCurrency(val as "USD" | "KES")}>
+            <div className="flex items-center gap-4 mt-2">
+              <RadioGroupItem value="USD" id="usd" />
+              <Label htmlFor="usd">USD ($)</Label>
+
+              <RadioGroupItem value="KES" id="kes" />
+              <Label htmlFor="kes">KES (KSh)</Label>
+            </div>
+          </RadioGroup>
+        </div>
+
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full max-w-md grid-cols-2 mb-6">
             <TabsTrigger value="custom">Custom Amount</TabsTrigger>
-           {/** <TabsTrigger value="packages">Quick Packages</TabsTrigger>**/}
           </TabsList>
 
-          {/* Custom Amount - Dominant Option */}
+          {/* Custom Amount */}
           <TabsContent value="custom">
             <Card className="border-primary/50 shadow-lg">
               <CardHeader>
@@ -262,9 +267,9 @@ useEffect(() => {
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-2">
-                  <Label htmlFor="amount">Amount (USD)</Label>
+                  <Label htmlFor="amount">Amount ({currency === "USD" ? "$" : "KSh"})</Label>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">{currency === "USD" ? "$" : "KSh"}</span>
                     <Input
                       id="amount"
                       type="number"
@@ -283,11 +288,11 @@ useEffect(() => {
                     <div className="flex items-center justify-between">
                       <span className="text-muted-foreground">You will receive:</span>
                       <span className="text-2xl font-bold text-primary">
-                        {calculateCredits(customAmount)} Credits
+                        {calculateCredits(customAmount, currency)} Credits
                       </span>
                     </div>
                     <p className="text-xs text-muted-foreground mt-2">
-                      Rate: $1 = {CREDIT_RATE} credits
+                      Rate: {currency === "USD" ? "$1" : `KSh ${KES_PER_CREDIT}`} per credit
                     </p>
                   </div>
                 )}
@@ -295,16 +300,6 @@ useEffect(() => {
                 <div className="space-y-3">
                   <Label>Select Payment Method</Label>
                   <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
-                  {/**  <div className="flex items-center space-x-2 p-4 border border-border rounded-lg hover:border-primary cursor-pointer transition-colors">
-                      <RadioGroupItem value="mpesa" id="mpesa" />
-                      <Label htmlFor="mpesa" className="flex items-center gap-2 cursor-pointer flex-1">
-                        <Smartphone className="w-5 h-5 text-success" />
-                        <div>
-                          <p className="font-medium">M-Pesa</p>
-                          <p className="text-xs text-muted-foreground">Pay via mobile money</p>
-                        </div>
-                      </Label>
-                    </div>**/}
                     <div className="flex items-center space-x-2 p-4 border border-border rounded-lg hover:border-primary cursor-pointer transition-colors">
                       <RadioGroupItem value="paystack" id="paystack" />
                       <Label htmlFor="paystack" className="flex items-center gap-2 cursor-pointer flex-1">
@@ -329,80 +324,12 @@ useEffect(() => {
                       Processing...
                     </>
                   ) : (
-                    <>
-                      Proceed to Payment
-                    </>
+                    <>Proceed to Payment</>
                   )}
                 </Button>
               </CardContent>
             </Card>
           </TabsContent>
-
-          {/* Credit Packages 
-          <TabsContent value="packages">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              {[
-                { credits: 100, price: 10, popular: false },
-                { credits: 500, price: 45, popular: true },
-                { credits: 1000, price: 85, popular: false },
-                { credits: 2500, price: 200, popular: false },
-              ].map((pkg, i) => (
-                <div
-                  key={i}
-                  className={`bg-card border rounded-lg p-6 text-center relative ${
-                    pkg.popular ? 'border-primary shadow-lg' : 'border-border'
-                  }`}
-                >
-                  {pkg.popular && (
-                    <Badge className="absolute -top-2 left-1/2 -translate-x-1/2">
-                      Popular
-                    </Badge>
-                  )}
-                  <p className="text-3xl font-bold text-foreground mb-2">{pkg.credits}</p>
-                  <p className="text-sm text-muted-foreground mb-4">Credits</p>
-                  <p className="text-2xl font-bold text-foreground mb-4">${pkg.price}</p>
-                  <Button 
-                    className="w-full" 
-                    variant={pkg.popular ? "default" : "outline"}
-                    onClick={() => handlePackagePayment(pkg.price)}
-                    disabled={isProcessing}
-                  >
-                    {isProcessing ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      "Purchase"
-                    )}
-                  </Button>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-6 space-y-3">
-              <Label>Select Payment Method</Label>
-              <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
-                {/** <div className="flex items-center space-x-2 p-4 border border-border rounded-lg hover:border-primary cursor-pointer transition-colors">
-                 <RadioGroupItem value="mpesa" id="mpesa-pkg" />
-                  <Label htmlFor="mpesa-pkg" className="flex items-center gap-2 cursor-pointer flex-1">
-                    <Smartphone className="w-5 h-5 text-success" />
-                    <div>
-                      <p className="font-medium">M-Pesa</p>
-                      <p className="text-xs text-muted-foreground">Pay via mobile money</p>
-                    </div>
-                  </Label>
-                </div>**/}
-                {/*<div className="flex items-center space-x-2 p-4 border border-border rounded-lg hover:border-primary cursor-pointer transition-colors">
-                  <RadioGroupItem value="paystack" id="paystack-pkg" />
-                  <Label htmlFor="paystack-pkg" className="flex items-center gap-2 cursor-pointer flex-1">
-                    <CreditCard className="w-5 h-5 text-primary" />
-                    <div>
-                      <p className="font-medium">Paystack</p>
-                      <p className="text-xs text-muted-foreground">Pay with card or bank</p>
-                    </div>
-                  </Label>
-                </div>
-              </RadioGroup>
-            </div>
-          </TabsContent>*/}
         </Tabs>
       </div>
 
@@ -430,7 +357,7 @@ useEffect(() => {
                     <TableCell className="font-medium">{tx.id}</TableCell>
                     <TableCell className="text-muted-foreground">{tx.date}</TableCell>
                     <TableCell>{tx.type}</TableCell>
-                    <TableCell>${tx.amount}</TableCell>
+                    <TableCell>{currency === "USD" ? `$${tx.amount}` : `KSh ${tx.amount}`}</TableCell>
                     <TableCell>{tx.credits} credits</TableCell>
                     <TableCell><Badge variant="secondary">{tx.status}</Badge></TableCell>
                     <TableCell className="text-right">
@@ -445,8 +372,8 @@ useEffect(() => {
         </div>
       </div>
 
-      {/* M-Pesa Dialog ... same as your current implementation ... */}
-            <Dialog open={showMpesaDialog} onOpenChange={setShowMpesaDialog}>
+      {/* M-Pesa Dialog */}
+      <Dialog open={showMpesaDialog} onOpenChange={setShowMpesaDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
@@ -454,7 +381,7 @@ useEffect(() => {
               Enter M-Pesa Number
             </DialogTitle>
             <DialogDescription>
-              We'll send an STK push to this number to complete your payment of ${pendingAmount}
+              We'll send an STK push to this number to complete your payment of {currency === "USD" ? `$${pendingAmount}` : `KSh ${pendingAmount}`}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">

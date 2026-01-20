@@ -1,5 +1,17 @@
 import { motion } from "motion/react";
-import { AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from "recharts";
+import {
+  AreaChart,
+  Area,
+  ResponsiveContainer,
+  XAxis,
+  YAxis,
+  Tooltip,
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
+  Radar,
+} from "recharts";
 import { Smile, Meh, Frown, TrendingUp } from "lucide-react";
 import { useState } from "react";
 
@@ -9,7 +21,11 @@ interface SentimentChartProps {
   negative: number;
 }
 
-export function SentimentChart({ positive, neutral, negative }: SentimentChartProps) {
+export function SentimentChart({
+  positive,
+  neutral,
+  negative,
+}: SentimentChartProps) {
   const [viewType, setViewType] = useState<"area" | "radar">("area");
 
   const areaData = [
@@ -48,31 +64,37 @@ export function SentimentChart({ positive, neutral, negative }: SentimentChartPr
     },
   ];
 
-  const dominantSentiment = positive > neutral && positive > negative
-    ? "Positive"
-    : neutral > negative
-    ? "Neutral"
-    : "Negative";
+  const dominantSentiment =
+    positive > neutral && positive > negative
+      ? "Positive"
+      : neutral > negative
+      ? "Neutral"
+      : "Negative";
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: 0.2 }}
-      className="bg-white rounded-2xl shadow-xl border border-gray-200 p-8"
+      className="bg-white rounded-2xl shadow-xl border border-gray-200
+                 p-4 sm:p-6 lg:p-8 overflow-hidden" // ✅ mobile
     >
-      <div className="flex items-center justify-between mb-6">
+      {/* Header */}
+      <div
+        className="flex flex-col sm:flex-row sm:items-center
+                   sm:justify-between gap-4 mb-6" // ✅ mobile
+      >
         <div>
-          <h3 className="text-2xl bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
+          <h3 className="text-xl sm:text-2xl bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
             Sentiment Analysis
           </h3>
-          <div className="flex items-center gap-2 mt-2 text-gray-600">
+          <div className="flex items-center gap-2 mt-2 text-gray-600 text-sm">
             <TrendingUp className="w-4 h-4" />
             <span>Dominant: {dominantSentiment}</span>
           </div>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2"> {/* ✅ mobile */}
           <button
             onClick={() => setViewType("area")}
             className={`px-4 py-2 rounded-lg transition-colors ${
@@ -97,7 +119,9 @@ export function SentimentChart({ positive, neutral, negative }: SentimentChartPr
       </div>
 
       {/* Sentiment Cards */}
-      <div className="grid grid-cols-3 gap-4 mb-8">
+      <div
+        className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8" // ✅ mobile
+      >
         {stats.map((stat, index) => (
           <motion.div
             key={stat.label}
@@ -110,8 +134,9 @@ export function SentimentChart({ positive, neutral, negative }: SentimentChartPr
               <stat.icon className="w-6 h-6" />
               <span className="text-sm opacity-90">{stat.label}</span>
             </div>
+
             <div className="text-3xl">{stat.value}%</div>
-            
+
             <motion.div
               className="absolute -bottom-4 -right-4 w-24 h-24 bg-white/20 rounded-full"
               animate={{
@@ -134,10 +159,11 @@ export function SentimentChart({ positive, neutral, negative }: SentimentChartPr
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.4 }}
-        className="bg-gray-50 rounded-xl p-4"
+        className="bg-gray-50 rounded-xl p-4 w-full
+                   h-[260px] sm:h-[300px]" // ✅ mobile
       >
         {viewType === "area" ? (
-          <ResponsiveContainer width="100%" height={300}>
+          <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={areaData}>
               <defs>
                 <linearGradient id="sentimentGradient" x1="0" y1="0" x2="0" y2="1">
@@ -165,7 +191,7 @@ export function SentimentChart({ positive, neutral, negative }: SentimentChartPr
             </AreaChart>
           </ResponsiveContainer>
         ) : (
-          <ResponsiveContainer width="100%" height={300}>
+          <ResponsiveContainer width="100%" height="100%">
             <RadarChart data={radarData}>
               <PolarGrid stroke="#e5e7eb" />
               <PolarAngleAxis dataKey="sentiment" stroke="#9ca3af" />

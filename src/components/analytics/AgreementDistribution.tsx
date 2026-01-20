@@ -1,15 +1,23 @@
 import { motion } from "motion/react";
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Bar, XAxis, YAxis } from "recharts";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  Tooltip,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+} from "recharts";
 import { ThumbsUp, Meh, ThumbsDown } from "lucide-react";
 import { useState } from "react";
 
-interface AgreementDistributionProps {
-  agree: number;
-  neutral: number;
-  disagree: number;
-}
-
-export function AgreementDistribution({ agree, neutral, disagree }: AgreementDistributionProps) {
+export function AgreementDistribution({
+  agree,
+  neutral,
+  disagree,
+}: AgreementDistributionProps) {
   const [viewType, setViewType] = useState<"pie" | "bar">("pie");
 
   const data = [
@@ -31,61 +39,56 @@ export function AgreementDistribution({ agree, neutral, disagree }: AgreementDis
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: 0.1 }}
-      className="bg-white rounded-2xl shadow-xl border border-gray-200 p-8"
+      className="bg-white rounded-2xl shadow-xl border border-gray-200 p-4 sm:p-6 lg:p-8 overflow-hidden"
     >
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-2xl bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+        <h3 className="text-xl sm:text-2xl bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
           Agreement Distribution
         </h3>
-        
-        <div className="flex gap-2">
-          <button
-            onClick={() => setViewType("pie")}
-            className={`px-4 py-2 rounded-lg transition-colors ${
-              viewType === "pie"
-                ? "bg-violet-600 text-white"
-                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-            }`}
-          >
-            Pie
-          </button>
-          <button
-            onClick={() => setViewType("bar")}
-            className={`px-4 py-2 rounded-lg transition-colors ${
-              viewType === "bar"
-                ? "bg-violet-600 text-white"
-                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-            }`}
-          >
-            Bar
-          </button>
+
+        <div className="flex flex-wrap gap-2">
+          {["pie", "bar"].map((type) => (
+            <button
+              key={type}
+              onClick={() => setViewType(type as "pie" | "bar")}
+              className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
+                viewType === type
+                  ? "bg-violet-600 text-white"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              }`}
+            >
+              {type.toUpperCase()}
+            </button>
+          ))}
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-3 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         {data.map((item, index) => (
           <motion.div
             key={item.name}
-            initial={{ opacity: 0, scale: 0.8 }}
+            initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: index * 0.1 }}
-            whileHover={{ scale: 1.05, y: -5 }}
             className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-4 border border-gray-200 shadow-sm"
           >
             <div className="flex items-center gap-3 mb-2">
               <div
-                className="w-10 h-10 rounded-lg flex items-center justify-center"
+                className="w-9 h-9 rounded-lg flex items-center justify-center"
                 style={{ backgroundColor: `${item.color}20` }}
               >
-                <item.icon className="w-5 h-5" style={{ color: item.color }} />
+                <item.icon className="w-4 h-4" style={{ color: item.color }} />
               </div>
-              <span className="text-gray-600">{item.name}</span>
+              <span className="text-gray-600 text-sm">{item.name}</span>
             </div>
-            <div className="text-3xl" style={{ color: item.color }}>
+
+            <div className="text-2xl font-semibold" style={{ color: item.color }}>
               {item.value}%
             </div>
-            <div className="text-sm text-gray-500 mt-1">
+
+            <div className="text-xs text-gray-500 mt-1">
               {total > 0 ? Math.round((item.value / 100) * total) : 0} responses
             </div>
           </motion.div>
@@ -95,53 +98,38 @@ export function AgreementDistribution({ agree, neutral, disagree }: AgreementDis
       {/* Chart */}
       <motion.div
         key={viewType}
-        initial={{ opacity: 0, scale: 0.9 }}
+        initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.4 }}
+        className="w-full h-[260px] sm:h-[350px]"
       >
         {viewType === "pie" ? (
-          <ResponsiveContainer width="100%" height={350}>
+          <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
                 data={data}
                 cx="50%"
                 cy="50%"
-                labelLine={false}
-                label={(entry) => `${entry.name}: ${entry.value}%`}
-                outerRadius={120}
-                fill="#8884d8"
+                outerRadius={90}
                 dataKey="value"
-                animationBegin={0}
-                animationDuration={800}
+                label={window.innerWidth >= 640}
               >
                 {data.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
+                  <Cell key={index} fill={entry.color} />
                 ))}
               </Pie>
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "white",
-                  border: "1px solid #e5e7eb",
-                  borderRadius: "8px",
-                }}
-              />
+              <Tooltip />
             </PieChart>
           </ResponsiveContainer>
         ) : (
-          <ResponsiveContainer width="100%" height={350}>
+          <ResponsiveContainer width="100%" height="100%">
             <BarChart data={barData}>
-              <XAxis dataKey="name" stroke="#9ca3af" />
-              <YAxis stroke="#9ca3af" />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "white",
-                  border: "1px solid #e5e7eb",
-                  borderRadius: "8px",
-                }}
-              />
-              <Bar dataKey="value" radius={[8, 8, 0, 0]} animationDuration={800}>
-                {barData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={data[index].color} />
+              <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+              <YAxis tick={{ fontSize: 12 }} />
+              <Tooltip />
+              <Bar dataKey="value" radius={[6, 6, 0, 0]}>
+                {barData.map((_, index) => (
+                  <Cell key={index} fill={data[index].color} />
                 ))}
               </Bar>
             </BarChart>
@@ -151,23 +139,17 @@ export function AgreementDistribution({ agree, neutral, disagree }: AgreementDis
 
       {/* Progress Bar */}
       <div className="mt-6">
-        <div className="flex h-4 rounded-full overflow-hidden">
+        <div className="flex h-3 rounded-full overflow-hidden">
           <motion.div
-            initial={{ width: 0 }}
             animate={{ width: `${agree}%` }}
-            transition={{ duration: 1, ease: "easeOut" }}
             className="bg-green-500"
           />
           <motion.div
-            initial={{ width: 0 }}
             animate={{ width: `${neutral}%` }}
-            transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
             className="bg-amber-500"
           />
           <motion.div
-            initial={{ width: 0 }}
             animate={{ width: `${disagree}%` }}
-            transition={{ duration: 1, ease: "easeOut", delay: 0.4 }}
             className="bg-red-500"
           />
         </div>

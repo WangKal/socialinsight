@@ -15,19 +15,22 @@ interface RepliesSectionProps {
 }
 
 export function RepliesSection({ replies }: RepliesSectionProps) {
-  // Ensure replies is always an array
   const safeReplies = Array.isArray(replies) ? replies : [];
 
-  const [activeFilter, setActiveFilter] = useState<"all" | "agree" | "neutral" | "disagree">("all");
+  const [activeFilter, setActiveFilter] =
+    useState<"all" | "agree" | "neutral" | "disagree">("all");
   const [searchTerm, setSearchTerm] = useState("");
 
   const filteredReplies = safeReplies.filter((reply) => {
     const matchesFilter =
-      activeFilter === "all" || reply.agreement.toLowerCase() === activeFilter;
+      activeFilter === "all" ||
+      reply.agreement.toLowerCase() === activeFilter;
+
     const matchesSearch =
       searchTerm === "" ||
       reply.text.toLowerCase().includes(searchTerm.toLowerCase()) ||
       reply.user.toLowerCase().includes(searchTerm.toLowerCase());
+
     return matchesFilter && matchesSearch;
   });
 
@@ -36,17 +39,23 @@ export function RepliesSection({ replies }: RepliesSectionProps) {
     {
       id: "agree" as const,
       label: "Agree",
-      count: safeReplies.filter((r) => r.agreement.toLowerCase() === "agree").length,
+      count: safeReplies.filter(
+        (r) => r.agreement.toLowerCase() === "agree"
+      ).length,
     },
     {
       id: "neutral" as const,
       label: "Neutral",
-      count: safeReplies.filter((r) => r.agreement.toLowerCase() === "neutral").length,
+      count: safeReplies.filter(
+        (r) => r.agreement.toLowerCase() === "neutral"
+      ).length,
     },
     {
       id: "disagree" as const,
       label: "Disagree",
-      count: safeReplies.filter((r) => r.agreement.toLowerCase() === "disagree").length,
+      count: safeReplies.filter(
+        (r) => r.agreement.toLowerCase() === "disagree"
+      ).length,
     },
   ];
 
@@ -61,14 +70,14 @@ export function RepliesSection({ replies }: RepliesSectionProps) {
     }
   };
 
-  const getAgreementColor = (agreement: string) => {
+  const getAgreementBorder = (agreement: string) => {
     switch (agreement.toLowerCase()) {
       case "agree":
-        return "border-green-500 bg-green-50";
+        return "border-green-500";
       case "disagree":
-        return "border-red-500 bg-red-50";
+        return "border-red-500";
       default:
-        return "border-amber-500 bg-amber-50";
+        return "border-amber-500";
     }
   };
 
@@ -77,27 +86,34 @@ export function RepliesSection({ replies }: RepliesSectionProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: 0.4 }}
-      className="bg-white rounded-2xl shadow-xl border border-gray-200 p-8"
+      className="bg-white rounded-2xl shadow-xl border border-gray-200 p-4 sm:p-8 overflow-hidden"
     >
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <MessageSquare className="w-6 h-6 text-violet-600" />
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+        <div className="flex items-center gap-3 min-w-0">
+          <MessageSquare className="w-6 h-6 text-violet-600 flex-shrink-0" />
           <h3 className="text-2xl bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
             All Replies
           </h3>
-          <span className="px-3 py-1 bg-violet-100 text-violet-700 rounded-full text-sm">
+          <span className="px-3 py-1 bg-violet-100 text-violet-700 rounded-full text-sm flex-shrink-0">
             {filteredReplies.length}
           </span>
         </div>
       </div>
 
-      {/* Search Bar */}
+      {/* Explanation */}
+      <p className="text-sm text-gray-600 mb-6 max-w-full">
+        Browse every reply individually. Use filters and search to quickly find
+        opinions, patterns, or specific users.
+      </p>
+
+      {/* Search */}
       <div className="mb-6">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
           <input
             type="text"
-            placeholder="Search replies..."
+            placeholder="Search by user or reply text…"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
@@ -106,15 +122,15 @@ export function RepliesSection({ replies }: RepliesSectionProps) {
       </div>
 
       {/* Filters */}
-      <div className="flex items-center gap-2 mb-6 flex-wrap">
+      <div className="flex flex-wrap items-center gap-2 mb-6">
         <Filter className="w-4 h-4 text-gray-500" />
         {filters.map((filter) => (
           <button
             key={filter.id}
             onClick={() => setActiveFilter(filter.id)}
-            className={`px-4 py-2 rounded-lg transition-all ${
+            className={`px-4 py-2 rounded-lg text-sm transition-all ${
               activeFilter === filter.id
-                ? "bg-violet-600 text-white shadow-lg"
+                ? "bg-violet-600 text-white shadow"
                 : "bg-gray-100 text-gray-600 hover:bg-gray-200"
             }`}
           >
@@ -124,11 +140,11 @@ export function RepliesSection({ replies }: RepliesSectionProps) {
       </div>
 
       {/* Replies List */}
-      <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2">
+      <div className="space-y-4 max-h-[600px] overflow-y-auto pr-1">
         {filteredReplies.length === 0 ? (
           <div className="text-center py-12 text-gray-500">
             <MessageSquare className="w-12 h-12 mx-auto mb-3 opacity-50" />
-            <p>No replies found</p>
+            <p>No replies match your filters</p>
           </div>
         ) : (
           <AnimatePresence mode="popLayout">
@@ -136,21 +152,28 @@ export function RepliesSection({ replies }: RepliesSectionProps) {
               <motion.div
                 key={index}
                 layout
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
                 transition={{ duration: 0.2, delay: index * 0.02 }}
-                className={`p-4 rounded-xl border-l-4 ${getAgreementColor(
+                className={`p-4 rounded-xl border-l-4 ${getAgreementBorder(
                   reply.agreement
-                )} hover:shadow-md transition-shadow`}
+                )} bg-white hover:shadow-md transition-shadow overflow-hidden`}
               >
-                <div className="flex items-start gap-4">
+                <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-400 to-purple-500 flex items-center justify-center text-white flex-shrink-0">
-                    {reply.user[0]}
+                    {reply.user?.[0] || "U"}
                   </div>
-                  <div className="flex-1">
-                    <div className="text-gray-900 mb-1">{reply.user}</div>
-                    <p className="text-gray-700 mb-3">{reply.text}</p>
+
+                  <div className="flex-1 min-w-0">
+                    <div className="text-gray-900 font-medium break-words">
+                      {reply.user}
+                    </div>
+
+                    <p className="text-gray-700 mt-1 mb-3 break-words max-w-full">
+                      {reply.text}
+                    </p>
+
                     <div className="flex flex-wrap gap-2">
                       <span
                         className={`px-3 py-1 rounded-full text-xs ${getSentimentColor(
@@ -159,9 +182,11 @@ export function RepliesSection({ replies }: RepliesSectionProps) {
                       >
                         Sentiment: {reply.sentiment}
                       </span>
+
                       <span className="px-3 py-1 rounded-full text-xs text-blue-600 bg-blue-50">
                         Agreement: {reply.agreement}
                       </span>
+
                       <span className="px-3 py-1 rounded-full text-xs text-purple-600 bg-purple-50">
                         Tone: {reply.tone}
                       </span>
