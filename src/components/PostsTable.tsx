@@ -47,7 +47,6 @@ export function PostsTable({ posts, onViewPost, onAssignPost, showAssignButton =
             <TableHead>Replies</TableHead>
             <TableHead>Sentiment</TableHead>
             <TableHead>Agreement</TableHead>
-            {showAssignButton && <TableHead>Category</TableHead>}
             <TableHead>Status</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
@@ -75,29 +74,15 @@ export function PostsTable({ posts, onViewPost, onAssignPost, showAssignButton =
               <TableCell className="text-gray-900">{post.replies}</TableCell>
               <TableCell>
                 <span className={getSentimentColor(post.sentiment)}>
-                  {post.sentiment}%
+                  {post.sentiment_distribution}%
                 </span>
               </TableCell>
               <TableCell>
                 <span className={getAgreementColor(post.agreement)}>
-                  {post.agreement}%
+                  {post.agreement_distribution}%
                 </span>
               </TableCell>
-              {showAssignButton && (
-                <TableCell>
-                  <Badge
-                    variant={
-                      post.category === "campaign"
-                        ? "default"
-                        : post.category === "personal"
-                        ? "secondary"
-                        : "outline"
-                    }
-                  >
-                    {post.category}
-                  </Badge>
-                </TableCell>
-              )}
+
               <TableCell>
                 <Badge
                   variant={
