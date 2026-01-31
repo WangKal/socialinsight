@@ -11,10 +11,13 @@ interface Reply {
 }
 
 interface RepliesSectionProps {
-  replies: Reply[];
+  replies: Reply[] | number[];   // ← can now be indexes
+  allReplies?: Reply[];          // ← optional full source
 }
 
+
 export function RepliesSection({ replies }: RepliesSectionProps) {
+
   const safeReplies = Array.isArray(replies) ? replies : [];
 
   const [activeFilter, setActiveFilter] =
@@ -28,8 +31,8 @@ export function RepliesSection({ replies }: RepliesSectionProps) {
 
     const matchesSearch =
       searchTerm === "" ||
-      reply.text.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      reply.user.toLowerCase().includes(searchTerm.toLowerCase());
+      reply.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      reply.username.toLowerCase().includes(searchTerm.toLowerCase());
 
     return matchesFilter && matchesSearch;
   });
@@ -162,16 +165,16 @@ export function RepliesSection({ replies }: RepliesSectionProps) {
               >
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-400 to-purple-500 flex items-center justify-center text-white flex-shrink-0">
-                    {reply.user?.[0] || "U"}
+                    {reply.username?.[0] || "U"}
                   </div>
 
                   <div className="flex-1 min-w-0">
                     <div className="text-gray-900 font-medium break-words">
-                      {reply.user}
+                      {reply.username}
                     </div>
 
                     <p className="text-gray-700 mt-1 mb-3 break-words max-w-full">
-                      {reply.text}
+                      {reply.content}
                     </p>
 
                     <div className="flex flex-wrap gap-2">

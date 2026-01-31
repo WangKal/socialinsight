@@ -66,7 +66,6 @@ useEffect(() => {
   const campaignPosts = posts.filter((p) => p.campaign != null);
  console.log(campaignPosts)
 
- console.log(userCampaigns)
   const campaigns: Campaign[] = (userCampaigns || []).map((campaign) => {
     const campaignPostsList = campaignPosts.filter((p) => p.campaign == campaign.id);
    console.log(campaignPostsList)
@@ -75,18 +74,32 @@ useEffect(() => {
       postsCount: campaignPostsList.length,
       totalReplies: campaignPostsList.reduce((sum, p) => sum + p.replies, 0),
       avgSentiment: campaignPostsList.length > 0
-        ? Math.round(campaignPostsList.reduce((sum, p) => sum + p.sentiment, 0) / campaignPostsList.length)
+        ? Math.round(campaignPostsList.reduce((sum, p) => sum + p.sentiment_distribution, 0) / (campaignPostsList.length))
         : 0,
       avgAgreement: campaignPostsList.length > 0
-        ? Math.round(campaignPostsList.reduce((sum, p) => sum + p.agreement, 0) / campaignPostsList.length)
+        ? Math.round(campaignPostsList.reduce((sum, p) => sum + p.agreement_distribution, 0) / (campaignPostsList.length))
         : 0,
     };
   });
 
-  const calculateAvg = (postsList: Post[], field: "sentiment" | "agreement") => {
-    if (postsList.length === 0) return 0;
-    return Math.round(postsList.reduce((sum, p) => sum + p[field], 0) / postsList.length);
-  };
+const calculateAvg = (
+  postsList: Post[],
+  field: "sentiment" | "agreement"
+) => {
+  if (postsList.length === 0) return 0;
+
+  const total = postsList.reduce((sum, p) => {
+    const value =
+      field === "sentiment"
+        ? p.sentiment_distribution
+        : p.agreement_distribution;
+
+    return sum + (value ?? 0);
+  }, 0);
+console.log(postsList)
+  return Math.round(total / postsList.length);
+};
+
 
   const handleViewPost = (postId: string) => {
       const encrypted = encryptId(postId);
@@ -169,26 +182,8 @@ useEffect(() => {
 
   };
 
-  const handleAddLink = (url: string, title: string) => {
-    const newPost: Post = {
-      id: Date.now().toString(),
-      title,
-      url,
-      date: new Date().toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      }),
-      replies: 0,
-      sentiment: 0,
-      agreement: 0,
-      category: "general",
-      status: "analyzing",
-    };
-
-    setPosts((prev) => [newPost, ...prev]);
-    alert("Post added! Analysis starting...");
-  };
+ const handleAddLink = (url: string, title: string) => {
+};
 
   // Generate trend data for a campaign
   const generateTrendData = (campaignId: string) => {
@@ -198,8 +193,8 @@ useEffect(() => {
 
     return campaignPostsList.map((post) => ({
       date: post.date.split(",")[0],
-      sentiment: post.sentiment,
-      agreement: post.agreement,
+      sentiment: post.sentiment_distribution,
+      agreement: post.agreement_distribution,
       replies: post.replies,
     }));
   };

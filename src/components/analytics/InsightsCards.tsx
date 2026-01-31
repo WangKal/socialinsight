@@ -1,10 +1,15 @@
 import { motion } from "motion/react";
-import { TrendingUp, Users, MessageCircle, Target, Activity, Award } from "lucide-react";
+import { TrendingUp, MessageCircle, Target, Award } from "lucide-react";
+
+interface RateMetric {
+  count: number;
+  percentage: number;
+}
 
 interface InsightsCardsProps {
   totalReplies: number;
-  agreementRate: number;
-  positiveRate: number;
+  agreementRate: RateMetric;
+  positiveRate: RateMetric;
   topicsCount: number;
 }
 
@@ -27,20 +32,20 @@ export function InsightsCards({
     {
       icon: TrendingUp,
       label: "Agreement Rate",
-      value: `${agreementRate}%`,
+      value: `${agreementRate.percentage}%`,
       color: "from-green-500 to-emerald-600",
       bgColor: "bg-green-50",
       iconColor: "text-green-600",
-      trend: agreementRate > 50 ? "+12%" : "-5%",
+      trend: agreementRate.percentage > 50 ? "+12%" : "-5%",
     },
     {
       icon: Award,
       label: "Positive Sentiment",
-      value: `${positiveRate}%`,
+      value: `${positiveRate.percentage}%`,
       color: "from-amber-500 to-orange-600",
       bgColor: "bg-amber-50",
       iconColor: "text-amber-600",
-      trend: positiveRate > 60 ? "+8%" : "-3%",
+      trend: positiveRate.percentage > 60 ? "+8%" : "-3%",
     },
     {
       icon: Target,
@@ -64,7 +69,6 @@ export function InsightsCards({
           whileHover={{ scale: 1.05, y: -5 }}
           className="relative bg-white rounded-2xl p-6 shadow-xl border border-gray-200 overflow-hidden group"
         >
-          {/* Animated gradient background */}
           <motion.div
             className={`absolute inset-0 bg-gradient-to-br ${insight.color} opacity-0 group-hover:opacity-5 transition-opacity duration-300`}
           />
@@ -74,6 +78,7 @@ export function InsightsCards({
               <div className={`w-12 h-12 rounded-xl ${insight.bgColor} flex items-center justify-center`}>
                 <insight.icon className={`w-6 h-6 ${insight.iconColor}`} />
               </div>
+
               {insight.trend && (
                 <span
                   className={`text-sm ${
@@ -91,18 +96,10 @@ export function InsightsCards({
             <div className="text-sm text-gray-600">{insight.label}</div>
           </div>
 
-          {/* Decorative element */}
           <motion.div
             className={`absolute -bottom-6 -right-6 w-24 h-24 bg-gradient-to-br ${insight.color} rounded-full opacity-10`}
-            animate={{
-              scale: [1, 1.2, 1],
-              rotate: [0, 90, 0],
-            }}
-            transition={{
-              duration: 8,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
+            animate={{ scale: [1, 1.2, 1], rotate: [0, 90, 0] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
           />
         </motion.div>
       ))}

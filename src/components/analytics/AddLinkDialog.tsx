@@ -2,7 +2,16 @@ import { motion, AnimatePresence } from "motion/react";
 import { X, Link as LinkIcon, Plus } from "lucide-react";
 import { useState } from "react";
 import { Button } from "../ui/button";
+import { useNavigate } from "react-router-dom";
 import { GuideDialog } from "@/components/GuideDialog";
+import {
+  detectPlatformFromUrl,
+  extractPostData,
+  buildAnalysisPayload,
+  sendForAnalysis,
+} from "@/services/analysisService";
+import {useAuth } from "@/hooks/use-auth"
+
 
 interface AddLinkDialogProps {
   isOpen: boolean;
@@ -11,33 +20,74 @@ interface AddLinkDialogProps {
 }
 
 export function AddLinkDialog({ isOpen, onClose, onAdd }: AddLinkDialogProps) {
+  const { user } = useAuth();
+  const navigate =useNavigate()
   const [url, setUrl] = useState("");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [extensionDialog, setExtensionDialog] = useState(false);
    const [guideOpen, setGuideOpen] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Validation
-    if (!url.trim()) {
-      setError("URL is required");
+ const jwt = localStorage.getItem("internal_jwt") || "";
+
+
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setError("");
+
+  if (!url.trim()) {
+    setError("URL is required");
+    return;
+  }
+
+  let parsedUrl: URL;
+  try {
+    parsedUrl = new URL(url);
+  } catch {
+    setError("Please enter a valid URL");
+    return;
+  }
+
+  const platform = detectPlatformFromUrl(parsedUrl.href);
+
+  if (!platform) {
+    setError("Unsupported or invalid post URL");
+    return;
+  }
+
+  if (!user?.id) {
+    setError("You must be logged in");
+    return;
+  }
+
+  try {
+    // 1️⃣ Send to backend for analysis
+    const response = await sendForAnalysis(parsedUrl, jwt, user.id);
+
+    if (response.status !== "success") {
+      setError(response.msg || "Analysis failed");
       return;
     }
+setError("")
+    // 2️⃣ Show success message first
+    setSuccess(
+      `Analysis started for the post!\n\nURL: ${parsedUrl.href}\nPlatform: ${platform}\n\nThis may take a few moments.`
+    );
 
-    try {
-      new URL(url);
-    } catch {
-      setError("Please enter a valid URL");
-      return;
-    }
+    // 3️⃣ Wait for 3 seconds before redirecting
+    setTimeout(() => {
+      // Trigger your dashboard update or navigation here
+      onAdd(parsedUrl.href, platform); // optional, if you want to add it to state
+      handleClose(); // close the dialog
+      navigate("/dashboard"); // redirect to dashboard
+    }, 10000); 
+  } catch (err) {
+    console.error(err);
+    setError("Analysis failed. Please try again.");
+  }
+};
 
 
-    onAdd(url, title);
-    setUrl("");
-    setError("");
-    onClose();
-  };
 
   const handleClose = () => {
     setUrl("");
@@ -86,20 +136,62 @@ export function AddLinkDialog({ isOpen, onClose, onAdd }: AddLinkDialogProps) {
                     Analysis
                   </h2>
                 </div>
-                <p className="text-gray-600"><i><strong>Heads Up</strong>: We capture the most recent posts and their top-level replies. Some replies may be missing, nested replies are not included, and replies may change if users edit or delete them</i></p>
+                <p className="text-gray-600">
+                  Add a social media post URL to analyze (Only Tiktok Supported)
+                </p>
               </div>
 
-              
+              {/* Form */}
+              <form onSubmit={handleSubmit} className="space-y-4">
+
+                {/* URL Input */}
+                <div>
+                  <label htmlFor="url" className="block text-sm text-gray-700 mb-2">
+                    Post URL *
+                  </label>
+                  <input
+                    id="url"
+                    type="text"
+                    value={url}
+                    onChange={(e) => {
+                      setUrl(e.target.value);
+                      setError("");
+                    }}
+                    placeholder="https://twitter.com/user/status/123456789"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                  />
+                </div>
 
 
+                {/* Error Message */}
+                {error && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="p-3 bg-red-50 border border-red-200 rounded-lg"
+                  >
+                    <p className="text-sm text-red-600">{error}</p>
+                  </motion.div>
+                )}
+                 {/* Success Message */}
+                {success && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="p-3 bg-green-50 border border-green-200 rounded-lg"
+                  >
+                    <p className="text-sm text-green-600">{success}</p>
+                  </motion.div>
+                )}
 
                 {/* Info Box */}
                 <div className="p-4 bg-violet-50 border border-violet-200 rounded-lg">
                   <p className="text-sm text-violet-700">
-                    <strong>Note:</strong> Currently we only support the use of our extension. Please use the guide below and embark on you post analysis journey
+                    <strong>Note:</strong> Currently the extension supports X , Facebook and Twitter. Please use the guide below and embark on you post analysis journey
                   </p>
                   <Button
-                    onClick={()=>{ setGuideOpen(true)}}
+                    type="submit"
+                    onClick={()=>{handleClose;setExtensionDialog(true)}}
                     className="flex-1 bg-gradient-to-r from-violet-600 to-purple-600 text-white hover:from-violet-700 hover:to-purple-700"
                   >
                     <Plus className="w-4 h-4 mr-2" />
@@ -119,12 +211,13 @@ export function AddLinkDialog({ isOpen, onClose, onAdd }: AddLinkDialogProps) {
                     Cancel
                   </Button>
                 </div>   
-            
+              </form>
             </div>
           </motion.div>
         </>
       )}
     </AnimatePresence>
+ 
           <GuideDialog
     open={guideOpen}
     setOpen ={() => setGuideOpen(false)}
@@ -132,3 +225,4 @@ export function AddLinkDialog({ isOpen, onClose, onAdd }: AddLinkDialogProps) {
       </>
   );
 }
+

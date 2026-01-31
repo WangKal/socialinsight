@@ -83,24 +83,47 @@ useEffect(() => {
   if (loading) return <p>Loading analytics...</p>;
   if (!data) return <p>No data found.</p>;
 
-  // Safe access
-  const post = data.post_text || {};
-  console.log(post)
-  const groups = data?.analysis_result.groups || {};
-  const stats = data?.analysis_result.statistics || {};
-  const replies = Array.isArray(data?.analysis_result.replies) ? data?.analysis_result.replies : [];
-  const topicsCount = Object.values(groups).reduce(
-    (sum: number, group: any) => sum + (group?.clusters?.length || 0),
-    0
-  );
+// =====================
+// Safe access
+// =====================
+const post = data.post_text || "";
 
-  const agreement = stats.agreement_distribution || {};
-  const sentiment = stats.sentiment_distribution || {};
-    const handleAddLink = (url: string, title: string) => {
-    console.log("Adding link:", { url, title });
-    // In a real app, this would trigger the analysis process
-    alert(`Link added successfully!\nURL: ${url}\nTitle: ${title}\n\nAnalysis will begin shortly...`);
-  };
+// Merge clusters into groups for TopicClusters
+const groups = {
+  agree: {
+    clusters: data.agree_clusters || [],
+    percentage: data.statistics?.agreement_distribution?.agree || 0,
+  },
+  neutral: {
+    clusters: data.neutral_clusters || [],
+    percentage: data.statistics?.agreement_distribution?.neutral || 0,
+  },
+  disagree: {
+    clusters: data.disagree_clusters || [],
+    percentage: data.statistics?.agreement_distribution?.disagree || 0,
+  },
+};
+
+// Flatten all replies from clusters
+const allReplies = [
+  ...(data.agree_replies || []),
+  ...(data.neutral_replies || []),
+  ...(data.disagree_replies || []),
+];
+
+
+
+// Topic count (cluster count, not reply count)
+const topicsCount =
+  (data.agree_clusters?.length || 0) +
+  (data.neutral_clusters?.length || 0) +
+  (data.disagree_clusters?.length || 0);
+
+// Stats (fallback-safe)
+const agreement = data.statistics?.agreement_distribution || {};
+const sentiment = data.statistics?.sentiment_distribution || {};
+ const handleAddLink = (url: string, title: string) => {
+};
   const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString("en-US", {
     year: "numeric",
@@ -108,7 +131,6 @@ useEffect(() => {
     day: "numeric",
   });
 };
-
 // usage
 <p>{formatDate(data.created_at)}</p>
 
@@ -169,12 +191,13 @@ useEffect(() => {
         </div>
 
         {/* Insights Cards */}
-        <InsightsCards
-          totalReplies={replies.length}
-          agreementRate={agreement.agree || 0}
-          positiveRate={sentiment.positive || 0}
-          topicsCount={topicsCount}
-        />
+<InsightsCards
+  totalReplies={allReplies.length}
+  agreementRate={agreement.agree || 0}
+  positiveRate={sentiment.positive || 0}
+  topicsCount={topicsCount}
+/>
+
 
         {/* Charts Grid */}
         <div className="grid lg:grid-cols-2 gap-8 mb-8">
@@ -192,12 +215,17 @@ useEffect(() => {
 
         {/* Topic Clusters */}
         <div className="mb-8">
-          <TopicClusters groups={groups} />
+          <TopicClusters
+  groups={groups}
+  generalClusters={[]} // reserved for later
+/>
+
         </div>
 
         {/* All Replies */}
         <div>
-          <RepliesSection replies={replies} />
+          <RepliesSection replies={allReplies} />
+
         </div>
       </div>
        {/* Add Link Dialog */}

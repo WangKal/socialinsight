@@ -13,6 +13,17 @@ import {
 import { ThumbsUp, Meh, ThumbsDown } from "lucide-react";
 import { useState } from "react";
 
+interface AgreementValue {
+  count?: number;
+  percentage?: number;
+}
+
+interface AgreementDistributionProps {
+  agree: number | AgreementValue;
+  neutral: number | AgreementValue;
+  disagree: number | AgreementValue;
+}
+
 export function AgreementDistribution({
   agree,
   neutral,
@@ -20,19 +31,30 @@ export function AgreementDistribution({
 }: AgreementDistributionProps) {
   const [viewType, setViewType] = useState<"pie" | "bar">("pie");
 
+  // Helper to normalize values to numbers
+  const normalize = (val: number | AgreementValue) => {
+    if (typeof val === "number") return val;
+    if (val && typeof val === "object") return val.count ?? 0;
+    return 0;
+  };
+
+  const agreeVal = normalize(agree);
+  const neutralVal = normalize(neutral);
+  const disagreeVal = normalize(disagree);
+
+  const total = agreeVal + neutralVal + disagreeVal;
+
   const data = [
-    { name: "Agree", value: agree, color: "#10b981", icon: ThumbsUp },
-    { name: "Neutral", value: neutral, color: "#f59e0b", icon: Meh },
-    { name: "Disagree", value: disagree, color: "#ef4444", icon: ThumbsDown },
+    { name: "Agree", value: agreeVal, color: "#10b981", icon: ThumbsUp },
+    { name: "Neutral", value: neutralVal, color: "#f59e0b", icon: Meh },
+    { name: "Disagree", value: disagreeVal, color: "#ef4444", icon: ThumbsDown },
   ];
 
   const barData = [
-    { name: "Agree", value: agree },
-    { name: "Neutral", value: neutral },
-    { name: "Disagree", value: disagree },
+    { name: "Agree", value: agreeVal },
+    { name: "Neutral", value: neutralVal },
+    { name: "Disagree", value: disagreeVal },
   ];
-
-  const total = agree + neutral + disagree;
 
   return (
     <motion.div
@@ -85,11 +107,11 @@ export function AgreementDistribution({
             </div>
 
             <div className="text-2xl font-semibold" style={{ color: item.color }}>
-              {item.value}%
+              {total > 0 ? Math.round((item.value / total) * 100) : 0}%
             </div>
 
             <div className="text-xs text-gray-500 mt-1">
-              {total > 0 ? Math.round((item.value / 100) * total) : 0} responses
+              {item.value} responses
             </div>
           </motion.div>
         ))}
@@ -112,13 +134,13 @@ export function AgreementDistribution({
                 cy="50%"
                 outerRadius={90}
                 dataKey="value"
-                label={window.innerWidth >= 640}
+                label={({ name, percent }) => `${name}: ${Math.round(percent * 100)}%`}
               >
                 {data.map((entry, index) => (
                   <Cell key={index} fill={entry.color} />
                 ))}
               </Pie>
-              <Tooltip />
+              <Tooltip formatter={(value: number) => `${value} responses`} />
             </PieChart>
           </ResponsiveContainer>
         ) : (
@@ -126,7 +148,7 @@ export function AgreementDistribution({
             <BarChart data={barData}>
               <XAxis dataKey="name" tick={{ fontSize: 12 }} />
               <YAxis tick={{ fontSize: 12 }} />
-              <Tooltip />
+              <Tooltip formatter={(value: number) => `${value} responses`} />
               <Bar dataKey="value" radius={[6, 6, 0, 0]}>
                 {barData.map((_, index) => (
                   <Cell key={index} fill={data[index].color} />
@@ -138,21 +160,23 @@ export function AgreementDistribution({
       </motion.div>
 
       {/* Progress Bar */}
-      <div className="mt-6">
-        <div className="flex h-3 rounded-full overflow-hidden">
-          <motion.div
-            animate={{ width: `${agree}%` }}
-            className="bg-green-500"
-          />
-          <motion.div
-            animate={{ width: `${neutral}%` }}
-            className="bg-amber-500"
-          />
-          <motion.div
-            animate={{ width: `${disagree}%` }}
-            className="bg-red-500"
-          />
-        </div>
+      <div className="mt-6 h-3 rounded-full overflow-hidden flex">
+        {total > 0 && (
+          <>
+            <motion.div
+              animate={{ width: `${(agreeVal / total) * 100}%` }}
+              className="bg-green-500"
+            />
+            <motion.div
+              animate={{ width: `${(neutralVal / total) * 100}%` }}
+              className="bg-amber-500"
+            />
+            <motion.div
+              animate={{ width: `${(disagreeVal / total) * 100}%` }}
+              className="bg-red-500"
+            />
+          </>
+        )}
       </div>
     </motion.div>
   );

@@ -2,40 +2,224 @@ import { supabase } from '@/intergrations/supabase/client';
 
 
 /**
- * Fetch post analytics by post ID
- * @param {string} postId 
- * @returns {Promise<Object>}
+ * Fetch full analytics for a post
+ * - clusters with metadata
+ * - replies hydrated correctly
+ * - statistics preserved
+ * - safe for 30k+ replies
  */
-export async function  fetchPostAnalytics(postId) {
-  const { data, error } = await supabase
-    .from('social_posts')
-    .select('*')
-    .eq('id', postId)
+export async function fetchPostAnalytics(postId: string) {
+  // 1️⃣ Fetch post
+  const { data: post, error: postError } = await supabase
+    .from("social_posts")
+    .select("*")
+    .eq("id", postId)
     .single();
 
-  if (error) {
-    console.error('Supabase fetch error:', error);
+  if (postError || !post) return null;
+
+  /* ---------------------------------------
+   * 2️⃣ Normalize + index post replies ONCE
+   * modelReplyId -> base reply
+   * ------------------------------------- */
+  const normalizeReplies = (raw: any): any[] => {
+    if (!raw) return [];
+    if (Array.isArray(raw)) return raw;
+    if (typeof raw === "string") {
+      try {
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  };
+
+  const replyIndex = new Map<string, any>();
+  normalizeReplies(post.replies).forEach((reply, idx) => {
+    replyIndex.set(String(idx + 1), reply); // 1-based indexing
+  });
+
+  /* ---------------------------------------
+   * 3️⃣ Fetch agreement metadata
+   * ------------------------------------- */
+  const [
+    agreeRes,
+    neutralRes,
+    disagreeRes,
+  ] = await Promise.all([
+    supabase.from("agree_replies").select("reply").eq("social_post_id", postId),
+    supabase.from("neutral_replies").select("reply").eq("social_post_id", postId),
+    supabase.from("disagree_replies").select("reply").eq("social_post_id", postId),
+  ]);
+
+  /* ---------------------------------------
+   * 4️⃣ Hydrate agreement replies
+   * modelReplyId -> FULL reply JSON
+   * ------------------------------------- */
+  const hydrateReplies = (rows: any[] = []) => {
+    const map = new Map<string, any>();
+    const list: any[] = [];
+
+    for (const row of rows) {
+      const meta = row.reply;
+      if (!meta?.id) continue;
+
+      const base = replyIndex.get(String(meta.id));
+      if (!base) continue;
+
+      const hydrated = {
+        id: meta.id,
+        content: base.content ?? "",
+        displayName: base.displayName ?? null,
+        username: base.username ?? null,
+        timestamp: base.timestamp ?? null,
+        counts: base.counts ?? {},
+        tone: meta.tone,
+        agreement: meta.agreement,
+        sentiment: meta.sentiment,
+      };
+
+      map.set(String(meta.id), hydrated);
+      list.push(hydrated);
+    }
+
+    return { map, list };
+  };
+
+  const agree = hydrateReplies(agreeRes.data || []);
+  const neutral = hydrateReplies(neutralRes.data || []);
+  const disagree = hydrateReplies(disagreeRes.data || []);
+
+  /* ---------------------------------------
+   * 5️⃣ Fallback cluster-table fetcher
+   * ------------------------------------- */
+const fetchClusterReplyIds = async (
+  table: string,
+  clusterId: string
+): Promise<string[]> => {
+  const { data, error } = await supabase
+    .from(table)
+    .select("reply")
+    .eq("cluster_id", clusterId)
+    .eq("social_post_id", postId);
+
+  if (error || !Array.isArray(data)) {
+    console.error("Cluster reply fetch error:", error);
+    return [];
+  }
+
+  // data = [{ reply: "7" }, { reply: "12" }, ...]
+  return data
+    .map(row => String(row.reply))
+    .filter(Boolean);
+};
+
+
+  /* ---------------------------------------
+   * 6️⃣ Attach replies to clusters
+   * ------------------------------------- */
+  const attachReplies = async (
+    clusters: any[] = [],
+    replyMap: Map<string, any>,
+    clusterTable: string
+  ) => {
+    const result = [];
+
+    for (const cluster of clusters) {
+      let replyIds: string[] = [];
+
+      // A️⃣ analysis already attached replies
+      if (Array.isArray(cluster.replies) && cluster.replies.length) {
+        replyIds = cluster.replies.map((r: any) => String(r.id));
+      } 
+      // B️⃣ fallback to cluster table
+      else {
+        replyIds = await fetchClusterReplyIds(
+          clusterTable,
+          cluster.cluster_id
+        );
+      }
+
+      result.push({
+        ...cluster,
+        replies: replyIds
+          .map(id => replyMap.get(id))
+          .filter(Boolean),
+      });
+    }
+
+    return result;
+  };
+
+  /* ---------------------------------------
+   * 7️⃣ FINAL PAYLOAD
+   * ------------------------------------- */
+  return {
+    id: post.id,
+    post_text: post.post_text,
+    platform: post.platform,
+    created_at: post.created_at,
+    detected_type: post.detected_type,
+
+    statistics: {
+      agreement_distribution: post.agreement_distribution || {},
+      sentiment_distribution: post.sentiment_distribution || {},
+    },
+
+    agree_clusters: await attachReplies(
+      post.topic_clusters?.agree || [],
+      agree.map,
+      "agree_clusters"
+    ),
+
+    neutral_clusters: await attachReplies(
+      post.topic_clusters?.neutral || [],
+      neutral.map,
+      "neutral_clusters"
+    ),
+
+    disagree_clusters: await attachReplies(
+      post.topic_clusters?.disagree || [],
+      disagree.map,
+      "disagree_clusters"
+    ),
+
+    // ✅ explicitly returned as requested
+    agree_replies: agree.list,
+    neutral_replies: neutral.list,
+    disagree_replies: disagree.list,
+  };
+}
+
+
+/**
+ * Fetch the most recent completed post analytics
+ */
+export async function fetchRecentPost(userId?: string) {
+  const query = supabase
+    .from("social_posts")
+    .select("id")
+    .eq("status", "completed")
+    .order("created_at", { ascending: false })
+    .limit(1);
+
+  // optional user scoping (future-safe)
+  if (userId) {
+    query.eq("user_id", userId);
+  }
+
+  const { data, error } = await query.single();
+
+  if (error || !data) {
+    console.error("Recent post fetch error:", error);
     return null;
   }
 
-  return data;
+  return fetchPostAnalytics(data.id);
 }
-export async function fetchRecentPost(userId: string) {
-  const { data, error } =  await supabase
-        .from("social_posts")
-        .select("*")
-        .eq("status", "completed")
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .single();
 
-        if (error) {
-    console.error('Supabase fetch error:', error);
-    return null;
-  }
-
-  return data;
-}
 
 export async function analyzeExternalLink(link){
   return true;
@@ -139,14 +323,11 @@ function mapPost(row: any) {
 
     replies: Number(row.total_replies) || 0,
 
-    sentiment: (() => {
-      if (analysis?.sentiment === "positive") return 90;
-      if (analysis?.sentiment === "neutral") return 50;
-      if (analysis?.sentiment === "negative") return 10;
-      return 50;
-    })(),
+    sentiment: row.sentiment_percentage ?? 0,
 
-    agreement: row.agree_percentage ?? 0,
+    agreement: row.agreement_percentage ?? 0,
+    agreement_distribution: row.agreement_distribution?.agree?.percentage ?? 0,
+    sentiment_distribution: row.sentiment_distribution?.positive?.percentage ?? 0,
 
     category: row.category || null,
 
