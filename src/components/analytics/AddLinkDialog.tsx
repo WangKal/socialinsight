@@ -27,12 +27,16 @@ export function AddLinkDialog({ isOpen, onClose, onAdd }: AddLinkDialogProps) {
   const [success, setSuccess] = useState("");
   const [extensionDialog, setExtensionDialog] = useState(false);
    const [guideOpen, setGuideOpen] = useState(false)
+   const [isSubmitting, setIsSubmitting] = useState(false);
+
 
  const jwt = localStorage.getItem("internal_jwt") || "";
 
 
 const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
+   if (isSubmitting) return; // double submit guard
+   setIsSubmitting(true);
   setError("");
 
   if (!url.trim()) {
@@ -43,8 +47,10 @@ const handleSubmit = async (e: React.FormEvent) => {
   let parsedUrl: URL;
   try {
     parsedUrl = new URL(url);
+    setIsSubmitting(false)
   } catch {
     setError("Please enter a valid URL");
+    setIsSubmitting(false)
     return;
   }
 
@@ -142,76 +148,108 @@ setError("")
               </div>
 
               {/* Form */}
-              <form onSubmit={handleSubmit} className="space-y-4">
+<form onSubmit={handleSubmit} className="space-y-4">
+  {/* URL Input */}
+  <div>
+    <label htmlFor="url" className="block text-sm text-gray-700 mb-2">
+      Post URL *
+    </label>
+    <input
+      id="url"
+      type="text"
+      value={url}
+      onChange={(e) => {
+        setUrl(e.target.value);
+        setError("");
+      }}
+      placeholder="https://twitter.com/user/status/123456789"
+      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+    />
+  </div>
 
-                {/* URL Input */}
-                <div>
-                  <label htmlFor="url" className="block text-sm text-gray-700 mb-2">
-                    Post URL *
-                  </label>
-                  <input
-                    id="url"
-                    type="text"
-                    value={url}
-                    onChange={(e) => {
-                      setUrl(e.target.value);
-                      setError("");
-                    }}
-                    placeholder="https://twitter.com/user/status/123456789"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
-                  />
-                </div>
+  {/* Messages */}
+  {error && (
+    <motion.div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+      <p className="text-sm text-red-600">{error}</p>
+    </motion.div>
+  )}
+
+  {success && (
+    <motion.div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+      <p className="text-sm text-green-600">{success}</p>
+    </motion.div>
+  )}
+
+  {/* URL Submit Button */}
+<Button
+  type="submit"
+  disabled={isSubmitting}
+  className="w-full bg-gradient-to-r from-violet-600 to-purple-600 text-white
+             disabled:opacity-50 disabled:cursor-not-allowed"
+>
+  {isSubmitting ? (
+    <div className="flex items-center gap-2">
+      <svg
+        className="h-4 w-4 animate-spin"
+        viewBox="0 0 24 24"
+      >
+        <circle
+          className="opacity-25"
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="currentColor"
+          strokeWidth="4"
+          fill="none"
+        />
+        <path
+          className="opacity-75"
+          fill="currentColor"
+          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+        />
+      </svg>
+      Analyzing…
+    </div>
+  ) : (
+    <>
+      <Plus className="w-4 h-4 mr-2" />
+      Analyze Link
+    </>
+  )}
+</Button>
 
 
-                {/* Error Message */}
-                {error && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="p-3 bg-red-50 border border-red-200 rounded-lg"
-                  >
-                    <p className="text-sm text-red-600">{error}</p>
-                  </motion.div>
-                )}
-                 {/* Success Message */}
-                {success && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="p-3 bg-green-50 border border-green-200 rounded-lg"
-                  >
-                    <p className="text-sm text-green-600">{success}</p>
-                  </motion.div>
-                )}
+  {/* Info Box */}
+  <div className="p-4 bg-violet-50 border border-violet-200 rounded-lg">
+    <p className="text-sm text-violet-700 mb-3">
+      <strong>Note:</strong> Currently supports X, Facebook, and Twitter.
+    </p>
 
-                {/* Info Box */}
-                <div className="p-4 bg-violet-50 border border-violet-200 rounded-lg">
-                  <p className="text-sm text-violet-700">
-                    <strong>Note:</strong> Currently the extension supports X , Facebook and Twitter. Please use the guide below and embark on you post analysis journey
-                  </p>
-                  <Button
-                    type="submit"
-                    onClick={()=>{handleClose;setExtensionDialog(true)}}
-                    className="flex-1 bg-gradient-to-r from-violet-600 to-purple-600 text-white hover:from-violet-700 hover:to-purple-700"
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Analyze by Extension
-                  </Button>
-                </div>
-               
+    {/* Extension Button — NOT a submit */}
+    <Button
+      type="button"
+      onClick={() => {
+        setExtensionDialog(true);
+        handleClose();
+      }}
+      className="w-full bg-gradient-to-r from-violet-600 to-purple-600 text-white"
+    >
+      <Plus className="w-4 h-4 mr-2" />
+      Analyze by Extension
+    </Button>
+  </div>
 
-                {/* Buttons */}
-                <div className="flex gap-3 pt-4">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleClose}
-                    className="flex-1"
-                  >
-                    Cancel
-                  </Button>
-                </div>   
-              </form>
+  {/* Cancel */}
+  <Button
+    type="button"
+    variant="outline"
+    onClick={handleClose}
+    className="w-full"
+  >
+    Cancel
+  </Button>
+</form>
+
             </div>
           </motion.div>
         </>

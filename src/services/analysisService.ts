@@ -32,7 +32,7 @@ export function detectPlatformFromUrl(url: string) {
 
 // services/tiktokService.ts
 export function validateTikTokUrl(url: string): boolean {
-	console.log(url)
+
   const pattern = /^https?:\/\/(www\.)?tiktok\.com\/@[^/]+\/video\/\d+/;
   return pattern.test(url);
 }

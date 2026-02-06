@@ -298,7 +298,7 @@ export async function updateUserProfile(userId, values) {
 //get campaigns
 export async function getCampaignsByUser(userId: string) {
    const result= await supabase.from("campaigns").select("*").eq("user_id", userId);
-   console.log(result)
+  
    return result.data
 }
 /**
@@ -365,10 +365,10 @@ export async function assignPost(
   newCampaignName?: string | null,
   description?:string | null
 ) {
-  console.log(userId+" "+
+ /** console.log(userId+" "+
   category+" "+
   campaignId+" "+
-  newCampaignName)
+  newCampaignName)**/
   try {
     // PERSONAL assignment
     if (category === "personal") {

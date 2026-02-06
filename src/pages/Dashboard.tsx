@@ -38,9 +38,9 @@ useEffect(() => {
   if (!user?.id) return;    // Don't run until user is loaded
 
   async function load() {
-    console.log("Loaded user:", user);
+ 
     const result = await getPostsByUser(user.id);
-    console.log(result)
+   
     setPosts(result);
   }
 
@@ -51,7 +51,7 @@ useEffect(() => {
   if (!user?.id) return;    // Don't run until user is loaded
 
   async function load() {
-    console.log("Loaded user:", user);
+ 
     const result = await getCampaignsByUser(user.id);
    
     setUserCampaigns(result);
@@ -64,11 +64,11 @@ useEffect(() => {
   const generalPosts = posts.filter((p) => p.category == null || p.category.length==0 || p.category == "NULL");
   const personalPosts = posts.filter((p) => p.category === "personal");
   const campaignPosts = posts.filter((p) => p.campaign != null);
- console.log(campaignPosts)
+
 
   const campaigns: Campaign[] = (userCampaigns || []).map((campaign) => {
     const campaignPostsList = campaignPosts.filter((p) => p.campaign == campaign.id);
-   console.log(campaignPostsList)
+
     return {
       ...campaign,
       postsCount: campaignPostsList.length,
@@ -96,7 +96,7 @@ const calculateAvg = (
 
     return sum + (value ?? 0);
   }, 0);
-console.log(postsList)
+
   return Math.round(total / postsList.length);
 };
 
@@ -132,7 +132,7 @@ console.log(postsList)
               variant: 'constructive',
             });
       
-       console.log(n_c);
+
        if(category == "personal"){
     setPosts( (prev) =>
           
