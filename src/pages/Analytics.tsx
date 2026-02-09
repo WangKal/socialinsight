@@ -111,7 +111,10 @@ const allReplies = [
   ...(data.disagree_replies || []),
 ];
 
-
+const total_replies = data.total_replies;
+console.log("agree :"+data.agree.length )
+console.log("disagree  :"+data.neutral_replies.length)
+console.log("neutral :" +data.neutral_replies.length )
 
 // Topic count (cluster count, not reply count)
 const topicsCount =
@@ -192,7 +195,7 @@ const sentiment = data.statistics?.sentiment_distribution || {};
 
         {/* Insights Cards */}
 <InsightsCards
-  totalReplies={allReplies.length}
+  totalReplies={total_replies}
   agreementRate={agreement.agree || 0}
   positiveRate={sentiment.positive || 0}
   topicsCount={topicsCount}
