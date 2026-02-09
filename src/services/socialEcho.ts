@@ -162,6 +162,7 @@ const fetchClusterReplyIds = async (
     platform: post.platform,
     created_at: post.created_at,
     detected_type: post.detected_type,
+    total_replies: post.total_replies,
 
     statistics: {
       agreement_distribution: post.agreement_distribution || {},
