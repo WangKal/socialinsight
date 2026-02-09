@@ -112,9 +112,9 @@ const allReplies = [
 ];
 
 const total_replies = data.total_replies;
-console.log("agree :"+data.agree.length )
-console.log("disagree  :"+data.neutral_replies.length)
-console.log("neutral :" +data.neutral_replies.length )
+console.log("agree :"+data?.agree?.length || 0 )
+console.log("disagree  :"+data?.disagree_replies?.length || 0)
+console.log("neutral :" +data?.neutral_replies?.length || 0)
 
 // Topic count (cluster count, not reply count)
 const topicsCount =
