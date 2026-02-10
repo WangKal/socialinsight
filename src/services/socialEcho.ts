@@ -92,6 +92,13 @@ export async function fetchPostAnalytics(postId: string) {
   const neutral = hydrateReplies(neutralRes.data || []);
   const disagree = hydrateReplies(disagreeRes.data || []);
 
+  console.log("agreeRes "+agreeRes?.length || 0)
+  console.log("neutralRes "+neutralRes?.length || 0)
+  console.log("disagreeRes "+disagreeRes?.length || 0)
+  console.log(agree?.length || 0)
+  console.log(neutral?.length || 0)
+  console.log(disagree?.length || 0)
+
   /* ---------------------------------------
    * 5️⃣ Fallback cluster-table fetcher
    * ------------------------------------- */
