@@ -1,69 +1,66 @@
 import { motion, AnimatePresence } from "motion/react";
 import { MessageSquare, Filter, Search } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 
 interface Reply {
-  user: string;
-  text: string;
+  id: string;
+  content: string;
+  username: string;
   sentiment: string;
   agreement: string;
   tone: string;
 }
 
 interface RepliesSectionProps {
-  replies: Reply[] | number[];   // ← can now be indexes
-  allReplies?: Reply[];          // ← optional full source
+  replies: Reply[];
 }
 
-
 export function RepliesSection({ replies }: RepliesSectionProps) {
-
   const safeReplies = Array.isArray(replies) ? replies : [];
 
   const [activeFilter, setActiveFilter] =
     useState<"all" | "agree" | "neutral" | "disagree">("all");
+
   const [searchTerm, setSearchTerm] = useState("");
 
-  const filteredReplies = safeReplies.filter((reply) => {
-    const matchesFilter =
-      activeFilter === "all" ||
-      reply.agreement.toLowerCase() === activeFilter;
+  /* ✅ Memoized filtering (huge perf win) */
+  const filteredReplies = useMemo(() => {
+    const term = searchTerm.toLowerCase();
 
-    const matchesSearch =
-      searchTerm === "" ||
-      reply.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      reply.username.toLowerCase().includes(searchTerm.toLowerCase());
+    return safeReplies.filter((reply) => {
+      const agreement = reply.agreement?.toLowerCase() || "";
+      const content = reply.content?.toLowerCase() || "";
+      const username = reply.username?.toLowerCase() || "";
 
-    return matchesFilter && matchesSearch;
-  });
+      const matchesFilter =
+        activeFilter === "all" || agreement === activeFilter;
 
-  const filters = [
-    { id: "all" as const, label: "All", count: safeReplies.length },
-    {
-      id: "agree" as const,
-      label: "Agree",
-      count: safeReplies.filter(
-        (r) => r.agreement.toLowerCase() === "agree"
-      ).length,
-    },
-    {
-      id: "neutral" as const,
-      label: "Neutral",
-      count: safeReplies.filter(
-        (r) => r.agreement.toLowerCase() === "neutral"
-      ).length,
-    },
-    {
-      id: "disagree" as const,
-      label: "Disagree",
-      count: safeReplies.filter(
-        (r) => r.agreement.toLowerCase() === "disagree"
-      ).length,
-    },
-  ];
+      const matchesSearch =
+        term === "" ||
+        content.includes(term) ||
+        username.includes(term);
 
+      return matchesFilter && matchesSearch;
+    });
+  }, [safeReplies, activeFilter, searchTerm]);
+
+  /* ✅ Memoized counts */
+  const filters = useMemo(() => {
+    const countByType = (type: string) =>
+      safeReplies.filter(
+        (r) => r.agreement?.toLowerCase() === type
+      ).length;
+
+    return [
+      { id: "all" as const, label: "All", count: safeReplies.length },
+      { id: "agree" as const, label: "Agree", count: countByType("agree") },
+      { id: "neutral" as const, label: "Neutral", count: countByType("neutral") },
+      { id: "disagree" as const, label: "Disagree", count: countByType("disagree") },
+    ];
+  }, [safeReplies]);
+console.log(filteredReplies)
   const getSentimentColor = (sentiment: string) => {
-    switch (sentiment.toLowerCase()) {
+    switch (sentiment?.toLowerCase()) {
       case "positive":
         return "text-green-600 bg-green-50";
       case "negative":
@@ -74,7 +71,7 @@ export function RepliesSection({ replies }: RepliesSectionProps) {
   };
 
   const getAgreementBorder = (agreement: string) => {
-    switch (agreement.toLowerCase()) {
+    switch (agreement?.toLowerCase()) {
       case "agree":
         return "border-green-500";
       case "disagree":
@@ -105,7 +102,7 @@ export function RepliesSection({ replies }: RepliesSectionProps) {
       </div>
 
       {/* Explanation */}
-      <p className="text-sm text-gray-600 mb-6 max-w-full">
+      <p className="text-sm text-gray-600 mb-6">
         Browse every reply individually. Use filters and search to quickly find
         opinions, patterns, or specific users.
       </p>
@@ -153,7 +150,7 @@ export function RepliesSection({ replies }: RepliesSectionProps) {
           <AnimatePresence mode="popLayout">
             {filteredReplies.map((reply, index) => (
               <motion.div
-                key={index}
+                key={reply.id ?? index}
                 layout
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -161,20 +158,20 @@ export function RepliesSection({ replies }: RepliesSectionProps) {
                 transition={{ duration: 0.2, delay: index * 0.02 }}
                 className={`p-4 rounded-xl border-l-4 ${getAgreementBorder(
                   reply.agreement
-                )} bg-white hover:shadow-md transition-shadow overflow-hidden`}
+                )} bg-white hover:shadow-md transition-shadow`}
               >
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-400 to-purple-500 flex items-center justify-center text-white flex-shrink-0">
-                    {reply.username?.[0] || "U"}
+                    {reply.username?.[0]?.toUpperCase() || "U"}
                   </div>
 
                   <div className="flex-1 min-w-0">
                     <div className="text-gray-900 font-medium break-words">
-                      {reply.username}
+                      {reply.username || "Unknown User"}
                     </div>
 
-                    <p className="text-gray-700 mt-1 mb-3 break-words max-w-full">
-                      {reply.content}
+                    <p className="text-gray-700 mt-1 mb-3 break-words">
+                      {reply.content || "No content"}
                     </p>
 
                     <div className="flex flex-wrap gap-2">
@@ -183,15 +180,15 @@ export function RepliesSection({ replies }: RepliesSectionProps) {
                           reply.sentiment
                         )}`}
                       >
-                        Sentiment: {reply.sentiment}
+                        Sentiment: {reply.sentiment || "Unknown"}
                       </span>
 
                       <span className="px-3 py-1 rounded-full text-xs text-blue-600 bg-blue-50">
-                        Agreement: {reply.agreement}
+                        Agreement: {reply.agreement || "Unknown"}
                       </span>
 
                       <span className="px-3 py-1 rounded-full text-xs text-purple-600 bg-purple-50">
-                        Tone: {reply.tone}
+                        Tone: {reply.tone || "Unknown"}
                       </span>
                     </div>
                   </div>

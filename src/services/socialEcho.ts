@@ -163,6 +163,7 @@ const fetchClusterReplyIds = async (
   /* ---------------------------------------
    * 7️⃣ FINAL PAYLOAD
    * ------------------------------------- */
+   console.log(agree.list)
   return {
     id: post.id,
     post_text: post.post_text,
