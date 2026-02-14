@@ -47,7 +47,7 @@ export async function sendForAnalysis(url: string, jwt: string, userId: string) 
     timestamp: Date.now()
   };
 
-  const res = await fetch(`https://socialinsightbackend.onrender.com/api/insights/web_analysis/`, {
+  const res = await fetch(`http://127.0.0.1:8000/api/insights/web_analysis/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

@@ -38,9 +38,8 @@ export async function fetchPostAnalytics(postId: string) {
 
   const replyIndex = new Map<string, any>();
   normalizeReplies(post.replies).forEach((reply, idx) => {
-    replyIndex.set(String(idx + 1), reply); // 1-based indexing
+    replyIndex.set(String(idx ), reply); // 1-based indexing
   });
-
   /* ---------------------------------------
    * 3️⃣ Fetch agreement metadata
    * ------------------------------------- */
@@ -58,15 +57,18 @@ export async function fetchPostAnalytics(postId: string) {
    * 4️⃣ Hydrate agreement replies
    * modelReplyId -> FULL reply JSON
    * ------------------------------------- */
+
   const hydrateReplies = (rows: any[] = []) => {
     const map = new Map<string, any>();
     const list: any[] = [];
 
     for (const row of rows) {
+    
       const meta = row.reply;
-      if (!meta?.id) continue;
+      if (meta?.id  == null) continue;
 
       const base = replyIndex.get(String(meta.id));
+ 
       if (!base) continue;
 
       const hydrated = {
@@ -87,17 +89,12 @@ export async function fetchPostAnalytics(postId: string) {
 
     return { map, list };
   };
+   
 
   const agree = hydrateReplies(agreeRes.data || []);
   const neutral = hydrateReplies(neutralRes.data || []);
   const disagree = hydrateReplies(disagreeRes.data || []);
 
-  console.log("agreeRes "+agreeRes?.length || 0)
-  console.log("neutralRes "+neutralRes?.length || 0)
-  console.log("disagreeRes "+disagreeRes?.length || 0)
-  console.log(agree?.length || 0)
-  console.log(neutral?.length || 0)
-  console.log(disagree?.length || 0)
 
   /* ---------------------------------------
    * 5️⃣ Fallback cluster-table fetcher
@@ -163,7 +160,7 @@ const fetchClusterReplyIds = async (
   /* ---------------------------------------
    * 7️⃣ FINAL PAYLOAD
    * ------------------------------------- */
-   console.log(agree.list)
+
   return {
     id: post.id,
     post_text: post.post_text,

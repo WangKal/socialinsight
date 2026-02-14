@@ -58,7 +58,44 @@ export function RepliesSection({ replies }: RepliesSectionProps) {
       { id: "disagree" as const, label: "Disagree", count: countByType("disagree") },
     ];
   }, [safeReplies]);
-console.log(filteredReplies)
+function groupDuplicateReplies(replies) {
+  const idMap = {};
+
+  // Group replies by ID
+  replies.forEach(reply => {
+    const id = String(reply.id);
+
+    if (!idMap[id]) {
+      idMap[id] = [];
+    }
+
+    idMap[id].push(reply);
+  });
+
+  // Keep only duplicates
+  const duplicates = Object.entries(idMap)
+    .filter(([_, items]) => items.length > 1);
+
+  if (duplicates.length === 0) {
+    console.log("✅ No duplicate reply IDs");
+    return {};
+  }
+
+  console.warn("⚠️ Duplicate Replies Found:\n");
+
+  duplicates.forEach(([id, items]) => {
+    console.warn(`ID ${id}`);
+    items.forEach(reply => {
+      console.log("→", reply);
+    });
+    console.log("---------------");
+  });
+
+  return Object.fromEntries(duplicates);
+}
+
+
+
   const getSentimentColor = (sentiment: string) => {
     switch (sentiment?.toLowerCase()) {
       case "positive":
