@@ -568,3 +568,28 @@ export const markAllAsRead = async (userId: string) => {
   if (error) throw error;
   return data;
 };
+
+// Delete Post
+export const deletePost = async (postId: string) => {
+
+  // 1️⃣ Delete Replies
+  await supabase.from("agree_replies").delete().eq("social_post_id", postId);
+  await supabase.from("neutral_replies").delete().eq("social_post_id", postId);
+  await supabase.from("disagree_replies").delete().eq("social_post_id", postId);
+
+  // 2️⃣ Delete Clusters
+  await supabase.from("agree_clusters").delete().eq("social_post_id", postId);
+  await supabase.from("neutral_clusters").delete().eq("social_post_id", postId);
+  await supabase.from("disagree_clusters").delete().eq("social_post_id", postId);
+
+  // 3️⃣ Delete Post (LAST)
+  const { data, error } = await supabase
+    .from("social_posts")
+    .delete()
+    .eq("id", postId);
+
+  if (error) throw error;
+
+  return data;
+};
+

@@ -299,6 +299,9 @@ const calculateAvg = (
               onViewPost={handleViewPost}
               onAssignPost={handleAssignPost}
               showAssignButton={true}
+              onPostDeleted={(postId) =>
+                setPosts(prev => prev.filter(p => p.id !== postId))
+              }
             />
           </div>
         </>

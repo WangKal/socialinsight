@@ -1,8 +1,11 @@
+import { useState } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
-import { ExternalLink, FolderPlus } from "lucide-react";
+import { ExternalLink, FolderPlus,Trash2 } from "lucide-react";
 import { motion } from "motion/react";
+import { deletePost } from "@/services/socialEcho";
+import {useToast } from "@/hooks/use-toast"
 
 export interface Post {
   id: string;
@@ -22,9 +25,47 @@ interface PostsTableProps {
   onViewPost: (postId: string) => void;
   onAssignPost?: (postId: string) => void;
   showAssignButton?: boolean;
+  onPostDeleted?: (postId: string) => void;
 }
 
-export function PostsTable({ posts, onViewPost, onAssignPost, showAssignButton = false }: PostsTableProps) {
+export function PostsTable({ posts, onViewPost, onAssignPost, showAssignButton = false, onPostDeleted }: PostsTableProps) {
+  
+ const { toast } = useToast();
+
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const handleDelete = async (postId: string) => {
+
+    if (deletingId) return; // 🚨 Prevent multi-click madness
+
+    try {
+      setDeletingId(postId);
+
+      await deletePost(postId);
+
+      toast({
+        title: "Post deleted",
+        description: "The post and related analysis were removed successfully.",
+      });
+
+      
+      onPostDeleted?.(postId); 
+
+    } catch (error) {
+
+      console.error(error);
+
+      toast({
+        variant: "destructive",
+        title: "Deletion failed",
+        description: "Something went wrong while deleting the post.",
+      });
+
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   const getSentimentColor = (sentiment: number) => {
     if (sentiment > 70) return "text-green-600";
     if (sentiment > 40) return "text-amber-600";
@@ -113,6 +154,13 @@ export function PostsTable({ posts, onViewPost, onAssignPost, showAssignButton =
                     onClick={() => onViewPost(post.id)}
                   >
                     View <ExternalLink className="w-4 h-4 ml-2" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => deletePost(post.id)}
+                  >
+                    Delete <Trash2 className="w-4 h-4 ml-2" />
                   </Button>
                 </div>
               </TableCell>
