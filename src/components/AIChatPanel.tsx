@@ -40,14 +40,37 @@ export function AIChatPanel({ postContent, replies,  postUsername }: AIChatPanel
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
-  useEffect(() => {
+useEffect(() => {
   const fetchHistory = async () => {
-    const res = await AIHistory(user.id,postContent.id);
-    const data = await res.json(); // expect { messages: Message[] }
-    setMessages(data.messages);
+    try {
+      const res = await AIHistory(user.id, postContent.id);
+      const data = await res.json(); // expect { messages: AIChatHistory[] }
+
+      // Hydrate reply mentions for each bot message
+      const hydratedMessages: Message[] = (data.messages || []).map((msg) => {
+        if (msg.role !== "bot" || !msg.reply_mentions) return msg;
+
+        const hydratedReplies: Reply[] = (msg.reply_mentions || []).map((mentionId) => {
+          const match = replies.find((r) => r.id === String(mentionId));
+          if (!match) return null;
+          return normalizeReply(match);
+        }).filter(Boolean) as Reply[];
+
+        return {
+          ...msg,
+          replyMentions: hydratedReplies,
+        };
+      });
+
+      setMessages(hydratedMessages);
+    } catch (err) {
+      console.error("Failed to fetch AI chat history:", err);
+    }
   };
+
   fetchHistory();
-}, [postContent]);
+}, [postContent, replies, user.id]);
+
 
 
   const normalizeReply = (reply: Reply) => ({
@@ -57,20 +80,33 @@ export function AIChatPanel({ postContent, replies,  postUsername }: AIChatPanel
     timestamp: reply.timestamp || reply.created_at || "",
   });
 
-  const sendMessage = async () => {
-    if (!input.trim() || isTyping) return;
+const sendMessage = async () => {
+  if (!input.trim() || isTyping) return;
 
-    const userMessage: Message = { role: "user", text: input.trim() };
-    setMessages((prev) => [...prev, userMessage]);
-    setInput("");
-    setIsTyping(true);
+  const userMessage: Message = { role: "user", text: input.trim() };
+  setMessages((prev) => [...prev, userMessage]);
+  setInput("");
+  setIsTyping(true);
 
-    const response: AIResponse = await fetchAIResponse(user.id, input, postContent);
-    const botMessage: Message = { role: "bot", text: response.text, replyMentions: response.replyMentions };
+  const response: AIResponse = await fetchAIResponse(user.id, input, postContent);
 
-    setMessages((prev) => [...prev, botMessage]);
-    setIsTyping(false);
+  // Hydrate reply mentions from IDs
+  const hydratedMentions: Reply[] = (response.replyMentions || []).map((mentionId) => {
+    const match = replies.find((r) => r.id === String(mentionId));
+    if (!match) return null;
+    return normalizeReply(match);
+  }).filter(Boolean) as Reply[];
+
+  const botMessage: Message = {
+    role: "bot",
+    text: response.answer || response.text,
+    replyMentions: hydratedMentions,
   };
+
+  setMessages((prev) => [...prev, botMessage]);
+  setIsTyping(false);
+};
+
 
   const copyMention = (username: string) => {
     navigator.clipboard.writeText(`@${username}`);
