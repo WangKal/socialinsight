@@ -10,6 +10,7 @@ import { TopicClusters } from "@/components/analytics/TopicClusters";
 import { RepliesSection } from "@/components/analytics/RepliesSection";
 import { ExportButton } from "@/components/analytics/ExportButton";
 import { AddLinkDialog } from "@/components/analytics/AddLinkDialog";
+import { AIChatPanel } from "@/components/AIChatPanel";
 import { Link as LinkIcon } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { fetchPostAnalytics,fetchRecentPost } from "@/services/socialEcho";
@@ -233,6 +234,13 @@ const sentiment = data.statistics?.sentiment_distribution || {};
         isOpen={isAddLinkOpen}
         onClose={() => setIsAddLinkOpen(false)}
         onAdd={handleAddLink}
+      />
+
+      {/* AI Chat Panel - Floating */}
+      <AIChatPanel
+        postContent={post}
+        replies={allReplies}
+        postUsername="techvisionary"
       />
     </div>
   );

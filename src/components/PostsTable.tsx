@@ -36,7 +36,7 @@ export function PostsTable({ posts, onViewPost, onAssignPost, showAssignButton =
 
   const handleDelete = async (postId: string) => {
 
-    if (deletingId) return; // 🚨 Prevent multi-click madness
+    if (deletingId) return; // Prevent multi-click madness
 
     try {
       setDeletingId(postId);

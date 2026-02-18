@@ -1,4 +1,5 @@
 import { supabase } from '@/intergrations/supabase/client';
+import { Reply } from "@/components/AIChatPanel"; // adjust path if needed
 
 
 /**
@@ -593,3 +594,65 @@ export const deletePost = async (postId: string) => {
   return data;
 };
 
+export const AIHistory= async (userId: string,postId: string) => {
+
+ const jwt = localStorage.getItem("internal_jwt") || "";
+ const payload = {
+    user_id: userId,
+    postId:postId
+  };
+  try {
+  const res = await fetch(`https://socialinsightbackend.onrender.com/api/insights/ai_chat_history/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${jwt}`
+    },
+    body: JSON.stringify({ data: [payload] })
+  });
+
+  if (!res.ok) {
+    throw new Error(`Backend error: ${res.statusText}`);
+  }
+
+  return res.json();
+  } catch (err) {
+    console.error(err);
+    return { text: "Sorry, I couldn't get a response. Try again.", replyMentions: [] };
+  }
+};
+
+
+export interface AIResponse {
+  text: string;
+  replyMentions: Reply[];
+}
+
+export const fetchAIResponse = async (userId: string, question: string, postId: string): Promise<AIResponse> => {
+ 
+ const jwt = localStorage.getItem("internal_jwt") || "";
+ const payload = {
+    user_id: userId,
+    question:question,
+    postId:postId
+  };
+  try {
+  const res = await fetch(`https://socialinsightbackend.onrender.com/api/insights/ai_chat/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${jwt}`
+    },
+    body: JSON.stringify({ data: [payload] })
+  });
+
+  if (!res.ok) {
+    throw new Error(`Backend error: ${res.statusText}`);
+  }
+
+  return res.json();
+  } catch (err) {
+    console.error(err);
+    return { text: "Sorry, I couldn't get a response. Try again.", replyMentions: [] };
+  }
+};
