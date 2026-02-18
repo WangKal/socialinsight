@@ -43,6 +43,7 @@ export function AIChatPanel({ postContent, replies,  postUsername }: AIChatPanel
 useEffect(() => {
   const fetchHistory = async () => {
     try {
+      console.log(postContent)
       const res = await AIHistory(user.id, postContent.id);
       const data = await res.json(); // expect { messages: AIChatHistory[] }
 

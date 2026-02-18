@@ -238,7 +238,7 @@ const sentiment = data.statistics?.sentiment_distribution || {};
 
       {/* AI Chat Panel - Floating */}
       <AIChatPanel
-        postContent={post}
+        postContent={data}
         replies={allReplies}
         postUsername="techvisionary"
       />
