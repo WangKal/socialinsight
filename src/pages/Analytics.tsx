@@ -13,8 +13,9 @@ import { AddLinkDialog } from "@/components/analytics/AddLinkDialog";
 import { AIChatPanel } from "@/components/AIChatPanel";
 import { Link as LinkIcon } from "lucide-react";
 import { Button } from "../components/ui/button";
-import { fetchPostAnalytics,fetchRecentPost } from "@/services/socialEcho";
+import { fetchPostAnalytics,fetchRecentPost, trackAnalyticsView } from "@/services/socialEcho";
 import {useAuth } from "@/hooks/use-auth"
+
 
 export default function Analytics() {
   const { user } = useAuth();
@@ -23,6 +24,9 @@ export default function Analytics() {
   const [isAddLinkOpen, setIsAddLinkOpen] = useState(false);
   const location = useLocation();
   const [mode, setMode] = useState<"Recent Post" | "Selected Post">("Recent Post");
+  useEffect(() => {
+  trackAnalyticsView();
+}, []);
 useEffect(() => {
   
 

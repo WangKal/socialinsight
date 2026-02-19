@@ -18,7 +18,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { getCredits, getTransactions } from "@/services/socialEcho";
+import { getCredits, getTransactions, trackPaymentsView } from "@/services/socialEcho";
 import { supabase } from '@/intergrations/supabase/client';
 
 export default function Payments() {
@@ -55,7 +55,9 @@ export default function Payments() {
     if (cur === "KES") return Math.floor(numAmount / KES_PER_CREDIT);
     return 0;
   };
-
+  useEffect(() => {
+  trackPaymentsView();
+}, []);
   // --- Fetch KES per credit from Supabase ---
   const fetchSettings = async () => {
     try {

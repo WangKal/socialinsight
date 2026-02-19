@@ -12,7 +12,7 @@ import { ExportButton } from "@/components/analytics/ExportButton";
 import { AddLinkDialog } from "@/components/analytics/AddLinkDialog";
 import { Link as LinkIcon } from "lucide-react";
 import { Button } from "../components/ui/button";
-import { fetchPostAnalytics,fetchRecentPost } from "@/services/socialEcho";
+import { fetchPostAnalytics,fetchRecentPost, trackGeneralView } from "@/services/socialEcho";
 import {useAuth } from "@/hooks/use-auth"
 import { AuthButtons } from "@/components/AuthButtons";
 import { AIChatPanel } from "@/components/AIChatPanel";
@@ -25,6 +25,10 @@ export default function Analytics() {
   const [isAddLinkOpen, setIsAddLinkOpen] = useState(false);
   const location = useLocation();
   const [mode, setMode] = useState<"Recent Post" | "Selected Post">("Recent Post");
+  useEffect(() => {
+  trackGeneralView();
+}, []);
+
 useEffect(() => {
   (async () => {
     setLoading(true);
@@ -63,6 +67,7 @@ useEffect(() => {
 
  
 
+
   if (loading) return <p>Loading analytics...</p>;
   if (!data) return <p>No data found.</p>;
 
@@ -94,7 +99,7 @@ const allReplies = [
   ...(data.disagree_replies || []),
 ];
 
-
+const total_replies = data.total_replies;
 
 // Topic count (cluster count, not reply count)
 const topicsCount =

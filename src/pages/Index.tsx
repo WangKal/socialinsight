@@ -1,6 +1,14 @@
 import { BarChart3, TrendingUp, Users, ExternalLink } from "lucide-react";
+import { useEffect } from "react";
+import { trackHomeView } from "@/services/socialEcho";
+
+
+
 
 const Index = () => {
+  useEffect(() => {
+  trackHomeView();
+}, []);
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       {/* Extension Popup Container */}

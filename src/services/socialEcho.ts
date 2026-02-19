@@ -656,3 +656,32 @@ export const fetchAIResponse = async (userId: string, question: string, postId: 
     return { text: "Sorry, I couldn't get a response. Try again.", replyMentions: [] };
   }
 };
+
+export async function trackHomeView() {
+  await supabase.rpc("increment_page_view", {
+    p_page_name: "home",
+  });
+}
+
+export async function trackGeneralView() {
+  await supabase.rpc("increment_page_view", {
+    p_page_name: "general_view",
+  });
+}
+
+export async function trackAnalyticsDashboardView() {
+  await supabase.rpc("increment_page_view", {
+    p_page_name: "analytics_dashboard",
+  });
+}
+export async function trackAnalyticsView() {
+  await supabase.rpc("increment_page_view", {
+    p_page_name: "analytics",
+  });
+}
+
+export async function trackPaymentsView() {
+  await supabase.rpc("increment_page_view", {
+    p_page_name: "payments",
+  });
+}

@@ -3,6 +3,8 @@ import { Send, Bot, User, ChevronDown, ChevronUp, Copy, Check, MessageSquare, X 
 import { motion, AnimatePresence } from "motion/react";
 import { fetchAIResponse, AIHistory } from "@/services/socialEcho"; // fetch calls from services
 import {useAuth } from "@/hooks/use-auth"
+import { Link ,useNavigate} from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 
 interface Reply {
   id?: string;
@@ -29,7 +31,9 @@ interface AIChatPanelProps {
 
 export function AIChatPanel({ postContent, replies,  postUsername }: AIChatPanelProps) {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [messages, setMessages] = useState<Message[]>([]);
+  const navigate = useNavigate();
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [expandedMentions, setExpandedMentions] = useState<number | null>(null);
@@ -42,29 +46,25 @@ export function AIChatPanel({ postContent, replies,  postUsername }: AIChatPanel
   }, [messages]);
 useEffect(() => {
   const fetchHistory = async () => {
+    if (!user?.id) {
+      console.warn("User not logged in. Skipping AI history fetch.");
+      return;
+    }
+
     try {
-
       const data = await AIHistory(user.id, postContent.id);
-   
-       // expect { messages: AIChatHistory[] }
-
-      // Hydrate reply mentions for each bot message
       const hydratedMessages: Message[] = (data.chats || []).map((msg) => {
+        const hydratedReplies: Reply[] = (msg.reply_mentions || [])
+          .map((mentionId) => {
+            const match = replies.find((r) => r.id == String(mentionId));
+            if (!match) return null;
+            return normalizeReply(match);
+          })
+          .filter(Boolean) as Reply[];
 
-
-        const hydratedReplies: Reply[] = (msg.reply_mentions || []).map((mentionId) => {
-        
-          const match = replies.find((r) => r.id == String(mentionId));
-          if (!match) return null;
-          return normalizeReply(match);
-        }).filter(Boolean) as Reply[];
-
-        return {
-          ...msg,
-          replyMentions: hydratedReplies,
-        };
+        return { ...msg, replyMentions: hydratedReplies };
       });
-console.log(hydratedMessages);
+
       setMessages(hydratedMessages);
     } catch (err) {
       console.error("Failed to fetch AI chat history:", err);
@@ -72,7 +72,7 @@ console.log(hydratedMessages);
   };
 
   fetchHistory();
-}, [postContent, replies, user.id]);
+}, [postContent, replies, user?.id]);
 
 
 
@@ -87,13 +87,20 @@ console.log(hydratedMessages);
   });
 
 const sendMessage = async () => {
-  if (!input.trim()) return;
+  if (!user?.id) {
+    toast({
+      title: "Sign in required",
+      description: "You need to log in to ask questions or see AI insights.",
+      variant: "destructive",
+    });
+    return;
+  }
 
-  // ✅ Block if AI already running
+  if (!input.trim()) return;
   if (messages.some(m => m.id === "waiting")) return;
 
   const pendingMessage: Message = {
-    id: "waiting",                // ⭐ THE KEY
+    id: "waiting",
     question: input.trim(),
     answer: "",
     replyMentions: [],
@@ -118,31 +125,24 @@ const sendMessage = async () => {
       })
       .filter(Boolean) as Reply[];
 
-    // ✅ Update WAITING message
     setMessages(prev =>
       prev.map(msg =>
         msg.id === "waiting"
           ? {
               ...msg,
-              id: response.chat_id || Date.now().toString(), // ⭐ RE-ID
+              id: response.chat_id || Date.now().toString(),
               answer: response.answer || response.text,
               replyMentions: hydratedMentions,
             }
           : msg
       )
     );
-
   } catch (err) {
     console.error("AI error:", err);
-
     setMessages(prev =>
       prev.map(msg =>
         msg.id === "waiting"
-          ? {
-              ...msg,
-              id: Date.now().toString(), // re-id even on failure
-              answer: "Unable to generate answer.",
-            }
+          ? { ...msg, id: Date.now().toString(), answer: "Unable to generate answer." }
           : msg
       )
     );
@@ -174,7 +174,25 @@ const sendMessage = async () => {
         <motion.button
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
-          onClick={() => setIsOpen(true)}
+          onClick={() => {
+  if (!user) {
+    toast({
+      title: "Authentication Required",
+      description:
+        "You need to be signed in to access insights, analytics, and AI-powered tools.",
+      variant: "destructive", // or custom warning variant
+    });
+
+    setTimeout(() => {
+      navigate("/auth"); // or router.push("/auth")
+    }, 1200);
+
+    return;
+  }
+
+  setIsOpen(true);
+}}
+
           className="fixed bottom-8 right-8 z-50 bg-gradient-to-r from-violet-600 to-purple-600 text-white p-4 rounded-full shadow-2xl hover:shadow-violet-500/50 transition-all hover:scale-110"
         >
           <MessageSquare className="w-6 h-6" />
