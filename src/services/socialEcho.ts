@@ -602,7 +602,7 @@ export const AIHistory= async (userId: string,postId: string) => {
     post_id:postId
   };
   try {
-  const res = await fetch(`http://127.0.0.1:8000/api/insights/ai_chat_history/`, {
+  const res = await fetch(`https://socialinsightbackend.onrender.com/api/insights/ai_chat_history/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -637,7 +637,7 @@ export const fetchAIResponse = async (userId: string, question: string, postId: 
     postId:postId
   };
   try {
-  const res = await fetch(`http://127.0.0.1:8000/api/insights/ai_chat/`, {
+  const res = await fetch(`https://socialinsightbackend.onrender.com/api/insights/ai_chat/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

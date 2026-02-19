@@ -15,6 +15,7 @@ import { Button } from "../components/ui/button";
 import { fetchPostAnalytics,fetchRecentPost } from "@/services/socialEcho";
 import {useAuth } from "@/hooks/use-auth"
 import { AuthButtons } from "@/components/AuthButtons";
+import { AIChatPanel } from "@/components/AIChatPanel";
 
 export default function Analytics() {
   const { user } = useAuth();
@@ -201,6 +202,7 @@ const sentiment = data.statistics?.sentiment_distribution || {};
         </motion.div>
 
           {/* Post Overview */}
+          {/* Post Overview */}
         <div className="mb-8">
          <AnalyticsHeader
             postInfo={ post || "" }
@@ -212,7 +214,7 @@ const sentiment = data.statistics?.sentiment_distribution || {};
 
         {/* Insights Cards */}
 <InsightsCards
-  totalReplies={allReplies.length}
+  totalReplies={total_replies}
   agreementRate={agreement.agree || 0}
   positiveRate={sentiment.positive || 0}
   topicsCount={topicsCount}
@@ -253,6 +255,13 @@ const sentiment = data.statistics?.sentiment_distribution || {};
         isOpen={isAddLinkOpen}
         onClose={() => setIsAddLinkOpen(false)}
         onAdd={handleAddLink}
+      />
+
+      {/* AI Chat Panel - Floating */}
+      <AIChatPanel
+        postContent={data}
+        replies={allReplies}
+        postUsername="techvisionary"
       />
     </div>
   );
