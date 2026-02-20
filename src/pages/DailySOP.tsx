@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import UserCorrespondence from "@/components/UserCorrespondence";
+import SocialPostsList from "@/components/SocialPostsList";
 import { Progress } from "@/components/ui/progress";
 import {
   Collapsible,
@@ -374,7 +375,28 @@ export default function DailySOP() {
               </div>
               <span className="text-sm text-muted-foreground">{totalChecked} / {totalItems} tasks</span>
             </div>
-            <Progress value={overallProgress} className="h-2" />
+            <Progress value={overallProgress} className="h-2 mb-4" />
+
+            {/* Stage Summary */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-2">
+              {[
+                { label: "Detection", sections: [...rollingCycleSections.filter(s => s.id === "detection"), ...eveningCycles.filter(s => s.id === "eve1")], color: "text-blue-400", bg: "bg-blue-500/10" },
+                { label: "Engagement", sections: [...rollingCycleSections.filter(s => s.id === "engagement"), ...eveningCycles.filter(s => s.id === "eve2")], color: "text-emerald-400", bg: "bg-emerald-500/10" },
+                { label: "Amplification", sections: [...rollingCycleSections.filter(s => s.id === "amplification"), ...eveningCycles.filter(s => s.id === "eve3")], color: "text-amber-400", bg: "bg-amber-500/10" },
+                { label: "Conversion", sections: rollingCycleSections.filter(s => s.id === "conversion"), color: "text-purple-400", bg: "bg-purple-500/10" },
+              ].map((stage) => {
+                const stageItems = stage.sections.flatMap(s => s.items);
+                const done = stageItems.filter(i => checked[i.id]).length;
+                const total = stageItems.length;
+                return (
+                  <div key={stage.label} className={cn("rounded-lg p-2.5 border", stage.bg)}>
+                    <p className={cn("text-[11px] font-semibold", stage.color)}>{stage.label}</p>
+                    <p className="text-lg font-bold">{done}<span className="text-xs text-muted-foreground font-normal">/{total}</span></p>
+                    <Progress value={total > 0 ? (done / total) * 100 : 0} className="h-1 mt-1" />
+                  </div>
+                );
+              })}
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -394,7 +416,10 @@ export default function DailySOP() {
         defaultOpen
       >
         {rollingCycleSections.map((section) => (
-          <ChecklistSection key={section.id} section={section} checked={checked} onToggle={toggleCheck} />
+          <div key={section.id}>
+            <ChecklistSection section={section} checked={checked} onToggle={toggleCheck} />
+            {section.id === "detection" && <SocialPostsList />}
+          </div>
         ))}
       </CollapsibleSection>
 

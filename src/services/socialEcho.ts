@@ -685,3 +685,72 @@ export async function trackPaymentsView() {
     p_page_name: "payments",
   });
 }
+export function generateTemplate(post: any) {
+  const sentimentDist = post.sentiment_distribution || {};
+  const agreementDist = post.agreement_distribution || {};
+  const clusters = post.topic_clusters || {};
+
+  function dominant(dist: any) {
+    return Object.entries(dist)
+      .sort((a: any, b: any) => b[1].percentage - a[1].percentage)[0];
+  }
+
+  const [dominantSentiment, sentMeta]: any = dominant(sentimentDist) || [];
+  const [dominantAgreement, agrMeta]: any = dominant(agreementDist) || [];
+
+  const sentimentPct = sentMeta ? Math.round(sentMeta.percentage) : null;
+  const agreementPct = agrMeta ? Math.round(agrMeta.percentage) : null;
+
+  // Find dominant topic by frequency
+  let dominantTopic = null;
+  let highestFreq = 0;
+
+  Object.values(clusters).forEach((group: any) => {
+    group.forEach((cluster: any) => {
+      if (cluster.frequency > highestFreq) {
+        highestFreq = cluster.frequency;
+        dominantTopic = cluster.topic;
+      }
+    });
+  });
+
+  return buildStructuredTemplate({
+    dominantSentiment,
+    sentimentPct,
+    dominantAgreement,
+    agreementPct,
+    dominantTopic,
+    analysisLink: post.analysis_link || "#",
+  });
+}
+
+function buildStructuredTemplate(data: any) {
+  const {
+    dominantSentiment,
+    sentimentPct,
+    dominantAgreement,
+    agreementPct,
+    dominantTopic,
+    analysisLink,
+  } = data;
+
+  const mainText = `We analysed this discussion. Sentiment is largely ${
+    dominantSentiment || "neutral"
+  } (${sentimentPct ?? 50}%), with strong signals around ${
+    dominantTopic || "general topics"
+  }. Full breakdown → ${analysisLink}`;
+
+  const replyText = `Engagement here is interesting 👀 Recurring themes: ${
+    dominantTopic || "various topics"
+  }. Audience alignment trends ${
+    dominantAgreement || "mixed"
+  } (${agreementPct ?? 50}%). Explore grouped replies → ${analysisLink}`;
+
+  const dmText = `Hey — your post shows notable engagement clusters. Sentiment mix & key themes available here → ${analysisLink}`;
+
+  return {
+    main_post: { text: mainText, tone: "insightful", goal: "traffic" },
+    reply: { text: replyText, tone: "engaging", goal: "engagement" },
+    dm: { text: dmText, tone: "professional", goal: "conversion" },
+  };
+}
