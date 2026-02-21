@@ -117,7 +117,7 @@ const sendMessage = async () => {
       postContent
     );
 
-    const hydratedMentions: Reply[] = (response.replyMentions || [])
+    const hydratedMentions: Reply[] = (response.reply_mentions || [])
       .map((mentionId) => {
         const match = replies.find(r => r.id == String(mentionId));
         if (!match) return null;
