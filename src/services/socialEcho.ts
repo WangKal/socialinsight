@@ -720,7 +720,8 @@ export function generateTemplate(post: any) {
     dominantAgreement,
     agreementPct,
     dominantTopic,
-    analysisLink: post.analysis_link || "#",
+    analysisLink: `https://socialinsightbackend.onrender.com/general-analysis?post=${post.id}` || "#",
+    postLink:post.analysis_link || "#"
   });
 }
 
