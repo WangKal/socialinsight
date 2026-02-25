@@ -167,18 +167,22 @@ setError("")
     />
   </div>
 
-  {/* Messages */}
-  {error && (
-    <motion.div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-      <p className="text-sm text-red-600">{error}</p>
-    </motion.div>
-  )}
+{/* Messages */}
+{error && (
+  <motion.div
+    className="p-3 bg-red-50 border border-red-200 rounded-lg break-words max-w-full"
+  >
+    <p className="text-sm text-red-600">{error}</p>
+  </motion.div>
+)}
 
-  {success && (
-    <motion.div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-      <p className="text-sm text-green-600">{success}</p>
-    </motion.div>
-  )}
+{success && (
+  <motion.div
+    className="p-3 bg-green-50 border border-green-200 rounded-lg break-words max-w-full"
+  >
+    <p className="text-sm text-green-600">{success}</p>
+  </motion.div>
+)}
 
   {/* URL Submit Button */}
 <Button
