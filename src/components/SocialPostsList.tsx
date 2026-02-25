@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/intergrations/supabase/client";
+import { deletePost } from "@/services/socialEcho";
+import {useToast } from "@/hooks/use-toast"
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,7 +21,7 @@ import {
   DialogDescription
 } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Loader2, RefreshCw, BarChart3, CheckCircle2, Clock } from "lucide-react";
+import { Loader2, RefreshCw, BarChart3, CheckCircle2, Clock,Trash2 } from "lucide-react";
 import {Textarea} from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { generateTemplate } from "@/services/socialEcho";
@@ -69,6 +71,41 @@ export default function SocialPostsAdmin() {
   const [creating, setCreating] = useState(false);
   // inside the component
 const [editedTemplates, setEditedTemplates] = useState<Record<string, any>>({});
+ const { toast } = useToast();
+
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const handleDelete = async (postId: string) => {
+
+    if (deletingId) return; // Prevent multi-click madness
+
+    try {
+      setDeletingId(postId);
+
+      await deletePost(postId);
+
+      toast({
+        title: "Post deleted",
+        description: "The post and related analysis were removed successfully.",
+      });
+
+      
+      onPostDeleted?.(postId); 
+
+    } catch (error) {
+
+      console.error(error);
+
+      toast({
+        variant: "destructive",
+        title: "Deletion failed",
+        description: "Something went wrong while deleting the post.",
+      });
+
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
 const handleTemplateChange = (postId: string, section: string, value: Partial<any>) => {
   setEditedTemplates((prev) => ({
@@ -249,8 +286,9 @@ const saveEditedTemplates = async () => {
               <TableHead className="text-xs">Select</TableHead>
               <TableHead className="text-xs">Status</TableHead>
               <TableHead className="text-xs">Platform</TableHead>
-              <TableHead className="text-xs">Post</TableHead>
+              <TableHead className="text-xs">Source</TableHead>
               <TableHead className="text-xs">Posted</TableHead>
+               <TableHead className="text-xs">Action</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -274,8 +312,20 @@ const saveEditedTemplates = async () => {
                     {platformIcons[post.platform?.toLowerCase() || ""] || "🌐"} {post.platform || "—"}
                   </TableCell>
                   
-                  <TableCell className="max-w-[200px] truncate">{post_text?.content || ""}</TableCell>
+                  <TableCell className="max-w-[300px] ">{post.source_url || ""}</TableCell>
     <TableCell>{post.posted ? "✅" : "—"}</TableCell>
+                  <TableCell className="text-right">
+                <div className="flex items-center justify-end gap-2">
+                 
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => deletePost(post.id)}
+                  >
+                    Delete <Trash2 className="w-4 h-4 ml-2" />
+                  </Button>
+                </div>
+              </TableCell>
     
                 </TableRow>
               );

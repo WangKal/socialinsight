@@ -10,6 +10,7 @@ import { TopicClusters } from "@/components/analytics/TopicClusters";
 import { RepliesSection } from "@/components/analytics/RepliesSection";
 import { ExportButton } from "@/components/analytics/ExportButton";
 import { AddLinkDialog } from "@/components/analytics/AddLinkDialog";
+import { CreditsBanner } from "@/components/CreditsBanner";
 import { AIChatPanel } from "@/components/AIChatPanel";
 import { Link as LinkIcon } from "lucide-react";
 import { Button } from "../components/ui/button";
@@ -141,6 +142,7 @@ const sentiment = data.statistics?.sentiment_distribution || {};
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-violet-50 via-white to-blue-50">
+       <CreditsBanner />
       <div className="max-w-7xl mx-auto px-6 py-12">
         {/* Page Title with Action Buttons */}
         <motion.div

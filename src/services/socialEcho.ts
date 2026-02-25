@@ -36,7 +36,7 @@ export async function fetchPostAnalytics(postId: string) {
     }
     return [];
   };
-
+console.log((JSON.parse(post.replies)).length)
   const replyIndex = new Map<string, any>();
   normalizeReplies(post.replies).forEach((reply, idx) => {
     replyIndex.set(String(idx ), reply); // 1-based indexing
@@ -720,7 +720,7 @@ export function generateTemplate(post: any) {
     dominantAgreement,
     agreementPct,
     dominantTopic,
-    analysisLink: `https://socialinsightbackend.onrender.com/general-analysis?post=${post.id}` || "#",
+    analysisLink: `https://socialinsight.vercel.app/general-analysis?post=${post.id}` || "#",
     postLink:post.analysis_link || "#"
   });
 }

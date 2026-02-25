@@ -10,6 +10,7 @@ import { TrendChart } from "@/components/TrendChart";
 import { Globe, User, Briefcase, Link as LinkIcon, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getPostsByUser, assignPost, getCampaignsByUser } from "@/services/socialEcho"
+import { CreditsBanner } from "@/components/CreditsBanner";
 import {useAuth } from "@/hooks/use-auth"
 import {useToast } from "@/hooks/use-toast"
 import { encryptId } from "@/hooks/encrypt";
@@ -237,6 +238,7 @@ const calculateAvg = (
 
           {/* Quick Campaigns Preview */}
           <div className="mb-8">
+             <CreditsBanner />
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-2xl bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
                 Active Campaigns

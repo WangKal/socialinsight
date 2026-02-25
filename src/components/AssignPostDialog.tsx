@@ -139,8 +139,9 @@ const [campaignDescription, setNewCampaignDescription] = useState("");
                       Remove as Personal post
                     </Button>
                   </div>)}
-
-                    {campaign==null || campaign.length < 1 ?(<motion.button
+                   {console.log(campaign)}
+                   {console.log(campaign.length)}
+                    {campaign==null || campaign=="NULL" || campaign.length < 1 ?(<motion.button
                       type="button"
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}

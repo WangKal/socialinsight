@@ -16,6 +16,7 @@ import { fetchPostAnalytics,fetchRecentPost, trackGeneralView } from "@/services
 import {useAuth } from "@/hooks/use-auth"
 import { AuthButtons } from "@/components/AuthButtons";
 import { AIChatPanel } from "@/components/AIChatPanel";
+import { CreditsBanner } from "@/components/CreditsBanner";
 
 export default function Analytics() {
   const { user } = useAuth();
@@ -163,6 +164,7 @@ const sentiment = data.statistics?.sentiment_distribution || {};
       </header>
 
       <div className="max-w-7xl mx-auto px-6 py-12">
+         <CreditsBanner />
         {/* Page Title with Action Buttons */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}

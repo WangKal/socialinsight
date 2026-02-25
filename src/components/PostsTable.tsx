@@ -88,6 +88,7 @@ export function PostsTable({ posts, onViewPost, onAssignPost, showAssignButton =
             <TableHead>Replies</TableHead>
             <TableHead>Sentiment</TableHead>
             <TableHead>Agreement</TableHead>
+            <TableHead>Post Url</TableHead>
             <TableHead>Status</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
@@ -103,7 +104,7 @@ export function PostsTable({ posts, onViewPost, onAssignPost, showAssignButton =
             >
               <TableCell>
                 <div>
-                  <div className="text-gray-900">{post.title}</div>
+                  <div className="text-gray-900 max-w-[200px] ">{post.post_text?.content}</div>
                   {post.campaignName && (
                     <div className="text-xs text-gray-500 mt-1">
                       Campaign: {post.campaignName}
@@ -123,7 +124,7 @@ export function PostsTable({ posts, onViewPost, onAssignPost, showAssignButton =
                   {post.agreement_distribution}%
                 </span>
               </TableCell>
-
+              <TableCell className="text-gray-900">{post.url}</TableCell>
               <TableCell>
                 <Badge
                   variant={
