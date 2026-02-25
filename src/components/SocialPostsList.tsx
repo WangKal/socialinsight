@@ -205,7 +205,7 @@ const saveEditedTemplates = async () => {
     try {
       await supabase
         .from("social_posts")
-        .update({ posted: true })
+        .update({ posted: true,is_general: true })
         .in("id", Array.from(selectedPosts));
 
       setPosts((prev) =>
