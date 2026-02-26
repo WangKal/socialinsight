@@ -685,73 +685,52 @@ export async function trackPaymentsView() {
     p_page_name: "payments",
   });
 }
-export function generateTemplate(post: any) {
+export async function generateTemplate(post: any) {
+
   const sentimentDist = post.sentiment_distribution || {};
   const agreementDist = post.agreement_distribution || {};
   const clusters = post.topic_clusters || {};
+   const jwt = localStorage.getItem("internal_jwt") || "";
 
-  function dominant(dist: any) {
-    return Object.entries(dist)
-      .sort((a: any, b: any) => b[1].percentage - a[1].percentage)[0];
-  }
-
-  const [dominantSentiment, sentMeta]: any = dominant(sentimentDist) || [];
-  const [dominantAgreement, agrMeta]: any = dominant(agreementDist) || [];
-
-  const sentimentPct = sentMeta ? Math.round(sentMeta.percentage) : null;
-  const agreementPct = agrMeta ? Math.round(agrMeta.percentage) : null;
-
-  // Find dominant topic by frequency
-  let dominantTopic = null;
-  let highestFreq = 0;
+  // Extract top topics (not just dominant)
+  const topics: any[] = [];
 
   Object.values(clusters).forEach((group: any) => {
     group.forEach((cluster: any) => {
-      if (cluster.frequency > highestFreq) {
-        highestFreq = cluster.frequency;
-        dominantTopic = cluster.topic;
-      }
+      topics.push({
+        topic: cluster.topic,
+        frequency: cluster.frequency
+      });
     });
   });
 
-  return buildStructuredTemplate({
-    dominantSentiment,
-    sentimentPct,
-    dominantAgreement,
-    agreementPct,
-    dominantTopic,
-    analysisLink: `https://socialinsight.vercel.app/general-analysis?post=${post.id}` || "#",
-    postLink:post.analysis_link || "#"
+  // Sort topics by frequency
+  const topTopics = topics
+    .sort((a, b) => b.frequency - a.frequency)
+    .slice(0, 5); // limit context size
+
+  const response = await fetch("http://127.0.0.1:8000/api/insights/generate_marketing_post/", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${jwt}`
+    },
+    body: JSON.stringify({
+      post: {
+        id: post.id, // backend expects "id", not "post_id"
+        sentiment_distribution: sentimentDist,
+        agreement_distribution: agreementDist,
+        platform:post.platform,
+        topic_clusters: {
+          main: topTopics.map(topic => ({
+            topic: topic.topic,
+            frequency: topic.frequency
+          }))
+        },
+        analysis_link: `https://socialinsight.vercel.app/general-analysis?post=${post.id}`
+      }
+    })
   });
-}
 
-function buildStructuredTemplate(data: any) {
-  const {
-    dominantSentiment,
-    sentimentPct,
-    dominantAgreement,
-    agreementPct,
-    dominantTopic,
-    analysisLink,
-  } = data;
-
-  const mainText = `We analysed this discussion. Sentiment is largely ${
-    dominantSentiment || "neutral"
-  } (${sentimentPct ?? 50}%), with strong signals around ${
-    dominantTopic || "general topics"
-  }. Full breakdown → ${analysisLink}`;
-
-  const replyText = `Engagement here is interesting 👀 Recurring themes: ${
-    dominantTopic || "various topics"
-  }. Audience alignment trends ${
-    dominantAgreement || "mixed"
-  } (${agreementPct ?? 50}%). Explore grouped replies → ${analysisLink}`;
-
-  const dmText = `Hey — your post shows notable engagement clusters. Sentiment mix & key themes available here → ${analysisLink}`;
-
-  return {
-    main_post: { text: mainText, tone: "insightful", goal: "traffic" },
-    reply: { text: replyText, tone: "engaging", goal: "engagement" },
-    dm: { text: dmText, tone: "professional", goal: "conversion" },
-  };
+  return response.json();
 }

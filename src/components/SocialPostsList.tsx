@@ -156,6 +156,7 @@ const saveEditedTemplates = async () => {
       .from("social_posts")
       .select("*")
       .order("created_at", { ascending: false });
+      console.log(data)
     if (!error && data) setPosts(data);
     setLoading(false);
   };
@@ -181,7 +182,8 @@ const saveEditedTemplates = async () => {
       const updatedPosts = [...posts];
       for (let post of posts) {
         if (selectedPosts.has(post.id) && post.status === "completed") {
-          const template = generateTemplate(post);
+          const template = await generateTemplate(post);
+          console.log(template);
           await supabase
             .from("social_posts")
             .update({ post_template: template })
