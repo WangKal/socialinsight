@@ -85,7 +85,6 @@ export function PostsTable({ posts, onViewPost, onAssignPost, showAssignButton =
           <TableRow className="bg-gray-50">
             <TableHead>Post Title</TableHead>
             <TableHead>Date</TableHead>
-            <TableHead>Replies</TableHead>
             <TableHead>Sentiment</TableHead>
             <TableHead>Agreement</TableHead>
             <TableHead>Post Url</TableHead>
@@ -113,7 +112,6 @@ export function PostsTable({ posts, onViewPost, onAssignPost, showAssignButton =
                 </div>
               </TableCell>
               <TableCell className="text-gray-600">{post.date}</TableCell>
-              <TableCell className="text-gray-900">{post.replies}</TableCell>
               <TableCell>
                 <span className={getSentimentColor(post.sentiment)}>
                   {post.sentiment_distribution}%

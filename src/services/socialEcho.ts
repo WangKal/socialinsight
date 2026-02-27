@@ -709,7 +709,7 @@ export async function generateTemplate(post: any) {
     .sort((a, b) => b.frequency - a.frequency)
     .slice(0, 5); // limit context size
 
-  const response = await fetch("http://127.0.0.1:8000/api/insights/generate_marketing_post/", {
+  const response = await fetch("https://socialinsightbackend.onrender.com/api/insights/generate_marketing_post/", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

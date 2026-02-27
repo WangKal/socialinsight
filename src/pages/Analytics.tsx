@@ -117,7 +117,7 @@ const allReplies = [
   ...(data.disagree_replies || []),
 ];
 
-const total_replies = data.total_replies;
+const total_replies = data.agree_replies.length + data.neutral_replies.length + data.disagree_replies.length  ;
 
 // Topic count (cluster count, not reply count)
 const topicsCount =
