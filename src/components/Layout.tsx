@@ -1,5 +1,6 @@
 import { ReactNode, useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { PageSwitcher } from "./components/PageSwitcher";
 import {
   LayoutDashboard,
   BarChart3,
@@ -241,6 +242,7 @@ export function Layout({ children }: LayoutProps) {
       <main className="flex-1 overflow-auto lg:pt-0 pt-16">
         {children}
       </main>
+      <PageSwitcher />
     </div>
   );
 }

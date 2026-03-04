@@ -1,22 +1,72 @@
 import { Home, LayoutDashboard, BarChart3, Bell, MessageSquare, Shield } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/use-auth";
+import { getUserProfile } from "@/services/socialEcho";
+import { useEffect, useState } from "react";
 
-type PageType = "home" | "analytics" | "dashboard" | "notifications" | "messaging" | "admin";
+type PageType =
+  | "home"
+  | "analytics"
+  | "dashboard"
+  | "notifications"
+  | "messaging"
+  | "admin";
 
 export function PageSwitcher() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const [role, setRole] = useState<string>("");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+
+
+    (async () => {
+      try {
+        const profile = await getUserProfile(user.id);
+        const userRole = profile?.role || "";
+
+        setRole(userRole);
+
+        //  Protect admin route
+        const isAdminRoute = location.pathname === "/admin";
+        const isAdminUser =
+          userRole === "super_admin" || userRole === "admin";
+
+        if (isAdminRoute && !isAdminUser) {
+          navigate("/");
+        }
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [user, location.pathname, navigate]);
+
+  if (loading) return null;
 
   const pages = [
     { id: "home" as const, label: "Home", icon: Home, path: "/" },
-    { id: "dashboard" as const, label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
+  
+    // Only include Admin page if allowed
+    ...(role === "super_admin" || role === "admin"
+      ? [
+        { id: "dashboard" as const, label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
     { id: "analytics" as const, label: "Analytics", icon: BarChart3, path: "/analytics" },
     { id: "notifications" as const, label: "Notifications", icon: Bell, path: "/notifications" },
     { id: "messaging" as const, label: "Messages", icon: MessageSquare, path: "/messages" },
-    { id: "admin" as const, label: "Admin", icon: Shield, path: "/admin" },
+
+          {
+            id: "admin" as const,
+            label: "Admin",
+            icon: Shield,
+            path: "/admin",
+          },
+        ]
+      : []),
   ];
 
-  // detect current page from URL
   const currentPage =
     pages.find((p) => p.path === location.pathname)?.id || "home";
 
@@ -39,7 +89,9 @@ export function PageSwitcher() {
           >
             <Icon className="w-4 h-4" />
             {active && (
-              <span className="text-sm hidden sm:inline">{page.label}</span>
+              <span className="text-sm hidden sm:inline">
+                {page.label}
+              </span>
             )}
           </button>
         );
