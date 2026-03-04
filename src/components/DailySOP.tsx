@@ -321,7 +321,7 @@ function CollapsibleSection({ title, icon, children, defaultOpen = false }: {
   );
 }
 
-export default function DailySOP() {
+export function DailySOP() {
   const [checked, setChecked] = useState<Record<string, boolean>>({});
 
   const toggleCheck = (id: string) => {

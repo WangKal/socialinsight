@@ -93,32 +93,32 @@ export function AdminPayments({ payments, selectedUserId }: AdminPaymentsProps) 
                 transition={{ delay: index * 0.05 }}
                 className="border-b border-gray-100 hover:bg-gray-50"
               >
-                <TableCell className="text-gray-900">{payment.id}</TableCell>
+                <TableCell className="text-gray-900">{payment?.id}</TableCell>
                 {!selectedUserId && (
                   <TableCell>
                     <div>
-                      <div className="text-gray-900">{payment.userName}</div>
-                      <div className="text-sm text-gray-500">{payment.userEmail}</div>
+                      <div className="text-gray-900">{payment?.userName}</div>
+                      <div className="text-sm text-gray-500">{payment?.userEmail}</div>
                     </div>
                   </TableCell>
                 )}
-                <TableCell className="text-gray-900">${payment.amount}</TableCell>
+                <TableCell className="text-gray-900">${payment?.amount}</TableCell>
                 <TableCell className="text-gray-900">
-                  {payment.credits.toLocaleString()}
+                 
                 </TableCell>
-                <TableCell className="text-sm text-gray-600">{payment.date}</TableCell>
+                <TableCell className="text-sm text-gray-600">{payment?.date}</TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2 text-sm text-gray-600">
                     <CreditCard className="w-4 h-4" />
-                    {payment.paymentMethod}
+                    {payment?.paymentMethod}
                   </div>
                 </TableCell>
                 <TableCell>
                   <Badge
                     variant={
-                      payment.status === "completed"
+                      payment?.status === "completed"
                         ? "default"
-                        : payment.status === "pending"
+                        : payment?.status === "pending"
                         ? "secondary"
                         : "destructive"
                     }

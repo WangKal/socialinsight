@@ -734,3 +734,82 @@ export async function generateTemplate(post: any) {
 
   return response.json();
 }
+
+
+
+export async function getAdminUsers() {
+  // 1️⃣ Get profiles
+  const { data: profiles, error: profilesError } = await supabase
+    .from("profiles")
+    .select("user_id, full_name, role, created_at");
+
+  if (profilesError) throw profilesError;
+
+  // 2️⃣ Get posts grouped by user
+  const { data: posts } = await supabase
+    .from("social_posts")
+    .select("user_id, id");
+
+  // 3️⃣ Get credits
+  const { data: credits } = await supabase
+    .from("credits")
+    .select("user_id, used_credits, remaining_credits");
+
+  // 4️⃣ Get campaigns
+  const { data: campaigns } = await supabase
+    .from("campaigns")
+    .select("user_id, id");
+
+  return profiles.map((profile) => {
+    const userPosts = posts?.filter(p => p.user_id === profile.user_id) || [];
+    const userCredits = credits?.find(c => c.user_id === profile.user_id);
+    const userCampaigns = campaigns?.filter(c => c.user_id === profile.user_id) || [];
+
+    return {
+      id: profile.user_id,
+      name: profile.full_name || "Unnamed",
+      role: profile.role,
+      totalPosts: userPosts.length,
+      creditsUsed: userCredits?.used_credits ?? 0,
+      creditsRemaining: userCredits?.remaining_credits ?? 0,
+      campaigns: userCampaigns.length,
+      joinedDate: profile.created_at,
+    };
+  });
+}
+
+export async function getAdminPayments() {
+  const { data, error } = await supabase
+    .from("payments")
+    .select(`
+      id,
+      user_id,
+      amount,
+      credits_purchased,
+      status,
+      payment_method,
+      created_at
+    `)
+    .order("created_at", { ascending: false });
+
+  if (error) throw error;
+
+  return data;
+}
+export async function getAdminRequests() {
+  const { data, error } = await supabase
+    .from("social_posts")
+    .select(`
+      id,
+      user_id,
+      source_url,
+      status,
+      created_at,
+      post_text
+    `)
+    .order("created_at", { ascending: false });
+
+  if (error) throw error;
+
+  return data;
+}

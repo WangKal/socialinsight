@@ -19,7 +19,7 @@ import Terms from "./pages/Terms";
 import Guide from "./pages/Guide";
 import NotFound from "./pages/NotFound";
 import { AuthProvider } from "./hooks/use-auth";
-import DailySOP from "./pages/DailySOP";
+import { PageSwitcher } from "./components/PageSwitcher";
 
 const queryClient = new QueryClient();
 
@@ -45,10 +45,11 @@ const App = () => (
           <Route path="/analytics" element={<Layout><Analytics /></Layout>} />
           <Route path="/payments" element={<Layout><Payments /></Layout>} />
           <Route path="/settings" element={<Layout><Settings /></Layout>} />
-          <Route path="/daily-sop" element={<Layout><DailySOP /></Layout>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
+           <PageSwitcher />
+  
       </BrowserRouter>
     </TooltipProvider>
     </AuthProvider>

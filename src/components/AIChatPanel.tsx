@@ -170,34 +170,46 @@ const sendMessage = async () => {
   return (
     <>
       {/* Floating Action Button */}
-      {!isOpen && (
-        <motion.button
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          onClick={() => {
-  if (!user) {
-    toast({
-      title: "Authentication Required",
-      description:
-        "You need to be signed in to access insights, analytics, and AI-powered tools.",
-      variant: "destructive", // or custom warning variant
-    });
+{!isOpen && (
+  <motion.button
+    initial={{ scale: 0.8, opacity: 0 }}
+    animate={{ scale: 1, opacity: 1 }}
+    transition={{ type: "spring", stiffness: 260, damping: 20 }}
+    onClick={() => {
+      if (!user) {
+        toast({
+          title: "Authentication Required",
+          description:
+            "Sign in to access insights and AI tools.",
+          variant: "destructive",
+        });
 
-    setTimeout(() => {
-      navigate("/auth"); // or router.push("/auth")
-    }, 1200);
+        setTimeout(() => {
+          navigate("/auth");
+        }, 1200);
 
-    return;
-  }
+        return;
+      }
 
-  setIsOpen(true);
-}}
-
-          className="fixed bottom-8 right-8 z-50 bg-gradient-to-r from-violet-600 to-purple-600 text-white p-4 rounded-full shadow-2xl hover:shadow-violet-500/50 transition-all hover:scale-110"
-        >
-          <MessageSquare className="w-6 h-6" />
-        </motion.button>
-      )}
+      setIsOpen(true);
+    }}
+    className="
+      fixed bottom-8 right-8 z-50
+      flex items-center gap-2
+      bg-violet-600 hover:bg-violet-700
+      text-white
+      px-5 py-3
+      rounded-2xl
+      shadow-lg hover:shadow-xl
+      transition-all duration-200
+    "
+  >
+    <MessageSquare className="w-5 h-5" />
+    <span className="text-sm font-medium">
+      AI Chat
+    </span>
+  </motion.button>
+)}
 
       {/* Chat Panel */}
       <AnimatePresence>

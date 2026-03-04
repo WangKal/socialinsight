@@ -1,136 +1,26 @@
+
 import { motion, AnimatePresence } from "motion/react";
-import { Shield, Users, DollarSign, BarChart3, MessageSquare, Settings, Plus, X } from "lucide-react";
-import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Shield, Users, DollarSign, BarChart3, MessageSquare, Settings, Plus, X, Link as LinkIcon ,ClipboardList} from "lucide-react";
+import { useState , useEffect } from "react";
 import { Button } from "../components/ui/button";
 import { AdminUserManagement } from "../components/AdminUserManagement";
 import { AdminPayments } from "../components/AdminPayments";
 import { AdminManagement } from "../components/AdminManagement";
+import { AdminRequests } from "../components/AdminRequests";
+import { DailySOP } from "../components/DailySOP";
+import {useAuth } from "@/hooks/use-auth"
 
-// Mock data
-const mockUsers = [
-  {
-    id: "1",
-    name: "John Doe",
-    email: "john@example.com",
-    status: "active" as const,
-    totalPosts: 45,
-    creditsUsed: 1250,
-    creditsRemaining: 750,
-    sitesAnalyzed: 12,
-    campaigns: 3,
-    joinedDate: "2024-11-01",
-    lastActive: "2 hours ago",
-  },
-  {
-    id: "2",
-    name: "Sarah Smith",
-    email: "sarah@example.com",
-    status: "active" as const,
-    totalPosts: 78,
-    creditsUsed: 2100,
-    creditsRemaining: 900,
-    sitesAnalyzed: 24,
-    campaigns: 5,
-    joinedDate: "2024-10-15",
-    lastActive: "1 day ago",
-  },
-  {
-    id: "3",
-    name: "Mike Johnson",
-    email: "mike@example.com",
-    status: "suspended" as const,
-    totalPosts: 23,
-    creditsUsed: 650,
-    creditsRemaining: 50,
-    sitesAnalyzed: 8,
-    campaigns: 2,
-    joinedDate: "2024-11-20",
-    lastActive: "1 week ago",
-  },
-  {
-    id: "4",
-    name: "Emily Davis",
-    email: "emily@example.com",
-    status: "active" as const,
-    totalPosts: 156,
-    creditsUsed: 4200,
-    creditsRemaining: 1800,
-    sitesAnalyzed: 45,
-    campaigns: 8,
-    joinedDate: "2024-09-10",
-    lastActive: "30 min ago",
-  },
-];
+import { useQuery } from "@tanstack/react-query";
+import {
+  getAdminUsers,
+  getAdminPayments,
+  getAdminRequests,
+  getUserProfile
+} from "@/services/socialEcho";
 
-const mockPayments = [
-  {
-    id: "PAY-001",
-    userId: "1",
-    userName: "John Doe",
-    userEmail: "john@example.com",
-    amount: 99,
-    credits: 1000,
-    date: "Dec 3, 2025",
-    status: "completed" as const,
-    paymentMethod: "Visa •••• 4242",
-  },
-  {
-    id: "PAY-002",
-    userId: "2",
-    userName: "Sarah Smith",
-    userEmail: "sarah@example.com",
-    amount: 199,
-    credits: 2500,
-    date: "Dec 2, 2025",
-    status: "completed" as const,
-    paymentMethod: "Mastercard •••• 5555",
-  },
-  {
-    id: "PAY-003",
-    userId: "4",
-    userName: "Emily Davis",
-    userEmail: "emily@example.com",
-    amount: 299,
-    credits: 5000,
-    date: "Dec 1, 2025",
-    status: "completed" as const,
-    paymentMethod: "Visa •••• 1234",
-  },
-  {
-    id: "PAY-004",
-    userId: "3",
-    userName: "Mike Johnson",
-    userEmail: "mike@example.com",
-    amount: 99,
-    credits: 1000,
-    date: "Nov 30, 2025",
-    status: "failed" as const,
-    paymentMethod: "Visa •••• 9876",
-  },
-];
 
-const mockAdmins = [
-  {
-    id: "A1",
-    name: "Admin User",
-    email: "admin@platform.com",
-    role: "admin" as const,
-    permissions: ["Full Access"],
-    joinedDate: "2024-01-01",
-    lastActive: "Just now",
-  },
-  {
-    id: "A2",
-    name: "Support Admin",
-    email: "support@platform.com",
-    role: "sub-admin" as const,
-    permissions: ["View Only", "No Payment Access", "No Credit Management"],
-    joinedDate: "2024-06-15",
-    lastActive: "1 hour ago",
-  },
-];
-
-type TabType = "overview" | "users" | "payments" | "admins";
+type TabType = "overview" | "users" | "payments" | "admins" | "requests";
 
 interface AddCreditsDialogProps {
   isOpen: boolean;
@@ -306,18 +196,64 @@ function ViewUserDialog({ isOpen, onClose, user, payments }: ViewUserDialogProps
 }
 
 export default function AdminDashboard() {
+  const {user} = useAuth()
+  const navigate = useNavigate()
+  const [role, setRole] = useState("");
+  const [loading, setLoading] = useState(false);
+useEffect(() => {
+  if (!user?.id) {
+    navigate("/auth");
+    return;
+  }
+
+  (async () => {
+    setLoading(true);
+
+    const profile = await getUserProfile(user.id);
+
+    const userRole = profile?.role || "";
+
+    // Check role directly from fetched profile
+    if (userRole !== "super_admin") {
+      navigate("/");
+      return;
+    }
+
+    setRole(userRole);
+    setLoading(false);
+  })();
+}, [user, navigate]);
+ 
+    //
   const [currentTab, setCurrentTab] = useState<TabType>("overview");
-  const [users, setUsers] = useState(mockUsers);
+ 
   const [isAddCreditsOpen, setIsAddCreditsOpen] = useState(false);
   const [isViewUserOpen, setIsViewUserOpen] = useState(false);
-  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
-  const [currentAdminRole] = useState<"admin" | "sub-admin">("admin");
 
+
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [currentAdminRole] = useState<"admin" | "super-admin">("admin");
+  const { data: users = [], isLoading: usersLoading } = useQuery({
+    queryKey: ["users"],
+    queryFn: getAdminUsers,
+  });
+
+  const { data: payments = [] } = useQuery({
+    queryKey: ["admin-payments"],
+    queryFn: getAdminPayments,
+  });
+ 
+  const { data: requests = [] } = useQuery({
+    queryKey: ["admin-requests"],
+    queryFn: getAdminRequests,
+  });
+  const admins = users.filter(u => u.role == "admin" || u.role =="super-admin" )
   const totalPosts = users.reduce((sum, u) => sum + u.totalPosts, 0);
   const totalCampaigns = users.reduce((sum, u) => sum + u.campaigns, 0);
-  const totalRevenue = mockPayments
-    .filter((p) => p.status === "completed")
-    .reduce((sum, p) => sum + p.amount, 0);
+
+  const totalRevenue = payments
+  .filter(p => p.status === "completed")
+  .reduce((sum, p) => sum + Number(p.amount), 0);
 
   const handleViewUser = (userId: string) => {
     setSelectedUserId(userId);
@@ -379,6 +315,8 @@ export default function AdminDashboard() {
             { id: "users", label: "Users", icon: Users },
             { id: "payments", label: "Payments", icon: DollarSign },
             { id: "admins", label: "Admins", icon: Shield },
+            { id: "requests", label: "Requests", icon: LinkIcon },
+            { id: "sops", label: "Daily Sop", icon: ClipboardList },
           ].map((tab) => {
             const Icon = tab.icon;
             return (
@@ -455,7 +393,7 @@ export default function AdminDashboard() {
                 </div>
                 <div>
                   <h3 className="text-xl mb-4 text-gray-900">Recent Payments</h3>
-                  <AdminPayments payments={mockPayments.slice(0, 3)} />
+                  <AdminPayments payments={payments.slice(0, 3)} />
                 </div>
               </div>
             </div>
@@ -474,7 +412,7 @@ export default function AdminDashboard() {
           )}
 
           {currentTab === "payments" && currentAdminRole === "admin" && (
-            <AdminPayments payments={mockPayments} />
+            <AdminPayments payments={payments} />
           )}
 
           {currentTab === "payments" && currentAdminRole === "sub-admin" && (
@@ -486,10 +424,19 @@ export default function AdminDashboard() {
 
           {currentTab === "admins" && (
             <AdminManagement
-              admins={mockAdmins}
+              admins={admins}
               onDeleteAdmin={(id) => console.log("Delete admin", id)}
               currentAdminRole={currentAdminRole}
             />
+          )}
+
+          {currentTab === "requests" && (
+            <AdminRequests requests={requests} />
+          )}
+
+
+          {currentTab === "sops" && (
+            <DailySOP />
           )}
         </motion.div>
       </div>
@@ -513,7 +460,7 @@ export default function AdminDashboard() {
               setSelectedUserId(null);
             }}
             user={selectedUser}
-            payments={mockPayments}
+            payments={payments}
           />
         </>
       )}
