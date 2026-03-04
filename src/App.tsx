@@ -19,7 +19,7 @@ import Terms from "./pages/Terms";
 import Guide from "./pages/Guide";
 import NotFound from "./pages/NotFound";
 import { AuthProvider } from "./hooks/use-auth";
-import { PageSwitcher } from "./components/PageSwitcher";
+
 
 const queryClient = new QueryClient();
 
@@ -48,7 +48,7 @@ const App = () => (
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
-           <PageSwitcher />
+         
   
       </BrowserRouter>
     </TooltipProvider>
