@@ -1,0 +1,89 @@
+{
+  "manifest_version": 3,
+  "name": "SocialInsight",
+  "version": "1.0",
+  "description": "Capture posts and replies for sentiment analysis",
+
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting",
+    "tabs",
+    "notifications",
+    "cookies",
+    "windows"
+  ],
+
+  "background": {
+    "service_worker": "background.js"
+  },
+
+  "content_scripts": [
+    {
+      "matches": [
+        "*://x.com/*",
+        "*://www.x.com/*",
+        "*://web.x.com/*",
+        "*://twitter.com/*",
+        "*://www.twitter.com/*",
+        "*://facebook.com/*",
+        "*://www.facebook.com/*",
+        "*://m.facebook.com/*",
+        "*://web.facebook.com/*",
+        "*://tiktok.com/*",
+        "*://web.tiktok.com/*",
+        "*://www.tiktok.com/*",
+        "*://reddit.com/*",
+        "*://www.reddit.com/*",
+        "*://amp.reddit.com/*",
+        "*://linkedin.com/*",
+        "*://www.linkedin.com/*",
+        "*://web.whatsapp.com/*"
+        
+
+      ],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/SocialInsightLogo.png",
+      "48": "icons/SocialInsightLogo.png",
+      "128": "icons/SocialInsightLogo.png"
+    }
+  },
+
+  "icons": {
+    "16": "icons/SocialInsightLogo.png",
+    "48": "icons/SocialInsightLogo.png",
+    "128": "icons/SocialInsightLogo.png"
+  },
+
+  "host_permissions": [
+    "*://x.com/*",
+    "*://www.x.com/*",
+    "*://twitter.com/*",
+    "*://www.twitter.com/*",
+    "*://facebook.com/*",
+    "*://www.facebook.com/*",
+    "*://m.facebook.com/*",
+    "*://tiktok.com/*",
+    "*://www.tiktok.com/*",
+    "*://reddit.com/*",
+    "*://www.reddit.com/*",
+    "*://amp.reddit.com/*",
+    "*://linkedin.com/*",
+    "*://www.linkedin.com/*",
+    "*://web.whatsapp.com/*"
+  ],
+
+  "web_accessible_resources": [
+    {
+      "resources": ["libs/supabase.js"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

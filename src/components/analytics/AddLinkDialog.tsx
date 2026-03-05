@@ -9,6 +9,7 @@ import {
   extractPostData,
   buildAnalysisPayload,
   sendForAnalysis,
+  requestAnalysis,
 } from "@/services/analysisService";
 import {useAuth } from "@/hooks/use-auth"
 
@@ -26,7 +27,9 @@ export function AddLinkDialog({ isOpen, onClose, onAdd }: AddLinkDialogProps) {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [extensionDialog, setExtensionDialog] = useState(false);
-   const [guideOpen, setGuideOpen] = useState(false)
+   const [guideOpen, setGuideOpen] = useState(false);
+   const [link, setLink] = useState("");
+const [requestSubmitting, setRequestSubmitting] = useState(false);
    const [isSubmitting, setIsSubmitting] = useState(false);
 
 
@@ -93,7 +96,61 @@ setError("")
   }
 };
 
+const handleRequestAnalysis = async (e: React.FormEvent) => {
+  e.preventDefault();
 
+ if (!link.trim()) {
+    setError("URL is required");
+    return;
+  }
+
+  let parsedUrl: URL;
+  try {
+    parsedUrl = new URL(link);
+    setIsSubmitting(false)
+  } catch {
+    setError("Please enter a valid URL");
+    setIsSubmitting(false)
+    return;
+  }
+
+  const platform = detectPlatformFromUrl(parsedUrl.href);
+
+  if (!platform) {
+    setError("Unsupported or invalid post URL");
+    return;
+  }
+
+  if (!user?.id) {
+    setError("You must be logged in");
+    return;
+  }
+
+  try {
+    setRequestSubmitting(true);
+    setError("");
+
+    const response = await requestAnalysis(platform, parsedUrl, jwt, user.id)
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      setError(data.msg || "Failed to submit request");
+      return;
+    }
+
+    setSuccess(
+      "Your request has been received. Our team will run the analysis and notify you when it is ready."
+    );
+
+    setLink("");
+  } catch (err) {
+    console.error(err);
+    setError("Failed to submit request");
+  } finally {
+    setRequestSubmitting(false);
+  }
+};
 
   const handleClose = () => {
     setUrl("");
@@ -222,9 +279,47 @@ setError("")
   )}
 </Button>
 
+{/* Divider */}
+<div className="border-t pt-4 mt-4">
+  <p className="text-sm text-gray-700 mb-3 font-medium">
+    Request Account Analysis
+  </p>
+
+  <p className="text-xs text-gray-500 mb-3">
+Prefer us to run the analysis for you?<br/>
+
+Add the Facebook or X (Twitter) link and we'll process the analysis on your
+behalf.
+  </p>
+
+  <div className="space-y-3">
+    {/* Facebook */}
+    <input
+      type="text"
+      placeholder="Facebook Page or Profile URL"
+      value={link}
+      onChange={(e) => setLink(e.target.value)}
+      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-violet-500"
+    />
+
+
+
+    <Button
+      type="button"
+      disabled={requestSubmitting}
+      onClick={handleRequestAnalysis}
+      className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white"
+    >
+      {requestSubmitting ? "Submitting Request..." : "Request Analysis"}
+    </Button>
+  </div>
+</div>
 
   {/* Info Box */}
   <div className="p-4 bg-violet-50 border border-violet-200 rounded-lg">
+  <p className="text-sm text-gray-700 mb-3 font-medium">
+    Analyze through our chrome extension.
+  </p>
     <p className="text-sm text-violet-700 mb-3">
       <strong>Note:</strong> Currently supports X, Facebook, and Twitter.
     </p>

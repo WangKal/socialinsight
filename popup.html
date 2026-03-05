@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Social Analytics</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Onboarding Modal -->
+    <div class="onboarding-overlay" id="onboardingOverlay">
+      <div class="onboarding-modal">
+        <!-- Progress Dots -->
+        <div class="onboarding-progress">
+          <div class="progress-dot active" data-step="1"></div>
+          <div class="progress-dot" data-step="2"></div>
+          <div class="progress-dot" data-step="3"></div>
+          <div class="progress-dot" data-step="4"></div>
+          <div class="progress-dot" data-step="5"></div>
+        </div>
+
+        <!-- Step 1: Welcome -->
+        <div class="onboarding-step active" data-step="1">
+          <div class="step-icon welcome-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+              <path d="M2 17l10 5 10-5"></path>
+              <path d="M2 12l10 5 10-5"></path>
+            </svg>
+            <div class="icon-glow"></div>
+          </div>
+          <h2 class="step-title">Welcome to SocialEcho 👋</h2>
+          <p class="step-subtitle">Analyze social media posts effortlessly — we handle the heavy lifting.</p>
+          <div class="welcome-features">
+            <div class="feature-pill">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              Sentiment Analysis
+            </div>
+            <div class="feature-pill">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              Topic Detection
+            </div>
+            <div class="feature-pill">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              Smart Insights
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2: Capture Methods -->
+        <div class="onboarding-step" data-step="2">
+          <div class="step-badge">Step 1</div>
+          <h2 class="step-title">Choose How You Capture</h2>
+          <div class="capture-options">
+            <div class="capture-card">
+              <div class="capture-icon manual">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                </svg>
+              </div>
+              <h3>Manual Capture</h3>
+              <p>Pick exactly what you want. Scroll to the content, then stop and analyze.</p>
+            </div>
+            <div class="capture-card">
+              <div class="capture-icon auto">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2v4"></path>
+                  <path d="M12 18v4"></path>
+                  <path d="M4.93 4.93l2.83 2.83"></path>
+                  <path d="M16.24 16.24l2.83 2.83"></path>
+                  <path d="M2 12h4"></path>
+                  <path d="M18 12h4"></path>
+                  <path d="M4.93 19.07l2.83-2.83"></path>
+                  <path d="M16.24 7.76l2.83-2.83"></path>
+                </svg>
+              </div>
+              <h3>Auto Capture</h3>
+              <p>Let us do it for you. Open a post, click Auto Capture, and relax.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3: Analysis Running -->
+        <div class="onboarding-step" data-step="3">
+          <div class="step-badge">Step 2</div>
+          <h2 class="step-title">While Analysis Runs</h2>
+          <div class="analysis-demo">
+            <div class="demo-animation">
+              <div class="demo-bar bar-1"></div>
+              <div class="demo-bar bar-2"></div>
+              <div class="demo-bar bar-3"></div>
+              <div class="demo-pulse"></div>
+            </div>
+          </div>
+          <div class="info-cards">
+            <div class="info-card">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+              <p>Analysis continues quietly in the background.</p>
+            </div>
+            <div class="info-card highlight">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+              <p>Results appear instantly if open — otherwise, they're saved for you.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 4: Extension Closed -->
+        <div class="onboarding-step" data-step="4">
+          <div class="step-badge">Step 3</div>
+          <h2 class="step-title">If You Close the Extension</h2>
+          <div class="reassurance-box">
+            <div class="reassurance-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                <polyline points="9 12 11 14 15 10"></polyline>
+              </svg>
+            </div>
+            <h3>Nothing is lost</h3>
+            <p>All analyses are securely saved and always available.</p>
+          </div>
+          <div class="access-options">
+            <div class="access-option">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="3" y1="9" x2="21" y2="9"></line>
+                <line x1="9" y1="21" x2="9" y2="9"></line>
+              </svg>
+              <span>View in the extension</span>
+            </div>
+            <div class="access-option">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="2" y1="12" x2="22" y2="12"></line>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+              </svg>
+              <span>Access on our website</span>
+            </div>
+          </div>
+          <p class="step-note">✨ Your work is never tied to keeping the extension open.</p>
+        </div>
+
+        <!-- Step 5: Heads Up -->
+        <div class="onboarding-step" data-step="5">
+          <div class="step-badge">Quick Note</div>
+          <h2 class="step-title">A Quick Heads-Up</h2>
+          <div class="notice-card">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+            <div class="notice-content">
+              <p>We capture <strong>recent posts</strong> and <strong>top-level replies</strong>.</p>
+              <ul>
+                <li>Some replies may be missing</li>
+                <li>Nested replies aren't included</li>
+                <li>Content may change if users edit or delete it</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="onboarding-nav">
+          <button class="nav-btn prev-btn" id="prevBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+            Back
+          </button>
+          <button class="nav-btn next-btn" id="nextBtn">
+            Next
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Footer -->
+        <div class="onboarding-footer">
+          <label class="dont-show-checkbox">
+            <input type="checkbox" id="dontShowAgain">
+            <span class="checkbox-custom"></span>
+            Don't show this again
+          </label>
+          <button class="skip-btn" id="skipBtn">Skip tour</button>
+        </div>
+      </div>
+    </div>
+  <!-- Header -->
+    <header class="header">
+      <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="20" x2="18" y2="10"></line>
+        <line x1="12" y1="20" x2="12" y2="4"></line>
+        <line x1="6" y1="20" x2="6" y2="14"></line>
+      </svg>
+      <h1>Social Analytics</h1>
+    </header>
+
+    <div class="login-section"  >
+<div id="login-status" style="margin-top:10px; font-size:14px;"></div>
+
+    <!-- AUTH VIEW -->
+<!-- FLIP CARD CONTAINER -->
+<div class="flip-card">
+  <div class="flip-card-inner">
+
+    <!-- FRONT: Login -->
+    <div class="flip-card-front auth-screen">
+      <h2>Welcome Back</h2>
+      <p class="subtext">Sign in to sync analysis and access dashboard</p>
+
+      <input type="email" id="login-email" placeholder="Email" class="input" />
+      <input type="password" id="login-password" placeholder="Password" class="input" />
+
+      <button id="login-btn" class="btn btn-primary">Login</button>
+      <!--<div class="divider">or</div>
+      <button id="google-login-btn" class="btn btn-google">
+        <img src="google.svg" class="icon-sm" /> Continue with Google
+      </button>-->
+    <div className="terms-box">
+  
+  <span>
+    <a href="https://socialinsight.vercel.app/auth" target="_blank">Forgot password</a>
+  </span>
+</div>
+      <p class="switch-text">Don't have an account? <span id="show-signup" class="link">Sign Up</span></p>
+    </div>
+
+    <!-- BACK: Signup -->
+    <div class="flip-card-back auth-screen">
+      <h2>Create Account</h2>
+      <p class="subtext">Sign up to start analyzing posts</p>
+      <input type="email" id="signup-company" placeholder="Company or Personal" class="input" />
+      <input type="email" id="signup-name" placeholder="Full Name" class="input" />
+      <input type="email" id="signup-email" placeholder="Email" class="input" />
+      <input type="password" id="signup-password" placeholder="Password" class="input" />
+      <div className="terms-box">
+  <input type="checkbox" id="terms" required />
+  <span>
+    I accept the <a href="https://socialinsight.vercel.app/terms" target="_blank">Terms & Conditions</a>
+  </span>
+</div>
+
+      <button id="signup-btn" class="btn btn-secondary">Sign Up</button>
+          <!-- Confirmation message -->
+    <div id="email-confirmation" style="display:none;">
+      <p>✅ Thanks for signing up!</p>
+      <p>Please check your email to confirm your account then reopen this extension.</p>
+      <button id="resend-btn">Resend Confirmation Email</button>
+    </div>
+      <!--<div class="divider">or</div>
+      <button id="google-signup-btn" class="btn btn-google">
+        <img src="google.svg" class="icon-sm" /> Continue with Google
+      </button>-->
+
+      <p class="switch-text">Already have an account? <span id="show-login" class="link">Login</span></p>
+    </div>
+
+  </div>
+</div>
+</div>
+  <div class="extension-popup" style="display:none">
+
+   <p class="card-description"> </p>
+    <!--<h3>Please note that the analysis is done at the current state of replies and first layer i.e post used at this point may be deleted sfter analysis</h3>
+    <h3>The analysis is done through ai and may not have the correct depiction of the user intent</h3>-->
+
+    <!-- Credits Section -->
+    <div class="credits-container">
+      <div class="credits-box">
+        <div class="credits-info">
+          <svg class="credits-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 6v6l4 2"></path>
+          </svg>
+          <div class="credits-text">
+            <p class="credits-label">Available Credits</p>
+            <p class="credits-amount" id="credits-amount">0</p>
+          </div>
+        </div>
+        <button class="btn btn-buy-credits" id="buyCreditsBtn">
+          <svg class="icon-sm" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="9" cy="21" r="1"></circle>
+            <circle cx="20" cy="21" r="1"></circle>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+          </svg>
+          Buy
+        </button>
+      </div>
+    </div>
+
+    <!-- Loader Overlay -->
+    <div class="loader-overlay" id="loaderOverlay">
+      <div class="loader-content">
+        <div class="loader-spinner">
+          <div class="spinner-ring"></div>
+          <div class="spinner-ring"></div>
+          <div class="spinner-ring"></div>
+        </div>
+        <p class="loader-text" id="loaderText">Processing...</p>
+      </div>
+    </div>
+    
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <button class="btn btn-primary" id="captureNow">
+        <svg class="icon-sm" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+          <polyline points="17 6 23 6 23 12"></polyline>
+        </svg>
+        Analyze Manually
+      </button>
+      <button class="btn btn-tertiary" id="autoCapture">Analyze Automatically</button>
+      <button class="btn btn-secondary" id="cancelCapture" style="display: none;"> Cancel Analysis</button>
+      
+    </div>
+          <!-- Status/Progress Area -->
+    <div class="about-container">
+      <div class="about-box">
+        <div class="about-header">
+          <p class="about-text" >Analyze social media posts and replies to uncover sentiments, agreements, emotions, and trending topics with powerful AI</p>
+          
+        </div>
+        
+      </div>
+    </div>
+    <!-- Status/Progress Area -->
+    <div class="status-container" id="status-container">
+      <div class="status-box">
+        <div class="status-header">
+          <p class="status-text" id="statusMessage">Anaylsis Status...</p>
+          <span class="status-percent">0%</span>
+        </div>
+        <div class="progress-bar-container">
+          <div class="progress-bar" id="progressBar" style="width: 0%;"></div>
+        </div>
+      </div>
+    </div>
+<div id="queueContainer"></div>
+    <!-- Analytics Section -->
+  
+
+    <!-- Scrollable List -->
+    <div class="analytics-section">
+      <h2 class="section-title">Recent Activity</h2>
+      <div class="analytics-list">
+        <!--<div class="analytics-card">
+          <div class="card-content">
+            <div class="card-text">
+              <h3 class="card-title">Instagram Engagement Up 24%</h3>
+              <p class="card-description">Your recent post gained 1.2k interactions</p>
+            </div>
+            <svg class="icon-link" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+              <polyline points="15 3 21 3 21 9"></polyline>
+              <line x1="10" y1="14" x2="21" y2="3"></line>
+            </svg>
+          </div>
+        </div>
+
+        <div class="analytics-card">
+          <div class="card-content">
+            <div class="card-text">
+              <h3 class="card-title">New Follower Milestone</h3>
+              <p class="card-description">You have reached 10,000 followers on Twitter</p>
+            </div>
+            <svg class="icon-link" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+              <polyline points="15 3 21 3 21 9"></polyline>
+              <line x1="10" y1="14" x2="21" y2="3"></line>
+            </svg>
+          </div>
+        </div>
+
+        <div class="analytics-card">
+          <div class="card-content">
+            <div class="card-text">
+              <h3 class="card-title">Best Posting Time Detected</h3>
+              <p class="card-description">Tuesday 2-4pm shows highest engagement</p>
+            </div>
+            <svg class="icon-link" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+              <polyline points="15 3 21 3 21 9"></polyline>
+              <line x1="10" y1="14" x2="21" y2="3"></line>
+            </svg>
+          </div>
+        </div>
+
+        <div class="analytics-card">
+          <div class="card-content">
+            <div class="card-text">
+              <h3 class="card-title">Content Performance Report</h3>
+              <p class="card-description">Weekly summary is ready for review</p>
+            </div>
+            <svg class="icon-link" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+              <polyline points="15 3 21 3 21 9"></polyline>
+              <line x1="10" y1="14" x2="21" y2="3"></line>
+            </svg>
+          </div>
+        </div>
+
+        <div class="analytics-card">
+          <div class="card-content">
+            <div class="card-text">
+              <h3 class="card-title">Audience Demographics Updated</h3>
+              <p class="card-description">Your audience is primarily 25-34 years old</p>
+            </div>
+            <svg class="icon-link" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+              <polyline points="15 3 21 3 21 9"></polyline>
+              <line x1="10" y1="14" x2="21" y2="3"></line>
+            </svg>
+          </div>
+        </div>-->
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-details">
+      <div class="footer-user">
+        <div class="user-avatar">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+        </div>
+        <div class="user-info">
+          <p class="user-name" id="logout-btn">Account</p>
+          <p class="user-email" id="user-account">user@email.com</p>
+        </div>
+      </div>
+      
+      <a href="https://socialinsight.vercel.app/dashboard" target="_blank" class="footer-link">Dashboard →</a>
+    </div>
+    <div style="text-align: center;">
+      <a href="#"  >Terms and condition</a>
+      <p>@Copyright 2025 Servitium Enterprise</p>
+    </div>
+    </footer>
+  </div>
+</body>
+<script src="popup.js"></script>
+<script src="libs/supabase.js"></script>
+</html>
