@@ -709,7 +709,7 @@ export async function generateTemplate(post: any) {
     .sort((a, b) => b.frequency - a.frequency)
     .slice(0, 5); // limit context size
 
-  const response = await fetch("https://socialinsightbackend.onrender.com/api/insights/generate_marketing_post/", {
+  const response = await fetch("http://127.0.0.1:8000/api/insights/generate_marketing_post/", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -798,14 +798,15 @@ export async function getAdminPayments() {
 }
 export async function getAdminRequests() {
   const { data, error } = await supabase
-    .from("social_posts")
+    .from("requests")
     .select(`
       id,
-      user_id,
+      requested_by,
       source_url,
       status,
+      platform,
       created_at,
-      post_text
+      done_by
     `)
     .order("created_at", { ascending: false });
 

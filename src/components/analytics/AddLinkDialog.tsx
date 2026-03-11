@@ -115,7 +115,7 @@ const handleRequestAnalysis = async (e: React.FormEvent) => {
   }
 
   const platform = detectPlatformFromUrl(parsedUrl.href);
-
+console.log(platform)
   if (!platform) {
     setError("Unsupported or invalid post URL");
     return;

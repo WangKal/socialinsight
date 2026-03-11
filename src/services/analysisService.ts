@@ -89,12 +89,12 @@ export async function sendForAnalysis(url: string, jwt: string, userId: string) 
 
   return res.json();
 }
-export async function requestAnalysis(playform:string,url: string, jwt: string, userId: string) {
+export async function requestAnalysis(platform:string,url: string, jwt: string, userId: string) {
   if (!validatePostUrl(url,platform)) throw new Error("Invalid URL");
 
   const payload = {
     user_id: userId,
-    url,
+    source_url:url,
     platform: platform,
     timestamp: Date.now()
   };
@@ -105,7 +105,7 @@ export async function requestAnalysis(playform:string,url: string, jwt: string, 
       "Content-Type": "application/json",
       Authorization: `Bearer ${jwt}`
     },
-    body: JSON.stringify({ data: [payload] })
+    body: JSON.stringify(payload)
   });
 
   if (!res.ok) {
