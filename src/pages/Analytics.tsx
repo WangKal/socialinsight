@@ -9,6 +9,7 @@ import { SentimentChart } from "@/components/analytics/SentimentChart";
 import { TopicClusters } from "@/components/analytics/TopicClusters";
 import { RepliesSection } from "@/components/analytics/RepliesSection";
 import { ExportButton } from "@/components/analytics/ExportButton";
+import { GeneratedArticle } from "../components/analytics/GeneratedArticle";
 import { AddLinkDialog } from "@/components/analytics/AddLinkDialog";
 import { CreditsBanner } from "@/components/CreditsBanner";
 import { AIChatPanel } from "@/components/AIChatPanel";
@@ -93,7 +94,7 @@ useEffect(() => {
 // Safe access
 // =====================
 const post = data.post_text || "";
-
+console.log(data)
 // Merge clusters into groups for TopicClusters
 const groups = {
   agree: {
@@ -219,7 +220,15 @@ const sentiment = data.statistics?.sentiment_distribution || {};
             negative={sentiment.negative || 0}
           />
         </div>
-
+   {/* Generated Article Section */}
+        <div className="mb-8">
+          <GeneratedArticle
+            title={data?.discussion_title || ""}
+            aiModel={data?.article_model || ""}
+            content={data?.discussion_article || ""}
+            generatedDate={formatDate(data.created_at)}
+          />
+        </div>
         {/* Topic Clusters */}
         <div className="mb-8">
           <TopicClusters
