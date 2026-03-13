@@ -10,6 +10,7 @@ import { TopicClusters } from "@/components/analytics/TopicClusters";
 import { RepliesSection } from "@/components/analytics/RepliesSection";
 import { ExportButton } from "@/components/analytics/ExportButton";
 import { AddLinkDialog } from "@/components/analytics/AddLinkDialog";
+import { GeneratedArticle } from "../components/analytics/GeneratedArticle";
 import { Link as LinkIcon } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { fetchPostAnalytics,fetchRecentPost, trackGeneralView } from "@/services/socialEcho";
@@ -243,7 +244,15 @@ const sentiment = data.statistics?.sentiment_distribution || {};
             negative={sentiment.negative || 0}
           />
         </div>
-
+        <div className="mb-8">
+          <GeneratedArticle
+            title={data?.discussion_title || ""}
+            aiModel={data?.article_model || ""}
+            content={data?.discussion_article || ""}
+            generatedDate={formatDate(data.created_at)}
+          />
+        </div>
+        {/* Topic Clusters */}
         {/* Topic Clusters */}
         <div className="mb-8">
           <TopicClusters
