@@ -36,7 +36,7 @@ export async function fetchPostAnalytics(postId: string) {
     }
     return [];
   };
-console.log((JSON.parse(post.replies)).length)
+
   const replyIndex = new Map<string, any>();
   normalizeReplies(post.replies).forEach((reply, idx) => {
     replyIndex.set(String(idx ), reply); // 1-based indexing

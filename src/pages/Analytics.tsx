@@ -94,7 +94,7 @@ useEffect(() => {
 // Safe access
 // =====================
 const post = data.post_text || "";
-console.log(data)
+
 // Merge clusters into groups for TopicClusters
 const groups = {
   agree: {
