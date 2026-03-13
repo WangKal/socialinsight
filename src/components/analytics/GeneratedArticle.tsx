@@ -159,10 +159,10 @@ export function GeneratedArticle({
               <Sparkles className="w-4 h-4 text-purple-600" />
               <span className="text-gray-600">AI Generated</span>
             </div>
-            <div className="flex items-center gap-2">
+            {/*<div className="flex items-center gap-2">
               <Cpu className="w-4 h-4 text-gray-600" />
               <span className="text-gray-600">{aiModel}</span>
-            </div>
+            </div>*/}
           </div>
           <span className="text-gray-500">Generated on {generatedDate}</span>
         </div>
