@@ -92,17 +92,28 @@ const signUp = async (
   // -------------------------
   // STEP 3: Assign Free Credits
   // -------------------------
-  try {
-    const { data: settings, error: settingsError } = await supabase
-      .from("settings")
-      .select("free_credits_enabled, free_credit_amount")
-      .single();
+try {
+  const { data: settingsRows, error: settingsError } = await supabase
+    .from("settings")
+    .select('name, setting_value')
+    .in("name", ["free_credits_enabled", "free_credit_amount"]);
 
-    if (settingsError) throw settingsError;
+  if (settingsError) throw settingsError;
 
-    const initialCredits = settings?.free_credits_enabled
-      ? settings?.free_credit_amount || 0
-      : 0;
+  // Convert rows into a settings object
+  const settings: Record<string, any> = {};
+
+  settingsRows?.forEach((row: any) => {
+    settings[row.column] = row.value;
+  });
+
+  const freeCreditsEnabled = settings["free_credits_enabled"] ?? false;
+  const freeCreditAmount = settings["free_credit_amount"] ?? 0;
+
+  const initialCredits = freeCreditsEnabled ? freeCreditAmount : 0;
+
+  if (initialCredits > 0) {
+    const now = new Date().toISOString();
 
     const { error: creditsError } = await supabase
       .from("credits")
@@ -111,15 +122,15 @@ const signUp = async (
         remaining_credits: initialCredits,
         total_credits: initialCredits,
         used_credits: 0,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
+        created_at: now,
+        updated_at: now,
       });
 
     if (creditsError) throw creditsError;
-  } catch (err) {
-    console.error("Credit initialization failed:", err);
   }
-
+} catch (err) {
+  console.error("Credit initialization failed:", err);
+}
   return { error: null };
 };
 

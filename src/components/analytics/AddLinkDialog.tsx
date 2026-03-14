@@ -296,7 +296,7 @@ behalf.
     {/* Facebook */}
     <input
       type="text"
-      placeholder="Facebook Page or Profile URL"
+      placeholder="Social Media site Url"
       value={link}
       onChange={(e) => setLink(e.target.value)}
       className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-violet-500"
