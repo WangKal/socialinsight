@@ -94,7 +94,7 @@ export default function Auth() {
       const { error } = await signUp(
         formData.email,
         formData.password,
-        formData.fullName,
+        formData.name,
         formData.company
       );
 
