@@ -1,6 +1,6 @@
 import { supabase } from '@/intergrations/supabase/client';
 import { Reply } from "@/components/AIChatPanel"; // adjust path if needed
-
+import { toast } from "@/hooks/use-toast";
 
 /**
  * Fetch full analytics for a post
@@ -666,6 +666,39 @@ export async function trackHomeView() {
   });
 }
 
+
+/**
+ * Submits a daily analysis request to Supabase.
+ * @param userId - ID of the user requesting analysis
+ * @param xAccountUrl - X account URL to analyze
+ */
+export async function submitDailyRequest(userId: string, xAccountUrl: string) {
+  if (!userId) return { success: false, error: "User not authenticated" };
+
+  try {
+    const { data, error } = await supabase
+      .from("daily_analysis_request")
+      .insert([{ user_id: userId, x_account_url: xAccountUrl }])
+      .select();
+
+    if (error) throw error;
+
+    toast({
+      title: "Request Accepted",
+      description: `Your daily analysis request for ${xAccountUrl} has been accepted!`,
+      variant: "constructive",
+    });
+
+    return { success: true, data };
+  } catch (err: any) {
+    toast({
+      title: "Error",
+      description: err.message,
+      variant: "destructive",
+    });
+    return { success: false, error: err.message };
+  }
+}
 export async function trackGeneralView() {
   await supabase.rpc("increment_page_view", {
     p_page_name: "general_view",

@@ -6,10 +6,11 @@ import { CampaignsList, Campaign } from "@/components/CampaignsList";
 import { PostsTable, Post } from "@/components/PostsTable";
 import { AssignPostDialog } from "@/components/AssignPostDialog";
 import { AddLinkDialog } from "@/components/analytics/AddLinkDialog";
+import { DailyAnalysisDialog } from "@/components/analytics/DailyAnalysisDialog";
 import { TrendChart } from "@/components/TrendChart";
 import { Globe, User, Briefcase, Link as LinkIcon, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { getPostsByUser, assignPost, getCampaignsByUser } from "@/services/socialEcho"
+import { getPostsByUser, assignPost, getCampaignsByUser, submitDailyRequest } from "@/services/socialEcho"
 import { CreditsBanner } from "@/components/CreditsBanner";
 import {useAuth } from "@/hooks/use-auth"
 import {useToast } from "@/hooks/use-toast"
@@ -32,6 +33,8 @@ export default function Dashboard() {
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [userCampaigns, setUserCampaigns] = useState([]);
+  const [isDailyRequestOpen, setIsDailyRequestOpen] = useState(false);
+  const [xAccountUrl, setXAccountUrl] = useState("");
   const { toast } =useToast();
 
 
@@ -200,6 +203,12 @@ const calculateAvg = (
     }));
   };
 
+const handleDailyRequestSubmit = async (url: string) => {
+  if (!user?.id) return;
+
+  await submitDailyRequest(user.id, url);
+  setIsDailyRequestOpen(false);
+};
   const renderContent = () => {
     // Overview
     if (currentView === "overview") {
@@ -553,7 +562,12 @@ const calculateAvg = (
 </div>
 
             </div>
-
+<Button
+  onClick={() => setIsDailyRequestOpen(true)}
+  className="bg-gradient-to-r from-green-500 to-teal-600 text-white hover:from-green-600 hover:to-teal-700"
+>
+  Request Daily Analysis
+</Button>
             <Button
               onClick={() => setIsAddLinkOpen(true)}
               className="bg-gradient-to-r from-violet-600 to-purple-600 text-white hover:from-violet-700 hover:to-purple-700"
@@ -592,6 +606,11 @@ const calculateAvg = (
         campaign = {selectedPost?.campaign || ""}
         assignedCampaignName= {selectedPost?.campaignName || ""}
       />
+      <DailyAnalysisDialog
+  isOpen={isDailyRequestOpen}
+  onClose={() => setIsDailyRequestOpen(false)}
+  onSubmit={handleDailyRequestSubmit}
+/>
     </div>
   );
 }
