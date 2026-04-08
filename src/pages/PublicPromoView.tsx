@@ -67,7 +67,7 @@ export default function PublicPromoView() {
     const [showFullInstructions, setShowFullInstructions] = useState(false);
 
   // --- Fetch promos via React Query ---
-  const { data: promos = [], isLoading, isError } = useQuery<>({
+  const { data: promos = [], isLoading, isError } = useQuery({
     queryKey: ["promos"],
     queryFn: getPromos,
   });
