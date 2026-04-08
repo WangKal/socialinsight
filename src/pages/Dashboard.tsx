@@ -64,6 +64,7 @@ useEffect(() => {
   load();
 }, [user]);
 
+
   // Calculate stats
   const generalPosts = posts.filter((p) => p.category == null || p.category.length==0 || p.category == "NULL");
   const personalPosts = posts.filter((p) => p.category === "personal");

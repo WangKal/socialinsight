@@ -44,6 +44,11 @@ export default function Terms() {
             <strong>Device & Browser Data:</strong> IP address, browser type,
             operating system, and access logs.
           </li>
+          <li>
+  <strong>Promo Data:</strong> Public usernames, replies, timestamps, and
+  interactions collected from third-party social media platforms for the purpose
+  of promo analysis and winner selection.
+</li>
         </ul>
         <p className="mt-2">
           We do <strong>not</strong> collect plaintext passwords, private
@@ -68,7 +73,19 @@ export default function Terms() {
           and aggregated information for analytics or reporting. Data may be
           disclosed if required by law or to protect our legal rights.
         </p>
-
+<h3 className="text-xl font-semibold mt-6 mb-2">
+  Promo Data & Third-Party Platforms
+</h3>
+<p>
+  Our promo features operate on publicly available data from third-party social
+  media platforms (e.g., replies, usernames, timestamps). We do not control or
+  own this data and do not guarantee its accuracy or availability.
+</p>
+<p className="mt-2">
+  Participants engage with promos directly on external platforms. We do not
+  collect private messages, contact details, or payment information from
+  participants unless explicitly provided through other services.
+</p>
         <h3 className="text-xl font-semibold mt-6 mb-2">
           5. Cookies & Local Storage
         </h3>
@@ -133,6 +150,37 @@ export default function Terms() {
           media content. We are not affiliated with or endorsed by any third-
           party platform and are not responsible for their content or policies.
         </p>
+        <h3 className="text-xl font-semibold mt-6 mb-2">
+  Promo Features & Responsibilities
+</h3>
+<p>
+  The Service may provide tools for analyzing social media promotions and
+  selecting winners based on predefined rules.
+</p>
+
+<p className="mt-2">
+  <strong>For Promo Creators:</strong>
+</p>
+<ul className="list-disc pl-6 space-y-2">
+  <li>You are solely responsible for the design, execution, and legality of your promotions</li>
+  <li>You are responsible for contacting winners and delivering prizes</li>
+  <li>You must provide accurate instructions and legitimate contact details</li>
+  <li>You must not require unlawful payments or engage in fraudulent activity</li>
+</ul>
+
+<p className="mt-2">
+  <strong>For Participants:</strong>
+</p>
+<ul className="list-disc pl-6 space-y-2">
+  <li>You participate in promotions at your own discretion</li>
+  <li>You are responsible for verifying the legitimacy of any promotion</li>
+  <li>You should not send money or sensitive information unless you trust the source</li>
+</ul>
+
+<p className="mt-2">
+  The platform does not manage or guarantee prize fulfillment, communication, or
+  transactions between promo creators and participants.
+</p>
 
         <h3 className="text-xl font-semibold mt-6 mb-2">
           3. User Responsibilities
@@ -182,7 +230,10 @@ export default function Terms() {
           <li>Platform changes or removed content</li>
           <li>Token or credit loss due to technical issues</li>
         </ul>
-
+<p className="mt-2">
+  The platform is not responsible for payments, transactions, prize delivery, or
+  interactions related to any promotion conducted using the Service.
+</p>
         <h3 className="text-xl font-semibold mt-6 mb-2">
           7. Intellectual Property
         </h3>

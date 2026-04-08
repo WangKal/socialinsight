@@ -1,6 +1,20 @@
 import { supabase } from '@/intergrations/supabase/client';
 import { Reply } from "@/components/AIChatPanel"; // adjust path if needed
 import { toast } from "@/hooks/use-toast";
+import { PromoFormData } from "../components/promo/PromoForm";
+
+export interface Promo {
+  id: string;
+  title: string;
+  description?: string | null;
+  prize?: string | null;
+  type: "first-n" | "every-nth" | "correct-answer" | "random";
+  number_of_winners: number;
+  start_time: string;
+  end_time: string;
+  status: "scheduled" | "active" | "completed";
+  created_at: string;
+}
 
 /**
  * Fetch full analytics for a post
@@ -316,12 +330,12 @@ export async function getCampaignsByUser(userId: string) {
  */
 
 function mapPost(row: any) {
-  const analysis = row.analysis_result?.post;
+  const analysis = row;
 
   return {
     id: row.id,
 
-    title: analysis?.text?.slice(0, 80) || "Untitled Post",
+    title: row.post_text,
 
     url: row.source_url,
 
@@ -330,14 +344,16 @@ function mapPost(row: any) {
       day: "numeric",
       year: "numeric",
     }),
-
+    platform:row.platform,
     replies: Number(row.total_replies) || 0,
 
-    sentiment: row.sentiment_percentage ?? 0,
-
-    agreement: row.agreement_percentage ?? 0,
-    agreement_distribution: row.agreement_distribution?.agree?.percentage ?? 0,
-    sentiment_distribution: row.sentiment_distribution?.positive?.percentage ?? 0,
+    sentiment: row.sentiment_distribution?.positive?.percentage ?? 0,
+    discussion_article: row.discussion_article,
+    article_model: row.article_model,
+    discussion_title: row.discussion_title,
+    agreement: row.agreement_distribution?.agree?.percentage ?? 0,
+    agreement_distribution: row.agreement_distribution ?? 0,
+    sentiment_distribution: row.sentiment_distribution ?? 0,
 
     category: row.category || null,
 
@@ -366,7 +382,16 @@ export async function getPostsByUser(user_id: string) {
 
   return data.map(mapPost);
 }
+export async function getGeneralPosts() {
+  const { data, error } = await supabase.rpc("get_general_posts");
 
+  if (error) {
+    console.error("Supabase getGeneralPosts error:", error);
+    throw error;
+  }
+
+  return (data || []).map(mapPost);
+}
 export async function assignPost(
   postId: string,
   userId: string,
@@ -847,6 +872,408 @@ export async function getAdminRequests() {
     .order("created_at", { ascending: false });
 
   if (error) throw error;
+
+  return data;
+}
+
+//PROMOS
+
+
+
+export const getPromos = async (): Promise<Promo2[]> => {
+  // 1️⃣ Fetch all promos
+  const promoBanners = [
+ 'https://images.unsplash.com/photo-1519389950473-47ba0277781c', // Tech Team/Social
+  'https://images.unsplash.com/photo-1498050108023-c5249f4df085', // Coding/Signup
+  'https://images.unsplash.com/photo-1556742044-3c52d6e88c62', // Mobile/Giveaway
+  'https://images.unsplash.com/photo-1505740420928-5e560c06d30e', // Product/Audio
+  'https://images.unsplash.com/photo-1522202176988-66273c2fd55f'  // Engagement
+  ];
+  const randomBanner = promoBanners[Math.floor(Math.random() * promoBanners.length)];
+
+  const { data: promosData, error: promosError } = await supabase
+    .from("promos")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (promosError) throw promosError;
+  if (!promosData || promosData.length === 0) return [];
+
+  // 2️⃣ Get all unique created_by IDs
+  const userIds = [...new Set(promosData.map(p => p.created_by).filter(Boolean))];
+
+  // 3️⃣ Fetch profiles in one go
+  let profilesMap: Record<string, string> = {};
+
+  if (userIds.length > 0) {
+    const { data: profilesData, error: profilesError } = await supabase
+      .from("profiles")
+      .select("user_id, full_name")
+      .in("user_id", userIds);
+
+    if (profilesError) {
+      console.error("Error fetching profiles", profilesError);
+    } else {
+      profilesMap = Object.fromEntries(
+        profilesData.map(p => [p.user_id, p.full_name])
+      );
+    }
+  }
+
+  // 4️⃣ Enrich promos
+  const enrichedPromos: Promo2[] = await Promise.all(
+    promosData.map(async (promo) => {
+      // Fetch replies JSON
+      const { data: repliesRow, error: repliesError } = await supabase
+        .from("promo_replies_json")
+        .select("replies_json")
+        .eq("promo_id", promo.id)
+        .maybeSingle();
+
+      if (repliesError) {
+        console.error(`Error fetching replies for promo ${promo.id}`, repliesError);
+      }
+
+      const repliesCount = repliesRow?.replies_json?.length || 0;
+
+      // Fetch winners count
+      const { data: winnersData, error: winnersError } = await supabase
+        .from("promo_winners")
+        .select("id")
+        .eq("promo_id", promo.id);
+
+      if (winnersError) {
+        console.error(`Error fetching winners for promo ${promo.id}`, winnersError);
+      }
+
+      const winnersCount = winnersData?.length || 0;
+
+      return {
+        id: promo.id,
+        title: promo.title,
+        description: promo.description,
+        prize: promo.prize,
+        startTime: promo.start_time,
+        endTime: promo.end_time,
+        totalReplies: repliesCount,
+        numberOfWinners: promo.number_of_winners,
+        status: promo.status as "scheduled" | "active" | "completed",
+        replies: repliesCount,
+        winners: winnersCount,
+        promoUrl: promo.promo_url,
+        brandingImage: randomBanner,
+        requirementInstructions: promo.requirement_instructions,
+
+
+        // ✅ NEW FIELDS
+        createdBy: profilesMap[promo.created_by] || null,
+        createdFor: promo.created_for || null,
+        createdForHandle: promo.created_for_handle || null,
+        contactName:promo.contact_name,
+        contactPhone:promo.contact_phone,
+        claimInstructions:promo.claim_instructions
+      };
+    })
+  );
+
+  return enrichedPromos;
+};
+
+export const getPromoById = async (id): Promise<Promo2[]> => {
+  // 1️⃣ Fetch all promos
+  const { data: promosData, error: promosError } = await supabase
+    .from("promos")
+    .select("*")
+    .eq('id',id);
+  if (promosError) throw promosError;
+  if (!promosData || promosData.length === 0) return [];
+
+  // 2️⃣ Get all unique created_by IDs
+  const userIds = [...new Set(promosData.map(p => p.created_by).filter(Boolean))];
+
+  // 3️⃣ Fetch profiles in one go
+  let profilesMap: Record<string, string> = {};
+
+  if (userIds.length > 0) {
+    const { data: profilesData, error: profilesError } = await supabase
+      .from("profiles")
+      .select("user_id, full_name")
+      .in("user_id", userIds);
+
+    if (profilesError) {
+      console.error("Error fetching profiles", profilesError);
+    } else {
+      profilesMap = Object.fromEntries(
+        profilesData.map(p => [p.user_id, p.full_name])
+      );
+    }
+  }
+
+  // 4️⃣ Enrich promos
+  const enrichedPromos: Promo2[] = await Promise.all(
+    promosData.map(async (promo) => {
+      // Fetch replies JSON
+      const { data: repliesRow, error: repliesError } = await supabase
+        .from("promo_replies_json")
+        .select("replies_json")
+        .eq("promo_id", promo.id)
+        .maybeSingle();
+
+      if (repliesError) {
+        console.error(`Error fetching replies for promo ${promo.id}`, repliesError);
+      }
+
+      const repliesCount = repliesRow?.replies_json?.length || 0;
+
+      // Fetch winners count
+      const { data: winnersData, error: winnersError } = await supabase
+        .from("promo_winners")
+        .select("id")
+        .eq("promo_id", promo.id);
+
+      if (winnersError) {
+        console.error(`Error fetching winners for promo ${promo.id}`, winnersError);
+      }
+
+      const winnersCount = winnersData?.length || 0;
+
+      return {
+        id: promo.id,
+        title: promo.title,
+        description: promo.description,
+        prize: promo.prize,
+        startTime: promo.start_time,
+        endTime: promo.end_time,
+        totalReplies: repliesCount,
+        numberOfWinners: promo.number_of_winners,
+        status: promo.status as "scheduled" | "active" | "completed",
+        replies: repliesCount,
+        winners: winnersCount,
+        promoUrl: promo.promo_url,
+        brandingImage: promo.branding_image,
+        requirementInstructions: promo.requirement_instructions,
+        contactName:promo.contact_name,
+        contactPhone:promo.contact_phone,
+        claimInstructions:promo.claim_instructions,
+
+        // ✅ NEW FIELDS
+        createdBy: profilesMap[promo.created_by] || null,
+        createdFor: promo.created_for || null,
+        createdForHandle: promo.created_for_handle || null,
+      };
+    })
+  );
+
+  return enrichedPromos;
+};
+// CREATE PROMO
+
+
+export async function createPromo(formData: PromoFormData): Promise<Promo> {
+  // Map form data
+  const promo = {
+    title: formData.title.trim(),
+    description: formData.description?.trim() || null,
+    prize: formData.prize?.trim() || null,
+    type: formData.type,
+    number_of_winners: formData.numberOfWinners,
+    start_time: new Date(formData.startTime).toISOString(),
+    end_time: new Date(formData.endTime).toISOString(),
+    status: "scheduled",
+    validation_type: "none", // default for now
+    requirement_instructions: formData.requirementInstructions,
+    contact_name:formData.contactName,
+    contact_phone:formData.contactPhone,
+    claim_instructions:formData.claim_instructions
+  };
+
+  const typeRule: any = { type: formData.type };
+  if (formData.type === "every-nth") typeRule.interval = formData.interval;
+  if (formData.type === "correct-answer") {
+    typeRule.correct_answer = formData.correctAnswer;
+    typeRule.case_sensitive = formData.caseSensitive;
+  }
+
+  // Insert promo
+  const { data: promoData, error: promoError } = await supabase
+    .from("promos")
+    .insert([promo])
+    .select()
+    .single();
+
+  if (promoError) throw promoError;
+
+  // Insert type rule
+  const { error: ruleError } = await supabase
+    .from("promo_type_rules")
+    .insert([{ ...typeRule, promo_id: promoData.id }]);
+
+  if (ruleError) throw ruleError;
+
+  return promoData as Promo;
+}
+// ✅ Fetch replies
+export const getReplies = async (promoId: string): Promise<Reply[]> => {
+  const { data, error } = await supabase
+    .from("replies")
+    .select("*")
+    .eq("promo_id", promoId)
+    .order("timestamp", { ascending: true });
+
+  if (error) throw error;
+  return data || [];
+};
+
+// ✅ Fetch winners
+export const getWinners = async (promoId: string): Promise<Reply[]> => {
+  const { data, error } = await supabase
+    .from("winners")
+    .select("*, replies(*)")
+    .eq("promo_id", promoId);
+
+  if (error) throw error;
+
+  return (data || []).map((w: any) => w.replies);
+};
+export async function deletePromo(promoId: string) {
+  const { data, error } = await supabase
+    .from("promos")
+    .delete()
+    .eq("id", promoId);
+
+  if (error) throw error;
+
+  return data;
+}
+// ✅ Run evaluation
+export const evaluatePromo = async (promoId: string) => {
+  const { data, error } = await supabase.rpc("evaluate_promo", {
+    promo_id: promoId,
+  });
+
+  if (error) throw error;
+  return data;
+};
+
+// GET REPLIES
+export const getRepliesByPromoId = async (promoId: string) => {
+  const { data, error } = await supabase
+    .from("promo_replies")
+    .select("*")
+    .eq("promo_id", promoId);
+
+  if (error) throw error;
+  return data;
+};
+
+// SAVE WINNERS
+export const saveWinners = async (promoId: string, winners: any[]) => {
+  const payload = winners.map(w => ({
+    promo_id: promoId,
+    reply_id: w.id,
+    username: w.username,
+  }));
+
+  const { error } = await supabase
+    .from("promo_winners")
+    .insert(payload);
+
+  if (error) throw error;
+};
+
+
+// Fetch promo replies from JSON table
+export async function getPromoReplies(promoId: string): Promise<Reply[]> {
+  const { data, error } = await supabase
+    .from("promo_replies_json")
+    .select("replies_json")
+    .eq("promo_id", promoId)
+    .order("fetched_at", { ascending: true })
+    .limit(1)
+    .single();
+
+  if (error) throw error;
+
+  return data?.replies_json || [];
+}
+
+// Fetch existing winners
+export async function getPromoWinners(promoId: string): Promise<Reply[]> {
+  const { data, error } = await supabase
+    .from("promo_winners")
+    .select("*")
+    .eq("promo_id", promoId);
+
+  if (error) throw error;
+  console.log(data)
+  return data.map((w: any) => ({
+    winnerId: w.id,
+    id: w. reply_id,
+    trackingNumber: w.tracking_number,
+    prizeAwarded: w.prize_awarded,
+    awardedDate: w.awarded_date,
+    note: w.note,
+    username: w.username,
+    text: w.text || "",
+    timestamp: w.post_date || new Date().toISOString(),
+    isWinner: w.prize_awarded,
+  }));
+}
+
+// Save winners after evaluation
+export async function savePromoWinners(promoId: string, winners: Reply[]) {
+  const records = winners.map((w) => ({
+    promo_id: promoId,
+    reply_id: w.id,
+    username: w.username,
+    social_handle: w.text,
+    prize_awarded: false,
+  }));
+
+  const { error } = await supabase.from("promo_winners").insert(records);
+  if (error) throw error;
+  return records;
+}
+export async function savePromoSource(
+  promoId: string,
+  source: {
+    url: string;
+    username?: string;
+    name?: string;
+  }
+) {
+  const { error } = await supabase
+    .from("promos")
+    .update({
+      promo_url: source.url,
+      promo_username: source.username || null,
+      promo_name: source.name || null,
+    }).eq('id', promoId);
+
+  if (error) throw error;
+}
+// services/socialEcho.ts
+
+export async function updateWinner(payload: {
+  id: string;
+  prize_awarded?: boolean;
+  awarded_date?: string | null;
+  tracking_number?: string;
+  notes?: string;
+}) {
+  const { id, ...updates } = payload;
+
+  const { data, error } = await supabase
+    .from("promo_winners")
+    .update(updates)
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error("updateWinner error:", error);
+    throw error;
+  }
 
   return data;
 }

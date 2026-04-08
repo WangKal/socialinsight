@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { motion } from "motion/react";
 import { LiveDemo } from "@/components/LiveDemo";
 import { AuthButtons } from "@/components/AuthButtons";
 import { HowItWorks } from "@/components/HowItWorks";
@@ -34,7 +35,18 @@ import {
   Hash,
   Lightbulb,
   MousePointerClick,
+  Gift,
+    Trophy,
+  ExternalLink,
+  PlayCircle,
+  Shuffle,
+  UserPlus,
+  BarChart2,
+  Settings,
+  ChevronUp,
+  ChevronDown
 } from "lucide-react";
+
 import { useState, useEffect } from "react";
 
 export default function Landing() {
@@ -44,6 +56,19 @@ export default function Landing() {
   const [activeDemo, setActiveDemo] = useState(0);
   const [animatedStats, setAnimatedStats] = useState({ posts: 0, sentiment: 0, topics: 0 });
   const [guideOpen, setGuideOpen] = useState(false)
+  const [showFullAnalytics, setShowFullAnalytics] = useState(false);
+  const [activePromoTour, setActivePromoTour] = useState(0);
+  const [activeDemoTab, setActiveDemoTab] = useState<"analytics" | "promos">("analytics");
+
+// optional auto-rotate
+useEffect(() => {
+  const timer = setInterval(() => {
+    setActiveDemoTab((prev) => (prev === "analytics" ? "promos" : "analytics"));
+  }, 5000);
+  return () => clearInterval(timer);
+}, []);
+  
+  
   // Animate stats on load
   useEffect(() => {
     const duration = 2000;
@@ -142,7 +167,36 @@ export default function Landing() {
       statLabel: "Processing",
     },
   ];
-
+  const promoTourSteps = [
+    {
+      icon: Gift,
+      title: "Create Promos",
+      description: "Launch giveaways and contests with customizable rules, prizes, and branding images",
+      color: "from-violet-500 to-purple-600",
+      image: "https://images.unsplash.com/photo-1513201099705-a9746e1e201f?w=800&q=80",
+    },
+    {
+      icon: Shuffle,
+      title: "Winner Selection",
+      description: "Choose winners randomly, first-come-first-served, or based on specific criteria",
+      color: "from-blue-500 to-cyan-600",
+      image: "https://images.unsplash.com/photo-1567427017947-545c5f8d16ad?w=800&q=80",
+    },
+    {
+      icon: BarChart2,
+      title: "Track Engagement",
+      description: "Monitor entries, replies, and participant engagement in real-time with beautiful analytics",
+      color: "from-emerald-500 to-teal-600",
+      image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80",
+    },
+    {
+      icon: Trophy,
+      title: "Manage Winners",
+      description: "Contact winners, track prize delivery, and manage the entire fulfillment process",
+      color: "from-amber-500 to-orange-600",
+      image: "https://images.unsplash.com/photo-1579888944880-d98341245702?w=800&q=80",
+    },
+  ];
   const stats = [
     { value: animatedStats.posts.toLocaleString() + "+", label: "Posts Analyzed", icon: BarChart3 },
     { value: "50K+", label: "Active Users", icon: Users },
@@ -291,63 +345,128 @@ export default function Landing() {
       <section className="relative container mx-auto px-6 py-20 lg:py-28">
         <div className="max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Left Content */}
-            <div className="space-y-8">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium animate-fade-in">
-                <Sparkles className="w-4 h-4" />
-                AI-Powered Social Post Analysis
-                <span className="flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-primary opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-                </span>
-              </div>
-              
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground leading-tight animate-fade-in" style={{ animationDelay: "0.1s" }}>
-                Understand What Your
-                <span className="relative">
-                  <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient"> Audience Really Thinks</span>
-                </span>
-              </h1>
-              
-              <p className="text-lg text-muted-foreground max-w-xl animate-fade-in" style={{ animationDelay: "0.2s" }}>
-                Analyze social media posts and replies to uncover <span className="text-foreground font-medium">sentiments</span>, <span className="text-foreground font-medium">agreements</span>, <span className="text-foreground font-medium">emotions</span>, and <span className="text-foreground font-medium">trending topics</span> with powerful AI.
-              </p>
-              
-              <div className="flex flex-col sm:flex-row gap-4 animate-fade-in" style={{ animationDelay: "0.3s" }}>
-                
-                  <Button size="lg" className="gap-2 text-lg px-8 py-6 shadow-xl shadow-primary/30 hover:shadow-primary/50 transition-all group"
-                    onClick={()=>{ user?setGuideOpen(true):navigate("/auth")}}
-                  >
-                    {user ? "Analyze" : "Start Analyzing Free"}
-                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-               
-                <Button size="lg" variant="outline" className="gap-2 text-lg px-8 py-6 group"
+          {/* Left Content */}
+<div className="space-y-8">
+  {/* Badge */}
+  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium animate-fade-in">
+    <Sparkles className="w-4 h-4" />
+    AI-Powered Social Insights & Promos
+    <span className="flex h-2 w-2">
+      <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-primary opacity-75"></span>
+      <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+    </span>
+  </div>
 
-                >
-                  <Play className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                  How it works
-                </Button>
-              </div>
-              
-              <div className="flex flex-wrap items-center gap-6 pt-4 animate-fade-in" style={{ animationDelay: "0.4s" }}>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <CheckCircle2 className="w-5 h-5 text-success" />
-                  No credit card required
-                </div>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <CheckCircle2 className="w-5 h-5 text-success" />
-                  50 free credits
-                </div>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <CheckCircle2 className="w-5 h-5 text-success" />
-                  Instant results
-                </div>
-              </div>
-            </div>
+  {/* Heading */}
+  <h1
+    className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground leading-tight animate-fade-in"
+    style={{ animationDelay: "0.1s" }}
+  >
+    Understand & Engage Your
+    <span className="relative">
+      <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient">
+        {" "}Audience in Real Time
+      </span>
+    </span>
+  </h1>
 
+  {/* Description */}
+  <p
+    className="text-lg text-muted-foreground max-w-xl animate-fade-in"
+    style={{ animationDelay: "0.2s" }}
+  >
+    Analyze conversations to uncover{" "}
+    <span className="text-foreground font-medium">sentiments</span>,{" "}
+    <span className="text-foreground font-medium">agreements</span>, and{" "}
+    <span className="text-foreground font-medium">trends</span> — or launch{" "}
+    <span className="text-foreground font-medium">interactive promos</span> to engage your audience and reward participation.
+  </p>
+
+  {/* Buttons */}
+  <div
+    className="flex flex-col sm:flex-row gap-4 animate-fade-in"
+    style={{ animationDelay: "0.3s" }}
+  >
+    {/* View Analysis */}
+    <Button
+      size="lg"
+      className="gap-2 text-lg px-8 py-6 shadow-xl shadow-primary/30 hover:shadow-primary/50 transition-all group"
+      onClick={() => navigate("/analytics-list/general")}
+    >
+      View Analysis
+      <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+    </Button>
+
+    {/* Public Promos */}
+    <Button
+      size="lg"
+      variant="outline"
+      className="gap-2 text-lg px-8 py-6 group"
+      onClick={() => navigate("/promos")}
+    >
+      <Gift className="w-5 h-5 group-hover:scale-110 transition-transform" />
+      Explore Promos
+    </Button>
+  </div>
+
+  {/* Trust Points */}
+  <div
+    className="flex flex-wrap items-center gap-6 pt-4 animate-fade-in"
+    style={{ animationDelay: "0.4s" }}
+  >
+    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+      <CheckCircle2 className="w-5 h-5 text-success" />
+      Real-time insights
+    </div>
+    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+      <CheckCircle2 className="w-5 h-5 text-success" />
+      Run giveaways & promos
+    </div>
+    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+      <CheckCircle2 className="w-5 h-5 text-success" />
+      Instant results
+    </div>
+  </div>
+</div>
             {/* Right - Interactive Demo */}
             <div className="relative animate-fade-in" style={{ animationDelay: "0.3s" }}>
+  <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 rounded-3xl blur-3xl" />
+
+  <Card className="relative bg-card/80 backdrop-blur-xl border-border/50 shadow-2xl overflow-hidden">
+    
+    {/* Top Gradient */}
+    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-accent to-primary animate-gradient bg-[length:200%_auto]" />
+
+    <CardContent className="p-5 space-y-5">
+
+      {/* Tabs */}
+      <div className="flex gap-2 mb-2">
+        <button
+          onClick={() => setActiveDemoTab("analytics")}
+          className={`flex-1 py-2 rounded-lg text-sm font-medium transition ${
+            activeDemoTab === "analytics"
+              ? "bg-primary text-white"
+              : "bg-muted text-muted-foreground"
+          }`}
+        >
+          Analytics
+        </button>
+
+        <button
+          onClick={() => setActiveDemoTab("promos")}
+          className={`flex-1 py-2 rounded-lg text-sm font-medium transition ${
+            activeDemoTab === "promos"
+              ? "bg-violet-600 text-white"
+              : "bg-muted text-muted-foreground"
+          }`}
+        >
+          Promos
+        </button>
+      </div>
+
+      {/* ================= ANALYTICS ================= */}
+      {activeDemoTab === "analytics" && (
+<div className="relative animate-fade-in" style={{ animationDelay: "0.3s" }}>
               <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 rounded-3xl blur-3xl" />
               <Card className="relative bg-card/80 backdrop-blur-xl border-border/50 shadow-2xl overflow-hidden">
                 <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-accent to-primary animate-gradient bg-[length:200%_auto]" />
@@ -464,8 +583,139 @@ export default function Landing() {
                 </div>
               </div>
             </div>
-          </div>
+                )}
+
+      {/* ================= PROMOS ================= */}
+      {activeDemoTab === "promos" && (
+        <div className="space-y-4">
+
+          {/* Right - Promo Interactive Demo */}
+<div className="relative animate-fade-in" style={{ animationDelay: "0.3s" }}>
+  {/* Glow */}
+  <div className="absolute inset-0 bg-gradient-to-r from-violet-500/20 to-purple-500/20 rounded-3xl blur-3xl" />
+
+  <Card className="relative bg-card/80 backdrop-blur-xl border-border/50 shadow-2xl overflow-hidden">
+    {/* Top animated border */}
+    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-violet-500 via-purple-500 to-violet-500 animate-gradient bg-[length:200%_auto]" />
+
+    <CardContent className="p-5 space-y-5">
+      
+      {/* Promo Header */}
+      <div className="relative rounded-xl overflow-hidden border border-border/50">
+        <img
+          src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678"
+          className="w-full h-28 object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+
+        <div className="absolute bottom-2 left-3 right-3">
+          <p className="text-xs text-white/80">🔥 Active Promo</p>
+          <p className="text-sm text-white font-semibold line-clamp-1">
+            Guess our next AI feature & win big!
+          </p>
         </div>
+
+        <Badge className="absolute top-2 right-2 bg-green-500 text-white text-xs">
+          Active
+        </Badge>
+      </div>
+
+      {/* Prize + Time */}
+      <div className="grid grid-cols-2 gap-3">
+        <div className="bg-violet-50 rounded-lg p-3 border border-violet-200">
+          <p className="text-xs text-muted-foreground">Prize</p>
+          <p className="text-sm font-semibold text-violet-700">
+            1 Year Pro 🚀
+          </p>
+        </div>
+
+        <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
+          <p className="text-xs text-muted-foreground">Time Left</p>
+          <p className="text-sm font-semibold text-blue-600">
+            12h remaining
+          </p>
+        </div>
+      </div>
+
+      {/* Live Stats */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between text-xs">
+          <span className="text-muted-foreground">Entries</span>
+          <span className="font-medium text-foreground">1,284 users</span>
+        </div>
+
+        {/* Progress bar */}
+        <div className="h-3 bg-muted rounded-full overflow-hidden">
+          <div className="h-full bg-gradient-to-r from-violet-500 to-purple-500 w-[75%] transition-all duration-1000" />
+        </div>
+
+        <div className="flex justify-between text-xs text-muted-foreground">
+          <span>Target: 1.5k</span>
+          <span>🔥 Trending</span>
+        </div>
+      </div>
+
+      {/* Winners Preview */}
+      <div className="space-y-2">
+        <p className="text-xs text-muted-foreground">Top Participants</p>
+
+        <div className="space-y-2">
+          {["@sam_ai", "@techguru", "@devqueen"].map((user, i) => (
+            <div
+              key={user}
+              className="flex items-center gap-2 bg-muted/50 rounded-lg px-3 py-2 text-xs"
+            >
+              <div className="w-6 h-6 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 text-white flex items-center justify-center text-[10px]">
+                {i === 0 ? "🥇" : i === 1 ? "🥈" : "🥉"}
+              </div>
+              <span className="text-foreground">{user}</span>
+              <span className="ml-auto text-muted-foreground">
+                {i === 0 ? "Winning" : "Close"}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* CTA */}
+      <Button className="w-full bg-gradient-to-r from-violet-600 to-purple-600 text-white group">
+        Enter Promo
+        <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+      </Button>
+    </CardContent>
+  </Card>
+
+  {/* Floating Activity */}
+  <div className="absolute -top-4 -right-4 bg-violet-600 text-white px-3 py-1 rounded-full text-xs shadow-lg animate-bounce">
+    +324 entries
+  </div>
+
+  <div className="absolute -bottom-4 -left-4 bg-card border border-border px-3 py-2 rounded-lg shadow-lg animate-float">
+    <div className="flex items-center gap-2">
+      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+      <span className="text-xs font-medium">Live submissions</span>
+    </div>
+  </div>
+</div>        </div>
+      )}
+    </CardContent>
+  </Card>
+
+  {/* Floating Indicator */}
+  <div className="absolute -top-4 -right-4 px-3 py-1 rounded-full text-xs font-medium shadow-lg bg-primary text-white animate-bounce-slow">
+    {activeDemoTab === "analytics" ? "Live Analysis" : "Live Promo"}
+  </div>
+
+  <div className="absolute -bottom-4 -left-4 bg-card border px-3 py-2 rounded-lg shadow-lg">
+    <span className="text-xs font-medium">
+      {activeDemoTab === "analytics"
+        ? "Real-time insights"
+        : "Auto winner selection"}
+    </span>
+  </div>
+</div>
+</div>
+</div>
       </section>
 
       {/* Stats Section */}
@@ -492,126 +742,190 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* What You Can Analyze Section */}
-      <section id="demo" className="container mx-auto px-6 py-20 bg-muted/30">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center space-y-4 mb-16">
-            <Badge className="px-4 py-2 bg-accent/10 text-accent border-accent/20">
-              <MousePointerClick className="w-4 h-4 mr-2" />
-              Powerful Analysis
-            </Badge>
-            <h2 className="text-3xl lg:text-5xl font-bold text-foreground">
-              What Can You Discover?
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Our AI dives deep into every post and reply to extract meaningful insights you can act on
+
+{/* What You Can Analyze Section */}
+<section id="demo" className="container mx-auto px-6 py-20 bg-muted/30">
+  <div className="max-w-6xl mx-auto">
+
+    {/* Header */}
+    <div className="text-center space-y-4 mb-12">
+      <Badge className="px-4 py-2 bg-accent/10 text-accent border-accent/20">
+        <MousePointerClick className="w-4 h-4 mr-2" />
+        Powerful Analysis
+      </Badge>
+      <h2 className="text-3xl lg:text-5xl font-bold text-foreground">
+        What Can You Discover?
+      </h2>
+      <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+        Our AI dives deep into every post and reply to extract meaningful insights you can act on
+      </p>
+    </div>
+
+    {/* 🔹 TOP VISIBLE ANALYTICS (High Impact Only) */}
+    <div className="grid lg:grid-cols-3 gap-8 mb-8">
+
+      {/* Sentiment */}
+      <Card className="group hover:shadow-xl transition-all duration-300 border-border/50 overflow-hidden">
+        <div className="h-2 bg-gradient-to-r from-success via-neutral to-destructive" />
+        <CardContent className="p-6 space-y-4">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-success/20 to-success/5 flex items-center justify-center">
+            <Heart className="w-6 h-6 text-success" />
+          </div>
+          <h3 className="text-xl font-semibold text-foreground">Sentiment Analysis</h3>
+          <p className="text-muted-foreground text-sm">
+            Instantly know if responses are positive, negative, or neutral.
+          </p>
+          <div className="pt-4 space-y-3">
+            <div className="flex items-center justify-between text-sm">
+              <span className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-success" />
+                Positive
+              </span>
+              <span className="font-medium">67%</span>
+            </div>
+            <div className="flex items-center justify-between text-sm">
+              <span className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-destructive" />
+                Negative
+              </span>
+              <span className="font-medium">18%</span>
+            </div>
+            <div className="flex items-center justify-between text-sm">
+              <span className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-neutral" />
+                Neutral
+              </span>
+              <span className="font-medium">15%</span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Agreement */}
+      <Card className="group hover:shadow-xl transition-all duration-300 border-border/50 overflow-hidden">
+        <div className="h-2 bg-gradient-to-r from-primary to-accent" />
+        <CardContent className="p-6 space-y-4">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
+            <ThumbsUp className="w-6 h-6 text-primary" />
+          </div>
+          <h3 className="text-xl font-semibold text-foreground">Agreement Detection</h3>
+          <p className="text-muted-foreground text-sm">
+            Understand who agrees, disagrees, or stays neutral.
+          </p>
+          <div className="pt-4 flex gap-2">
+            <div className="flex-1 bg-success/10 rounded-lg p-3 text-center">
+              <ThumbsUp className="w-5 h-5 text-success mx-auto mb-1" />
+              <p className="text-lg font-bold text-success">72%</p>
+              <p className="text-xs text-muted-foreground">Agree</p>
+            </div>
+            <div className="flex-1 bg-destructive/10 rounded-lg p-3 text-center">
+              <ThumbsDown className="w-5 h-5 text-destructive mx-auto mb-1" />
+              <p className="text-lg font-bold text-destructive">15%</p>
+              <p className="text-xs text-muted-foreground">Disagree</p>
+            </div>
+            <div className="flex-1 bg-muted rounded-lg p-3 text-center">
+              <Minus className="w-5 h-5 text-muted-foreground mx-auto mb-1" />
+              <p className="text-lg font-bold text-foreground">13%</p>
+              <p className="text-xs text-muted-foreground">Neutral</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Topics Preview */}
+      <Card className="group hover:shadow-xl transition-all duration-300 border-border/50 overflow-hidden">
+        <div className="h-2 bg-gradient-to-r from-violet-500 to-purple-500" />
+        <CardContent className="p-6 space-y-4">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500/20 to-violet-500/5 flex items-center justify-center">
+            <Hash className="w-6 h-6 text-violet-500" />
+          </div>
+          <h3 className="text-xl font-semibold text-foreground">Trending Topics</h3>
+          <p className="text-muted-foreground text-sm">
+            Quickly see what people are talking about.
+          </p>
+          <div className="pt-4 flex flex-wrap gap-2">
+            {["Product", "UX", "Pricing"].map((topic) => (
+              <Badge key={topic} variant="outline">#{topic}</Badge>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+
+    {/* 🔹 ACTION BUTTONS */}
+  
+<div className="flex flex-col sm:flex-row justify-center gap-4 mb-6">
+  
+  {/* Start Analyzing */}
+  <Button
+    size="lg"
+    className="px-8 py-6"
+    onClick={() => {
+      if (user) {
+        navigate("/analytics");
+      } else {
+        navigate("/auth");
+      }
+    }}
+  >
+    Start Analyzing
+  </Button>
+
+  {/* General Open Analysis */}
+  <Button
+    size="lg"
+    variant="outline"
+    onClick={() => navigate("/analytics-list/general")}
+  >
+    General Open Analysis
+  </Button>
+</div>
+
+{/* Toggle */}
+<div className="text-center mb-10">
+  <button
+    onClick={() => setShowFullAnalytics(!showFullAnalytics)}
+    className="inline-flex items-center gap-2 text-primary font-medium hover:underline transition"
+  >
+    {showFullAnalytics ? (
+      <>
+        Hide Detailed Analytics
+        <ChevronUp className="w-4 h-4 transition-transform" />
+      </>
+    ) : (
+      <>
+        Understand Our Analytics
+        <ChevronDown className="w-4 h-4 transition-transform" />
+      </>
+    )}
+  </button>
+</div>
+
+    {/* 🔹 EXPANDED ANALYTICS (ALL YOUR ORIGINAL CONTENT) */}
+    {showFullAnalytics && (
+      <div className="mt-10 space-y-10">
+
+        {/* FULL TOPIC CLUSTERING */}
+        <Card className="group hover:shadow-xl transition-all duration-300 border-border/50 overflow-hidden">
+          <div className="h-2 bg-gradient-to-r from-violet-500 to-purple-500" />
+          <CardContent className="p-6 space-y-4">
+            <h3 className="text-xl font-semibold text-foreground">Topic Clustering</h3>
+            <p className="text-muted-foreground text-sm">
+              Automatically group conversations by theme and discover what resonates most.
             </p>
-          </div>
+            <div className="pt-4 flex flex-wrap gap-2">
+              {["Product", "UX", "Price", "Support", "Speed"].map((topic, i) => (
+                <Badge key={topic} variant="outline">
+                  #{topic}
+                </Badge>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
 
-          <div className="grid lg:grid-cols-3 gap-8">
-            {/* Sentiment Card */}
-            <Card className="group hover:shadow-xl transition-all duration-300 border-border/50 overflow-hidden">
-              <div className="h-2 bg-gradient-to-r from-success via-neutral to-destructive" />
-              <CardContent className="p-6 space-y-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-success/20 to-success/5 flex items-center justify-center">
-                  <Heart className="w-6 h-6 text-success" />
-                </div>
-                <h3 className="text-xl font-semibold text-foreground">Sentiment Analysis</h3>
-                <p className="text-muted-foreground text-sm">
-                  Instantly know if responses are positive, negative, or neutral. Track sentiment trends over time.
-                </p>
-                <div className="pt-4 space-y-3">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-success" />
-                      Positive
-                    </span>
-                    <span className="font-medium">67%</span>
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-destructive" />
-                      Negative
-                    </span>
-                    <span className="font-medium">18%</span>
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-neutral" />
-                      Neutral
-                    </span>
-                    <span className="font-medium">15%</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Agreement Card */}
-            <Card className="group hover:shadow-xl transition-all duration-300 border-border/50 overflow-hidden">
-              <div className="h-2 bg-gradient-to-r from-primary to-accent" />
-              <CardContent className="p-6 space-y-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
-                  <ThumbsUp className="w-6 h-6 text-primary" />
-                </div>
-                <h3 className="text-xl font-semibold text-foreground">Agreement Detection</h3>
-                <p className="text-muted-foreground text-sm">
-                  See who agrees with your content and who pushes back. Understand the "why" behind reactions.
-                </p>
-                <div className="pt-4">
-                  <div className="flex gap-2">
-                    <div className="flex-1 bg-success/10 rounded-lg p-3 text-center">
-                      <ThumbsUp className="w-5 h-5 text-success mx-auto mb-1" />
-                      <p className="text-lg font-bold text-success">72%</p>
-                      <p className="text-xs text-muted-foreground">Agree</p>
-                    </div>
-                    <div className="flex-1 bg-destructive/10 rounded-lg p-3 text-center">
-                      <ThumbsDown className="w-5 h-5 text-destructive mx-auto mb-1" />
-                      <p className="text-lg font-bold text-destructive">15%</p>
-                      <p className="text-xs text-muted-foreground">Disagree</p>
-                    </div>
-                    <div className="flex-1 bg-muted rounded-lg p-3 text-center">
-                      <Minus className="w-5 h-5 text-muted-foreground mx-auto mb-1" />
-                      <p className="text-lg font-bold text-foreground">13%</p>
-                      <p className="text-xs text-muted-foreground">Neutral</p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Topics Card */}
-            <Card className="group hover:shadow-xl transition-all duration-300 border-border/50 overflow-hidden">
-              <div className="h-2 bg-gradient-to-r from-violet-500 to-purple-500" />
-              <CardContent className="p-6 space-y-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500/20 to-violet-500/5 flex items-center justify-center">
-                  <Hash className="w-6 h-6 text-violet-500" />
-                </div>
-                <h3 className="text-xl font-semibold text-foreground">Topic Clustering</h3>
-                <p className="text-muted-foreground text-sm">
-                  Automatically group conversations by theme. Discover what topics resonate most with your audience.
-                </p>
-                <div className="pt-4 flex flex-wrap gap-2">
-                  {["Product", "UX", "Price", "Support", "Speed"].map((topic, i) => (
-                    <Badge 
-                      key={topic}
-                      variant="outline"
-                      className="animate-fade-in"
-                      style={{ animationDelay: `${i * 0.1}s` }}
-                    >
-                      #{topic}
-                    </Badge>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Grid */}
-      <section id="features" className="container mx-auto px-6 py-20">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center space-y-4 mb-16">
+        {/* FEATURES GRID (UNCHANGED) */}
+        <section id="features">
+          <div className="text-center space-y-4 mb-10">
             <Badge className="px-4 py-2 bg-primary/10 text-primary border-primary/20">
               <Star className="w-4 h-4 mr-2" />
               Full Feature Suite
@@ -620,21 +934,21 @@ export default function Landing() {
               Everything You Need to Understand Your Audience
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Powerful AI tools that transform raw social data into actionable insights
+              Powerful AI tools that transform raw data into insights
             </p>
           </div>
-          
+
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
             {features.map((feature, index) => (
-              <Card 
-                key={index} 
+              <Card
+                key={index}
                 className="relative overflow-hidden border-border/50 hover:border-primary/50 transition-all duration-300 group cursor-pointer"
                 onMouseEnter={() => setHoveredFeature(index)}
                 onMouseLeave={() => setHoveredFeature(null)}
               >
-                <CardContent className="p-5 space-y-3 relative z-10">
+                <CardContent className="p-5 space-y-3">
                   <div className="flex items-start justify-between">
-                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${feature.color} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform`}>
+                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${feature.color} flex items-center justify-center`}>
                       <feature.icon className="w-6 h-6 text-white" />
                     </div>
                     <div className="text-right">
@@ -642,23 +956,225 @@ export default function Landing() {
                       <p className="text-xs text-muted-foreground">{feature.statLabel}</p>
                     </div>
                   </div>
-                  <h3 className="text-base font-semibold text-foreground group-hover:text-primary transition-colors">
+                  <h3 className="text-base font-semibold text-foreground">
                     {feature.title}
                   </h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
+                  <p className="text-sm text-muted-foreground">
                     {feature.description}
                   </p>
-                  <ChevronRight className={`w-5 h-5 text-primary transition-transform ${hoveredFeature === index ? 'translate-x-1' : ''}`} />
                 </CardContent>
-                <div className={`absolute inset-0 bg-gradient-to-br ${feature.color} opacity-0 group-hover:opacity-5 transition-opacity`} />
               </Card>
             ))}
           </div>
+        </section>
+
+        {/* KEEP THESE */}
+        <LiveDemo />
+        <HowItWorks />
+
+      </div>
+    )}
+  </div>
+</section>
+
+      {/* Promo Engine Section - Interactive Tour */}
+      <section id="promos" className="container mx-auto px-6 py-20 bg-muted/30">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center space-y-4 mb-16">
+            <Badge className="px-4 py-2 bg-gradient-to-r from-violet-500/10 to-purple-500/10 text-violet-600 border-violet-500/20">
+              <Gift className="w-4 h-4 mr-2" />
+              Promo & Giveaway Engine
+            </Badge>
+            <h2 className="text-3xl lg:text-5xl font-bold text-foreground">
+              Launch Engaging Promos & Contests
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Create, manage, and track social media giveaways with our complete promo engine
+            </p>
+          </div>
+
+          {/* Interactive Tour */}
+          <div className="grid lg:grid-cols-2 gap-12 items-center mb-16">
+            {/* Left - Tour Steps */}
+            <div className="space-y-4">
+              {promoTourSteps.map((step, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  onClick={() => setActivePromoTour(index)}
+                  className={`p-6 rounded-xl border-2 cursor-pointer transition-all ${
+                    activePromoTour === index
+                      ? 'border-primary bg-primary/5 shadow-lg'
+                      : 'border-border/50 hover:border-border bg-card/50'
+                  }`}
+                >
+                  <div className="flex items-start gap-4">
+                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${step.color} flex items-center justify-center flex-shrink-0 shadow-lg ${
+                      activePromoTour === index ? 'scale-110' : ''
+                    } transition-transform`}>
+                      <step.icon className="w-6 h-6 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <h3 className="text-lg font-semibold text-foreground">{step.title}</h3>
+                        {activePromoTour === index && (
+                          <Badge className="bg-primary text-primary-foreground text-xs">Active</Badge>
+                        )}
+                      </div>
+                      <p className="text-sm text-muted-foreground">{step.description}</p>
+                    </div>
+                    <ChevronRight className={`w-5 h-5 text-primary transition-transform ${
+                      activePromoTour === index ? 'translate-x-1' : ''
+                    }`} />
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Right - Visual Demonstration */}
+            <motion.div
+              key={activePromoTour}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5 }}
+              className="relative"
+            >
+              <div className="relative rounded-2xl overflow-hidden shadow-2xl border-2 border-border/50">
+                <img
+                  src={promoTourSteps[activePromoTour].image}
+                  alt={promoTourSteps[activePromoTour].title}
+                  className="w-full h-[500px] object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-8">
+                  <Badge className={`mb-4 bg-gradient-to-r ${promoTourSteps[activePromoTour].color} text-white`}>
+                    Step {activePromoTour + 1} of {promoTourSteps.length}
+                  </Badge>
+                  <h3 className="text-3xl font-bold text-white mb-3">
+                    {promoTourSteps[activePromoTour].title}
+                  </h3>
+                  <p className="text-lg text-white/90">
+                    {promoTourSteps[activePromoTour].description}
+                  </p>
+                </div>
+              </div>
+
+              {/* Progress Indicators */}
+              <div className="flex gap-2 justify-center mt-6">
+                {promoTourSteps.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setActivePromoTour(index)}
+                    className={`h-2 rounded-full transition-all ${
+                      activePromoTour === index
+                        ? 'w-8 bg-primary'
+                        : 'w-2 bg-border hover:bg-border/80'
+                    }`}
+                  />
+                ))}
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Quick Access Cards */}
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Public Promo Access */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              whileHover={{ y: -5 }}
+            >
+              <Card className="relative overflow-hidden border-2 border-border/50 hover:border-violet-500/50 transition-all group">
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-violet-500 to-purple-600" />
+                <CardContent className="p-8">
+                  <div className="flex items-start gap-4 mb-6">
+                    <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                      <UserPlus className="w-7 h-7 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-2xl font-bold text-foreground mb-2">Join Active Promos</h3>
+                      <p className="text-muted-foreground">
+                        Browse and participate in live giveaways, contests, and community events
+                      </p>
+                    </div>
+                  </div>
+                  <div className="space-y-3 mb-6">
+                    <div className="flex items-center gap-3 text-sm">
+                      <CheckCircle2 className="w-5 h-5 text-success flex-shrink-0" />
+                      <span className="text-foreground">View all active promos and winners</span>
+                    </div>
+                    <div className="flex items-center gap-3 text-sm">
+                      <CheckCircle2 className="w-5 h-5 text-success flex-shrink-0" />
+                      <span className="text-foreground">Easy entry with one-click participation</span>
+                    </div>
+                    <div className="flex items-center gap-3 text-sm">
+                      <CheckCircle2 className="w-5 h-5 text-success flex-shrink-0" />
+                      <span className="text-foreground">Track your entries and prizes won</span>
+                    </div>
+                  </div>
+                  <Button 
+                    onClick={() => navigate("/promos")}
+                    className="w-full bg-gradient-to-r from-violet-600 to-purple-600 text-white group/btn"
+                  >
+                    <ExternalLink className="w-4 h-4 mr-2 group-hover/btn:translate-x-1 transition-transform" />
+                    View Public Promos
+                    <ArrowRight className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />
+                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Admin Promo Access */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              whileHover={{ y: -5 }}
+            >
+              <Card className="relative overflow-hidden border-2 border-border/50 hover:border-blue-500/50 transition-all group">
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-cyan-600" />
+                <CardContent className="p-8">
+                  <div className="flex items-start gap-4 mb-6">
+                    <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                      <Settings className="w-7 h-7 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-2xl font-bold text-foreground mb-2">Create & Manage</h3>
+                      <p className="text-muted-foreground">
+                        Launch your own promos, select winners, and track all engagement metrics
+                      </p>
+                    </div>
+                  </div>
+                  <div className="space-y-3 mb-6">
+                    <div className="flex items-center gap-3 text-sm">
+                      <CheckCircle2 className="w-5 h-5 text-success flex-shrink-0" />
+                      <span className="text-foreground">Create unlimited promos with custom rules</span>
+                    </div>
+                    <div className="flex items-center gap-3 text-sm">
+                      <CheckCircle2 className="w-5 h-5 text-success flex-shrink-0" />
+                      <span className="text-foreground">Smart winner selection algorithms</span>
+                    </div>
+                    <div className="flex items-center gap-3 text-sm">
+                      <CheckCircle2 className="w-5 h-5 text-success flex-shrink-0" />
+                      <span className="text-foreground">Real-time analytics and reporting</span>
+                    </div>
+                  </div>
+                  <Button 
+                    onClick={() => navigate("/admin-promos")}
+                    className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 text-white group/btn"
+                  >
+                    <Trophy className="w-4 h-4 mr-2 group-hover/btn:scale-110 transition-transform" />
+                    Admin Dashboard
+                    <ArrowRight className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />
+                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
         </div>
       </section>
-
-      <LiveDemo/>
-      <HowItWorks/>
 
       {/* Testimonials */}
       <section id="testimonials" className="container mx-auto px-6 py-20 bg-muted/30">

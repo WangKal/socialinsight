@@ -114,12 +114,12 @@ export function PostsTable({ posts, onViewPost, onAssignPost, showAssignButton =
               <TableCell className="text-gray-600">{post.date}</TableCell>
               <TableCell>
                 <span className={getSentimentColor(post.sentiment)}>
-                  {post.sentiment_distribution}%
+                  {post.sentiment}%
                 </span>
               </TableCell>
               <TableCell>
                 <span className={getAgreementColor(post.agreement)}>
-                  {post.agreement_distribution}%
+                  {post.agreement}%
                 </span>
               </TableCell>
               <TableCell className="text-gray-900">{post.url}</TableCell>
