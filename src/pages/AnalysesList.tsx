@@ -47,7 +47,7 @@ interface Analysis {
 export default function AnalysesList() {
   const { user } = useAuth();
   const { scope } = useParams();
-  const [analyses, setAnalyses] = useState<>([]);
+  const [analyses, setAnalyses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedAnalysis, setSelectedAnalysis] = useState<Analysis | null>(null);
 
