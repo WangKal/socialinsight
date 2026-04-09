@@ -878,29 +878,38 @@ export async function getAdminRequests() {
 
 //PROMOS
 
-
-
-export const getPromos = async (): Promise<Promo2[]> => {
-  // 1️⃣ Fetch all promos
+export const getPromos = async (userId?: string | null): Promise<Promo2[]> => {
   const promoBanners = [
- 'https://images.unsplash.com/photo-1519389950473-47ba0277781c', // Tech Team/Social
-  'https://images.unsplash.com/photo-1498050108023-c5249f4df085', // Coding/Signup
-  'https://images.unsplash.com/photo-1556742044-3c52d6e88c62', // Mobile/Giveaway
-  'https://images.unsplash.com/photo-1505740420928-5e560c06d30e', // Product/Audio
-  'https://images.unsplash.com/photo-1522202176988-66273c2fd55f'  // Engagement
+    "https://images.unsplash.com/photo-1519389950473-47ba0277781c",
+    "https://images.unsplash.com/photo-1498050108023-c5249f4df085",
+    "https://images.unsplash.com/photo-1556742044-3c52d6e88c62",
+    "https://images.unsplash.com/photo-1505740420928-5e560c06d30e",
+    "https://images.unsplash.com/photo-1522202176988-66273c2fd55f",
   ];
-  const randomBanner = promoBanners[Math.floor(Math.random() * promoBanners.length)];
 
-  const { data: promosData, error: promosError } = await supabase
+  let query = supabase
     .from("promos")
     .select("*")
     .order("created_at", { ascending: false });
+
+  // 🚨 Explicit handling
+  if (!userId) {
+    // Guest → ONLY public promos
+    query = query.eq("test", false);
+  } else {
+    // Logged in → public + own test promos
+    query = query.or(
+      `test.eq.false,and(test.eq.true,created_by.eq.${userId})`
+    );
+  }
+
+  const { data: promosData, error: promosError } = await query;
 
   if (promosError) throw promosError;
   if (!promosData || promosData.length === 0) return [];
 
   // 2️⃣ Get all unique created_by IDs
-  const userIds = [...new Set(promosData.map(p => p.created_by).filter(Boolean))];
+  const userIds = [...new Set(promosData.map((p) => p.created_by).filter(Boolean))];
 
   // 3️⃣ Fetch profiles in one go
   let profilesMap: Record<string, string> = {};
@@ -915,7 +924,7 @@ export const getPromos = async (): Promise<Promo2[]> => {
       console.error("Error fetching profiles", profilesError);
     } else {
       profilesMap = Object.fromEntries(
-        profilesData.map(p => [p.user_id, p.full_name])
+        profilesData.map((p) => [p.user_id, p.full_name])
       );
     }
   }
@@ -923,7 +932,9 @@ export const getPromos = async (): Promise<Promo2[]> => {
   // 4️⃣ Enrich promos
   const enrichedPromos: Promo2[] = await Promise.all(
     promosData.map(async (promo) => {
-      // Fetch replies JSON
+      const randomBanner =
+        promoBanners[Math.floor(Math.random() * promoBanners.length)];
+
       const { data: repliesRow, error: repliesError } = await supabase
         .from("promo_replies_json")
         .select("replies_json")
@@ -936,7 +947,6 @@ export const getPromos = async (): Promise<Promo2[]> => {
 
       const repliesCount = repliesRow?.replies_json?.length || 0;
 
-      // Fetch winners count
       const { data: winnersData, error: winnersError } = await supabase
         .from("promo_winners")
         .select("id")
@@ -964,21 +974,18 @@ export const getPromos = async (): Promise<Promo2[]> => {
         brandingImage: randomBanner,
         requirementInstructions: promo.requirement_instructions,
 
-
-        // ✅ NEW FIELDS
         createdBy: profilesMap[promo.created_by] || null,
         createdFor: promo.created_for || null,
         createdForHandle: promo.created_for_handle || null,
-        contactName:promo.contact_name,
-        contactPhone:promo.contact_phone,
-        claimInstructions:promo.claim_instructions
+        contactName: promo.contact_name,
+        contactPhone: promo.contact_phone,
+        claimInstructions: promo.claim_instructions,
       };
     })
   );
 
   return enrichedPromos;
 };
-
 export const getPromoById = async (id): Promise<Promo2[]> => {
   // 1️⃣ Fetch all promos
   const { data: promosData, error: promosError } = await supabase
@@ -1084,7 +1091,8 @@ export async function createPromo(formData: PromoFormData): Promise<Promo> {
     requirement_instructions: formData.requirementInstructions,
     contact_name:formData.contactName,
     contact_phone:formData.contactPhone,
-    claim_instructions:formData.claim_instructions
+    claim_instructions:formData.claim_instructions,
+    test:formData.test
   };
 
   const typeRule: any = { type: formData.type };

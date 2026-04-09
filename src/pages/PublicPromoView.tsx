@@ -22,6 +22,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import type { Reply } from "../components/promo/ReplyList";
+import{useAuth} from "../hooks/use-auth"
 
 // --- API functions (replace with your actual API calls) ---
 import { getPromos, getPromoWinners, getPromoReplies } from "@/services/socialEcho";
@@ -47,6 +48,7 @@ interface Promo {
   contactName:string;
      contactPhone:string;
      claimInstructions:string;
+     test:boolean;
 }
 const promoBanners = [
   'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', // Midnight Aurora
@@ -59,7 +61,7 @@ const promoBanners = [
 // Inside your component:
 export default function PublicPromoView() {
   const navigate = useNavigate();
-
+  const {user} =useAuth();
   const [selectedPromo, setSelectedPromo] = useState<Promo | null>(null);
   const [winnerSearchQuery, setWinnerSearchQuery] = useState("");
   const [replySearchQuery, setReplySearchQuery] = useState("");
@@ -67,10 +69,11 @@ export default function PublicPromoView() {
     const [showFullInstructions, setShowFullInstructions] = useState(false);
 
   // --- Fetch promos via React Query ---
-  const { data: promos = [], isLoading, isError } = useQuery({
-    queryKey: ["promos"],
-    queryFn: getPromos,
-  });
+const { data: promos = [], isLoading, isError } = useQuery({
+  queryKey: ["promos", user?.id],
+  queryFn: () => getPromos(user?.id),
+  enabled: true, // optional, see below
+});
 
 const handleViewPromo = async (promo: Promo) => {
   try {
@@ -207,12 +210,7 @@ const filteredReplies = processedPromo?.replies?.filter(
       </div>
     );
 
-  if (isError)
-    return (
-      <div className="min-h-screen flex items-center justify-center text-red-500">
-        Failed to load promos.
-      </div>
-    );
+
 
   // --- Selected Promo View ---
 if (selectedPromo && processedPromo) {
@@ -644,151 +642,245 @@ if (selectedPromo && processedPromo) {
 
 
   // Promo List View
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-violet-50 via-white to-purple-50">
-      <div className="max-w-7xl mx-auto px-6 py-12">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
-        >
-          <h1 className="text-5xl mb-3 bg-gradient-to-r from-violet-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
-            Active Promos
-          </h1>
-          <p className="text-xl text-gray-600">
-            Browse active giveaways and view winners
-          </p>
-        </motion.div>
+  // Promo List View
+return (
+  <div className="min-h-screen bg-gradient-to-b from-violet-50 via-white to-purple-50">
+    <div className="max-w-7xl mx-auto px-6 py-12">
+      {/* Header */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mb-8"
+      >
+        <h1 className="text-5xl mb-3 bg-gradient-to-r from-violet-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
+          Active Promos
+        </h1>
+        <p className="text-xl text-gray-600">
+          Browse active giveaways and view winners
+        </p>
+      </motion.div>
 
-        {/* Promos Grid */}
-        <div className="grid md:grid-cols-2 gap-6">
-          {promos.map((promo, index) => (
-            <motion.div
-              key={promo.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              whileHover={{ scale: 1.02, y: -5 }}
-              className="bg-white rounded-2xl overflow-hidden shadow-lg border border-gray-200 hover:shadow-2xl transition-all cursor-pointer"
-              onClick={() => handleViewPromo(promo)}
-            >
-              {/* Branding Image with Title & Description Overlay */}
-              {promo.brandingImage ? (
-                <div className="relative h-64 overflow-hidden group/image">
-                  <img
-                    src={promo.brandingImage}
-                    alt={promo.title}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover/image:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
-                  
-                  {/* Status Badge */}
-                  <div className="absolute top-4 right-4">
-                    <Badge className={getStatusColor(promo.status)}>
-                      {promo.status}
-                    </Badge>
-                  </div>
+      {/* Promos Grid */}
+      <div className="grid md:grid-cols-2 gap-6">
+        {promos.map((promo, index) => (
+          <motion.div
+            key={promo.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.1 }}
+            whileHover={{ scale: 1.02, y: -5 }}
+            className="bg-white rounded-2xl overflow-hidden shadow-lg border border-gray-200 hover:shadow-2xl transition-all cursor-pointer"
+            onClick={() => handleViewPromo(promo)}
+          >
+            {/* Branding Image with Title & Description Overlay */}
+            {promo.brandingImage ? (
+              <div className="relative h-64 overflow-hidden group/image">
+                <img
+                  src={promo.brandingImage}
+                  alt={promo.title}
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover/image:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
 
-                  {/* Title & Description Overlay */}
-                  <div className="absolute bottom-0 left-0 right-0 p-6">
-                    <h3 className="text-2xl text-white mb-2 line-clamp-2">
-                      {promo.title}
-                    </h3>
-                    <p className="text-sm text-white/90 line-clamp-2">
-                      {promo.description}
-                    </p>
-                  </div>
+                {/* Status Badge */}
+                <div className="absolute top-4 right-4 flex flex-col gap-2 items-end">
+                  <Badge className={getStatusColor(promo.status)}>
+                    {promo.status}
+                  </Badge>
+
+                  <Badge
+                    className={`${
+                      promo.test
+                        ? "bg-amber-100 text-amber-700 border border-amber-300"
+                        : "bg-emerald-100 text-emerald-700 border border-emerald-300"
+                    }`}
+                  >
+                    {promo.test ? "Test Promo" : "Live Promo"}
+                  </Badge>
                 </div>
-              ) : (
-                // Fallback for promos without branding image
-                <div className="relative h-48 overflow-hidden bg-gradient-to-br from-violet-100 to-purple-100 flex items-center justify-center">
-                  <div className="text-center p-6">
-                    <Sparkles className="w-12 h-12 text-violet-400 mx-auto mb-3" />
-                    <div className="absolute top-4 right-4">
-                      <Badge className={getStatusColor(promo.status)}>
-                        {promo.status}
-                      </Badge>
+
+                {/* Title & Description Overlay */}
+                <div className="absolute bottom-0 left-0 right-0 p-6">
+                  <h3 className="text-2xl text-white mb-2 line-clamp-2">
+                    {promo.title}
+                  </h3>
+                  <p className="text-sm text-white/90 line-clamp-2">
+                    {promo.description}
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="relative h-48 overflow-hidden bg-gradient-to-br from-violet-100 via-purple-100 to-blue-100 flex items-center justify-center">
+                <div className="absolute inset-0">
+                  <motion.div
+                    className="absolute top-8 left-10 w-20 h-20 rounded-full bg-violet-300/20"
+                    animate={{ y: [0, -10, 0], x: [0, 6, 0] }}
+                    transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                  />
+                  <motion.div
+                    className="absolute bottom-8 right-10 w-16 h-16 rounded-full bg-blue-300/20"
+                    animate={{ y: [0, 10, 0], x: [0, -6, 0] }}
+                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                  />
+                </div>
+
+                <div className="absolute top-4 right-4 flex flex-col gap-2 items-end z-10">
+                  <Badge className={getStatusColor(promo.status)}>
+                    {promo.status}
+                  </Badge>
+
+                  <Badge
+                    className={`${
+                      promo.test
+                        ? "bg-amber-100 text-amber-700 border border-amber-300"
+                        : "bg-emerald-100 text-emerald-700 border border-emerald-300"
+                    }`}
+                  >
+                    {promo.test ? "Test Promo" : "Live Promo"}
+                  </Badge>
+                </div>
+
+                <div className="text-center p-6 relative z-10">
+                  <motion.div
+                    animate={{ y: [0, -6, 0], rotate: [0, 4, -4, 0] }}
+                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                  >
+                    <Gift className="w-14 h-14 text-violet-500 mx-auto mb-3" />
+                  </motion.div>
+                  <p className="text-lg text-violet-700">Promo Preview</p>
+                </div>
+              </div>
+            )}
+
+            <div className="p-6">
+              {/* CREATED BY */}
+              {promo.createdBy && (
+                <div className="mb-4 pb-4 border-b border-gray-200">
+                  <p className="text-sm text-gray-900 truncate">
+                    <span className="text-gray-500 mr-1">Promo created by:</span>
+                    {promo.createdBy}
+                  </p>
+                </div>
+              )}
+
+              {/* CREATED FOR */}
+              {promo.createdFor && (
+                <div className="mb-4 pb-4 border-b border-gray-200">
+                  <p className="text-xs text-gray-500 mb-1">Ad created for</p>
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center text-white text-sm flex-shrink-0">
+                      {promo.createdFor.charAt(0)}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-gray-900 truncate">{promo.createdFor}</p>
+                      {promo.createForHandle && (
+                        <p className="text-xs text-gray-500 truncate">
+                          {promo.createForHandle}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
               )}
-              
-              <div className="p-6">
-                {/* Creator Information */}
-         {/* CREATED BY */}
-{promo.createdBy && (
-  <div className="mb-4 pb-4 border-b border-gray-200">
-    <p className="text-sm text-gray-900 truncate">
-      <span className="text-gray-500 mr-1">Promo created by:</span>
-      {promo.createdBy}
-    </p>
-  </div>
-)}
 
-{/* CREATED FOR */}
-{promo.createdFor && (
-  <div className="mb-4 pb-4 border-b border-gray-200">
-    <p className="text-xs text-gray-500 mb-1">Ad created for</p>
-    <div className="flex items-center gap-2">
-      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center text-white text-sm flex-shrink-0">
-        {promo.createdFor.charAt(0)}
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-sm text-gray-900 truncate">{promo.createdFor}</p>
-        {promo.createdForHandle && (
-          <p className="text-xs text-gray-500 truncate">
-            {promo.createdForHandle}
-          </p>
-        )}
-      </div>
-    </div>
-  </div>
-)}
-
-                {/* Prize Section */}
-                <div className="bg-gradient-to-br from-violet-50 to-purple-50 rounded-lg p-4 mb-4">
-                  <div className="flex items-center gap-2">
-                    <Gift className="w-5 h-5 text-violet-600 flex-shrink-0" />
-                    <span className="text-sm text-gray-700 flex-shrink-0">Prize:</span>
-                    <span className="text-sm text-gray-900 truncate">{promo.prize}</span>
-                  </div>
+              {/* Prize Section */}
+              <div className="bg-gradient-to-br from-violet-50 to-purple-50 rounded-lg p-4 mb-4">
+                <div className="flex items-center gap-2">
+                  <Gift className="w-5 h-5 text-violet-600 flex-shrink-0" />
+                  <span className="text-sm text-gray-700 flex-shrink-0">Prize:</span>
+                  <span className="text-sm text-gray-900 truncate">{promo.prize}</span>
                 </div>
-
-                {/* Stats Grid */}
-                <div className="grid grid-cols-3 gap-3 mb-4">
-                  <div className="bg-gray-50 rounded-lg p-3">
-                    <p className="text-xs text-gray-600 mb-1">Entries</p>
-                    <p className="text-xl text-gray-900">{promo.totalReplies}</p>
-                  </div>
-                  <div className="bg-yellow-50 rounded-lg p-3">
-                    <p className="text-xs text-gray-600 mb-1">Winners</p>
-                    <p className="text-xl text-yellow-600">{console.log(promo)}{promo.winners || 0}</p>
-                  </div>
-                  <div className="bg-blue-50 rounded-lg p-3">
-                    <p className="text-xs text-gray-600 mb-1">Max</p>
-                    <p className="text-xl text-blue-600">{promo.numberOfWinners}</p>
-                  </div>
-                </div>
-
-                {/* Time Remaining */}
-                <div className="flex items-center justify-between text-xs text-gray-600 mb-4 pb-4 border-b border-gray-200">
-                  <div className="flex items-center gap-1">
-                    <Clock className="w-3 h-3" />
-                    {getTimeRemaining(promo.endTime)}
-                  </div>
-                </div>
-
-                {/* CTA Button */}
-                <Button className="w-full bg-gradient-to-r from-violet-600 to-purple-600 text-white group">
-                  View Promo Details
-                  <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                </Button>
               </div>
-            </motion.div>
-          ))}
-        </div>
+
+              {/* Stats Grid */}
+              <div className="grid grid-cols-3 gap-3 mb-4">
+                <div className="bg-gray-50 rounded-lg p-3">
+                  <p className="text-xs text-gray-600 mb-1">Entries</p>
+                  <p className="text-xl text-gray-900">{promo.totalReplies}</p>
+                </div>
+                <div className="bg-yellow-50 rounded-lg p-3">
+                  <p className="text-xs text-gray-600 mb-1">Winners</p>
+                  <p className="text-xl text-yellow-600">{promo.winners?.length || 0}</p>
+                </div>
+                <div className="bg-blue-50 rounded-lg p-3">
+                  <p className="text-xs text-gray-600 mb-1">Max</p>
+                  <p className="text-xl text-blue-600">{promo.numberOfWinners}</p>
+                </div>
+              </div>
+
+              {/* Time Remaining */}
+              <div className="flex items-center justify-between text-xs text-gray-600 mb-4 pb-4 border-b border-gray-200">
+                <div className="flex items-center gap-1">
+                  <Clock className="w-3 h-3" />
+                  {getTimeRemaining(promo.endTime)}
+                </div>
+              </div>
+
+              {/* CTA Button */}
+              <Button className="w-full bg-gradient-to-r from-violet-600 to-purple-600 text-white group">
+                View Promo Details
+                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </div>
+          </motion.div>
+        ))}
       </div>
+
+      {/* Empty State */}
+      {promos.length === 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex items-center justify-center py-16 sm:py-24"
+        >
+          <div className="relative max-w-2xl w-full">
+            <div className="absolute inset-0 bg-gradient-to-r from-violet-200/40 via-purple-200/30 to-blue-200/40 blur-3xl rounded-full" />
+
+            <div className="relative bg-white/80 backdrop-blur-xl border border-white/70 shadow-2xl rounded-3xl px-8 py-14 text-center overflow-hidden">
+              <motion.div
+                className="absolute -top-6 -left-6 w-24 h-24 rounded-full bg-violet-200/30"
+                animate={{ y: [0, 12, 0], x: [0, 8, 0] }}
+                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+              />
+              <motion.div
+                className="absolute -bottom-6 -right-6 w-28 h-28 rounded-full bg-blue-200/30"
+                animate={{ y: [0, -12, 0], x: [0, -8, 0] }}
+                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+              />
+
+              <motion.div
+                animate={{ y: [0, -8, 0], rotate: [0, 4, -4, 0] }}
+                transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
+                className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 via-purple-500 to-blue-500 shadow-lg"
+              >
+                <Gift className="w-10 h-10 text-white" />
+              </motion.div>
+
+              <h2 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-violet-600 via-purple-600 to-blue-600 bg-clip-text text-transparent mb-4">
+                Exciting promos are on the way
+              </h2>
+
+              <p className="text-gray-600 text-base sm:text-lg leading-relaxed max-w-xl mx-auto mb-8">
+                There are no active promos right now, but fresh giveaways, rewards,
+                and special offers will appear here soon.
+              </p>
+
+              <div className="flex flex-wrap items-center justify-center gap-3">
+                <div className="inline-flex items-center gap-2 rounded-full bg-violet-50 border border-violet-200 px-4 py-2 text-sm text-violet-700">
+                  <Sparkles className="w-4 h-4" />
+                  Fresh promos coming soon
+                </div>
+
+                <div className="inline-flex items-center gap-2 rounded-full bg-blue-50 border border-blue-200 px-4 py-2 text-sm text-blue-700">
+                  <Clock className="w-4 h-4" />
+                  Stay tuned
+                </div>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      )}
     </div>
-);
+  </div>
+);;
 }

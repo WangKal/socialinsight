@@ -50,7 +50,7 @@ export function PromoForm({ onSubmit, onCancel, isSubmitting }: PromoFormProps) 
     //brandingImage: "",
     requirementInstructions: "",
    // promoUrl: "",
-
+    test:false,
     contactName: "",
     contactPhone: "",
     claimInstructions: "",
@@ -492,6 +492,25 @@ export function PromoForm({ onSubmit, onCancel, isSubmitting }: PromoFormProps) 
           </div>
         </div>
       </div>
+
+<div className="flex items-center justify-between bg-yellow-50 border border-yellow-200 rounded-lg px-4 py-3">
+  <div>
+    <p className="text-sm font-medium text-yellow-800">Test Mode</p>
+    <p className="text-xs text-yellow-600">
+      This promo will be hidden from the public when enabled.
+    </p>
+  </div>
+
+  <input
+    type="checkbox"
+    checked={formData.test}
+    onChange={(e) =>
+      setFormData({ ...formData, test: e.target.checked })
+    }
+    className="w-5 h-5 text-yellow-600"
+  />
+</div>
+
 
       {/* Actions */}
       <div className="flex gap-3">

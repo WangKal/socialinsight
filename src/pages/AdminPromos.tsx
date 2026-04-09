@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/use-auth";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { PromoFormData } from "../components/promo/PromoForm";
@@ -99,15 +100,18 @@ export default function AdminPromos() {
   const [isFloatingDialogOpen, setIsFloatingDialogOpen] = useState(false);
 
   const { toast } = useToast();
+  const { user } = useAuth();
   const [sourceUrl, setSourceUrl] = useState("");
   const [sourceUsername, setSourceUsername] = useState("");
   const [sourceName, setSourceName] = useState("");
   const queryClient = useQueryClient();
 
-  const { data: promos = [], isLoading } = useQuery({
-    queryKey: ["promos"],
-    queryFn: getPromos,
-  });
+if (!user?.id) navigate("/");
+const { data: promos = [], isLoading, isError } = useQuery({
+  queryKey: ["promos", user?.id],
+  queryFn: () => getPromos(user?.id),
+  enabled: true, // optional, see below
+});
 
   const evaluateMutation = useMutation({
     mutationFn: async ({ promoId, promo }: { promoId: string; promo: Promo }) => {
@@ -388,6 +392,16 @@ export default function AdminPromos() {
                       <div className="flex items-center gap-3 mb-2">
                         <h3 className="text-2xl text-gray-900">{promo.title}</h3>
                         <Badge className={getStatusColor(promo.status)}>{promo.status}</Badge>
+                          {/* ✅ NEW TEST BADGE */}
+  <Badge
+    className={`${
+      promo.test
+        ? "bg-amber-100 text-amber-700 border border-amber-300"
+        : "bg-emerald-100 text-emerald-700 border border-emerald-300"
+    }`}
+  >
+    {promo.test ? "Test Promo" : "Live Promo"}
+  </Badge>
                       </div>
                       {promo.description && (
                         <p className="text-sm text-gray-600 mb-3">{promo.description}</p>
