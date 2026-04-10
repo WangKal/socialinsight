@@ -79,10 +79,10 @@ useEffect(() => {
       postsCount: campaignPostsList.length,
       totalReplies: campaignPostsList.reduce((sum, p) => sum + p.replies, 0),
       avgSentiment: campaignPostsList.length > 0
-        ? Math.round(campaignPostsList.reduce((sum, p) => sum + p.sentiment_distribution, 0) / (campaignPostsList.length))
+        ? Math.round(campaignPostsList.reduce((sum, p) => sum + p.sentiment_distribution?.positive?.percentage, 0) / (campaignPostsList.length))
         : 0,
       avgAgreement: campaignPostsList.length > 0
-        ? Math.round(campaignPostsList.reduce((sum, p) => sum + p.agreement_distribution, 0) / (campaignPostsList.length))
+        ? Math.round(campaignPostsList.reduce((sum, p) => sum + p.agreement_distribution?.agree?.percentage, 0) / (campaignPostsList.length))
         : 0,
     };
   });
@@ -96,8 +96,8 @@ const calculateAvg = (
   const total = postsList.reduce((sum, p) => {
     const value =
       field === "sentiment"
-        ? p.sentiment_distribution
-        : p.agreement_distribution;
+        ? p.sentiment_distribution?.positive?.percentage
+        : p.agreement_distribution?.agree?.percentage;
 
     return sum + (value ?? 0);
   }, 0);
