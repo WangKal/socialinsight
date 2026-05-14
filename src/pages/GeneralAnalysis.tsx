@@ -11,6 +11,7 @@ import { RepliesSection } from "@/components/analytics/RepliesSection";
 import { ExportButton } from "@/components/analytics/ExportButton";
 import { AddLinkDialog } from "@/components/analytics/AddLinkDialog";
 import { GeneratedArticle } from "../components/analytics/GeneratedArticle";
+import { StrategicReport } from "@/components/StrategicReport";
 import { Link as LinkIcon } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { fetchPostAnalytics,fetchRecentPost, trackGeneralView } from "@/services/socialEcho";
@@ -243,6 +244,10 @@ const sentiment = data.statistics?.sentiment_distribution || {};
             neutral={sentiment.neutral || 0}
             negative={sentiment.negative || 0}
           />
+        </div>
+        {/**Strategic report **/}
+        <div className="mt-12">
+          <StrategicReport strategicReport={data?.strategic_report} />
         </div>
         <div className="mb-8">
           <GeneratedArticle
