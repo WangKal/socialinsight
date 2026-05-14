@@ -53,37 +53,43 @@ export async function fetchPostAnalytics(postId: string) {
 
   const replyIndex = new Map<string, any>();
   normalizeReplies(post.replies).forEach((reply, idx) => {
-    replyIndex.set(String(idx ), reply); // 1-based indexing
+    // Python stores reply IDs as zero-based indexes.
+    replyIndex.set(String(idx), reply);
   });
+
   /* ---------------------------------------
    * 3️⃣ Fetch agreement metadata
    * ------------------------------------- */
-  const [
-    agreeRes,
-    neutralRes,
-    disagreeRes,
-  ] = await Promise.all([
-    supabase.from("agree_replies").select("reply").eq("social_post_id", postId),
-    supabase.from("neutral_replies").select("reply").eq("social_post_id", postId),
-    supabase.from("disagree_replies").select("reply").eq("social_post_id", postId),
+  const [agreeRes, neutralRes, disagreeRes] = await Promise.all([
+    supabase
+      .from("agree_replies")
+      .select("reply")
+      .eq("social_post_id", postId),
+
+    supabase
+      .from("neutral_replies")
+      .select("reply")
+      .eq("social_post_id", postId),
+
+    supabase
+      .from("disagree_replies")
+      .select("reply")
+      .eq("social_post_id", postId),
   ]);
 
   /* ---------------------------------------
    * 4️⃣ Hydrate agreement replies
    * modelReplyId -> FULL reply JSON
    * ------------------------------------- */
-
   const hydrateReplies = (rows: any[] = []) => {
     const map = new Map<string, any>();
     const list: any[] = [];
 
     for (const row of rows) {
-    
       const meta = row.reply;
-      if (meta?.id  == null) continue;
+      if (meta?.id == null) continue;
 
       const base = replyIndex.get(String(meta.id));
- 
       if (!base) continue;
 
       const hydrated = {
@@ -93,9 +99,11 @@ export async function fetchPostAnalytics(postId: string) {
         username: base.username ?? null,
         timestamp: base.timestamp ?? null,
         counts: base.counts ?? {},
-        tone: meta.tone,
-        agreement: meta.agreement,
-        sentiment: meta.sentiment,
+        tone: meta.tone ?? null,
+        agreement: meta.agreement ?? null,
+        sentiment: meta.sentiment ?? null,
+        confidence: meta.confidence ?? null,
+        reply_type: meta.reply_type ?? null,
       };
 
       map.set(String(meta.id), hydrated);
@@ -104,37 +112,33 @@ export async function fetchPostAnalytics(postId: string) {
 
     return { map, list };
   };
-   
 
   const agree = hydrateReplies(agreeRes.data || []);
   const neutral = hydrateReplies(neutralRes.data || []);
   const disagree = hydrateReplies(disagreeRes.data || []);
 
-
   /* ---------------------------------------
    * 5️⃣ Fallback cluster-table fetcher
    * ------------------------------------- */
-const fetchClusterReplyIds = async (
-  table: string,
-  clusterId: string
-): Promise<string[]> => {
-  const { data, error } = await supabase
-    .from(table)
-    .select("reply")
-    .eq("cluster_id", clusterId)
-    .eq("social_post_id", postId);
+  const fetchClusterReplyIds = async (
+    table: string,
+    clusterId: string
+  ): Promise<string[]> => {
+    const { data, error } = await supabase
+      .from(table)
+      .select("reply")
+      .eq("cluster_id", clusterId)
+      .eq("social_post_id", postId);
 
-  if (error || !Array.isArray(data)) {
-    console.error("Cluster reply fetch error:", error);
-    return [];
-  }
+    if (error || !Array.isArray(data)) {
+      console.error("Cluster reply fetch error:", error);
+      return [];
+    }
 
-  // data = [{ reply: "7" }, { reply: "12" }, ...]
-  return data
-    .map(row => String(row.reply))
-    .filter(Boolean);
-};
-
+    return data
+      .map((row) => String(row.reply))
+      .filter(Boolean);
+  };
 
   /* ---------------------------------------
    * 6️⃣ Attach replies to clusters
@@ -147,14 +151,18 @@ const fetchClusterReplyIds = async (
     const result = [];
 
     for (const cluster of clusters) {
+      if (!cluster) continue;
+
       let replyIds: string[] = [];
 
       // A️⃣ analysis already attached replies
       if (Array.isArray(cluster.replies) && cluster.replies.length) {
-        replyIds = cluster.replies.map((r: any) => String(r.id));
-      } 
+        replyIds = cluster.replies
+          .map((r: any) => String(r?.id))
+          .filter(Boolean);
+      }
       // B️⃣ fallback to cluster table
-      else {
+      else if (cluster.cluster_id) {
         replyIds = await fetchClusterReplyIds(
           clusterTable,
           cluster.cluster_id
@@ -164,7 +172,7 @@ const fetchClusterReplyIds = async (
       result.push({
         ...cluster,
         replies: replyIds
-          .map(id => replyMap.get(id))
+          .map((id) => replyMap.get(id))
           .filter(Boolean),
       });
     }
@@ -173,9 +181,22 @@ const fetchClusterReplyIds = async (
   };
 
   /* ---------------------------------------
-   * 7️⃣ FINAL PAYLOAD
+   * 7️⃣ Normalize strategic report fields
    * ------------------------------------- */
+  const strategicReport =
+    typeof post.strategic_report === "string"
+      ? (() => {
+          try {
+            return JSON.parse(post.strategic_report);
+          } catch {
+            return null;
+          }
+        })()
+      : post.strategic_report || null;
 
+  /* ---------------------------------------
+   * 8️⃣ FINAL PAYLOAD
+   * ------------------------------------- */
   return {
     id: post.id,
     post_text: post.post_text,
@@ -183,15 +204,30 @@ const fetchClusterReplyIds = async (
     created_at: post.created_at,
     detected_type: post.detected_type,
     total_replies: post.total_replies,
+
+    // Discussion article
     discussion_article: post.discussion_article,
     article_model: post.article_model,
     discussion_title: post.discussion_title,
 
+    // Strategic discourse report
+    strategic_report: strategicReport,
+    strategic_report_markdown:
+      post.strategic_report_markdown || null,
+    strategic_report_model:
+      post.strategic_report_model || null,
+    strategic_report_generated_at:
+      post.strategic_report_generated_at || null,
+
+    // Aggregate statistics
     statistics: {
-      agreement_distribution: post.agreement_distribution || {},
-      sentiment_distribution: post.sentiment_distribution || {},
+      agreement_distribution:
+        post.agreement_distribution || {},
+      sentiment_distribution:
+        post.sentiment_distribution || {},
     },
 
+    // Topic clusters with hydrated replies
     agree_clusters: await attachReplies(
       post.topic_clusters?.agree || [],
       agree.map,
@@ -210,13 +246,12 @@ const fetchClusterReplyIds = async (
       "disagree_clusters"
     ),
 
-    // ✅ explicitly returned as requested
+    // Full reply lists
     agree_replies: agree.list,
     neutral_replies: neutral.list,
     disagree_replies: disagree.list,
   };
 }
-
 
 /**
  * Fetch the most recent completed post analytics

@@ -4,6 +4,7 @@ import { decryptId } from "@/hooks/encrypt";
 import { motion } from "motion/react";
 import { AnalyticsHeader } from "@/components/analytics/AnalyticsHeader";
 import { InsightsCards } from "@/components/analytics/InsightsCards";
+import { StrategicReport } from "@/components/StrategicReport";
 import { AgreementDistribution } from "@/components/analytics/AgreementDistribution";
 import { SentimentChart } from "@/components/analytics/SentimentChart";
 import { TopicClusters } from "@/components/analytics/TopicClusters";
@@ -219,6 +220,10 @@ const sentiment = data.statistics?.sentiment_distribution || {};
             neutral={sentiment.neutral || 0}
             negative={sentiment.negative || 0}
           />
+        </div>
+{/**Strategic report **/}
+        <div className="mt-12">
+          <StrategicReport strategicReport={data?.strategic_report} />
         </div>
    {/* Generated Article Section */}
         <div className="mb-8">
