@@ -1320,3 +1320,142 @@ export async function updateWinner(payload: {
 
   return data;
 }
+
+
+
+export const createSocialCampaign = async (
+  userId: string,
+  payload: {
+    query: string[];
+    platforms: string[];
+    start_date: string;
+    end_date: string;
+  }
+) => {
+  const jwt = localStorage.getItem("internal_jwt") || "";
+
+  const requestBody = {
+    user_id: userId,
+    ...payload,
+  };
+
+  try {
+    const res = await fetch(
+      "http://127.0.0.1:8000/api/insights/social_insight_search/",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${jwt}`,
+        },
+        body: JSON.stringify(requestBody),
+      }
+    );
+
+    if (!res.ok) {
+      throw new Error(`Backend error: ${res.statusText}`);
+    }
+
+    return await res.json();
+  } catch (err) {
+    console.error(err);
+
+    return {
+      success: false,
+      message: "Failed to create campaign",
+    };
+  }
+};
+
+
+export interface Campaign {
+  id: number;
+  created_at: string;
+  name: string;
+  description: string;
+  status: string;
+  query: string;
+  platforms: string;
+  start_date: string;
+  end_date: string;
+  total_posts: number;
+  analyzed_posts: number;
+  platform_stats: string;
+  campaign_topic_clusters: string;
+  campaign_article: string;
+  campaign_report: string;
+  campaign_statistics: string;
+  last_heartbeat: string;
+  worker_id?: string;
+}
+
+export async function getCampaign(id: number): Promise<Campaign | null> {
+  try {
+    const { data, error } = await supabase
+      .from("campaigns")
+      .select("*")
+      .eq("id", id)
+      .single();
+
+    if (error) {
+      console.error("Failed to fetch campaign:", error);
+      return null;
+    }
+
+    if (!data) return null;
+
+    return {
+      id: data.id,
+      created_at: data.created_at,
+      name: data.name,
+      description: data.description,
+      status: data.status,
+
+      // IMPORTANT:
+      // keep these as strings exactly like MOCK_CAMPAIGN
+      query:
+        typeof data.query === "string"
+          ? data.query
+          : JSON.stringify(data.query ?? []),
+
+      platforms:
+        typeof data.platforms === "string"
+          ? data.platforms
+          : JSON.stringify(data.platforms ?? []),
+
+      start_date: data.start_date,
+      end_date: data.end_date,
+
+      total_posts: data.total_posts ?? 0,
+      analyzed_posts: data.analyzed_posts ?? 0,
+
+      platform_stats:
+        typeof data.platform_stats === "string"
+          ? data.platform_stats
+          : JSON.stringify(data.platform_stats ?? {}),
+
+      campaign_topic_clusters:
+        typeof data.campaign_topic_clusters === "string"
+          ? data.campaign_topic_clusters
+          : JSON.stringify(data.campaign_topic_clusters ?? {}),
+
+      campaign_article: data.campaign_article ?? "",
+
+      campaign_report:
+        typeof data.campaign_report === "string"
+          ? data.campaign_report
+          : JSON.stringify(data.campaign_report ?? {}),
+
+      campaign_statistics:
+        typeof data.campaign_statistics === "string"
+          ? data.campaign_statistics
+          : JSON.stringify(data.campaign_statistics ?? {}),
+
+      last_heartbeat: data.last_heartbeat,
+      worker_id: data.worker_id,
+    };
+  } catch (err) {
+    console.error("Campaign fetch error:", err);
+    return null;
+  }
+}

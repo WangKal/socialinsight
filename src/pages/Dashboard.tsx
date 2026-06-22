@@ -3,14 +3,16 @@ import { useNavigate } from "react-router-dom";
 import { useState,useEffect } from "react";
 import { CategoryCard } from "@/components/CategoryCard";
 import { CampaignsList, Campaign } from "@/components/CampaignsList";
+import { CampaignView } from "@/components/CampaignView";
 import { PostsTable, Post } from "@/components/PostsTable";
 import { AssignPostDialog } from "@/components/AssignPostDialog";
 import { AddLinkDialog } from "@/components/analytics/AddLinkDialog";
+import { SearchDialog } from "@/components/analytics/SearchDialog";
 import { DailyAnalysisDialog } from "@/components/analytics/DailyAnalysisDialog";
 import { TrendChart } from "@/components/TrendChart";
 import { Globe, User, Briefcase, Link as LinkIcon, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { getPostsByUser, assignPost, getCampaignsByUser, submitDailyRequest } from "@/services/socialEcho"
+import { getPostsByUser, assignPost, getCampaignsByUser, submitDailyRequest, createSocialCampaign,getCampaign } from "@/services/socialEcho"
 import { CreditsBanner } from "@/components/CreditsBanner";
 import {useAuth } from "@/hooks/use-auth"
 import {useToast } from "@/hooks/use-toast"
@@ -28,6 +30,7 @@ export default function Dashboard() {
   const navigate = useNavigate()
   const [currentView, setCurrentView] = useState<ViewType>("overview");
   const [selectedCampaignId, setSelectedCampaignId] = useState<string | null>(null);
+  const [campaignData, setCampaignData] = useState<string | null>(null);
   const [isAddLinkOpen, setIsAddLinkOpen] = useState(false);
   const [isAssignOpen, setIsAssignOpen] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
@@ -190,6 +193,54 @@ const calculateAvg = (
  const handleAddLink = (url: string, title: string) => {
 };
 
+
+
+const getCampaignData = async (payload) => {
+  
+  try {
+    const res = await getCampaign(payload);
+console.log(res)
+    if (res?.success === false) {
+      toast({
+              title: 'Campaign.',
+              description: `Campaign fetch was not successful`,
+              variant: 'destructive',
+            });
+      return;
+    }
+
+    
+    setCampaignData(res)
+  } catch (error) {
+    toast.error("Network error. Please try again.");
+  }
+};
+
+
+const handleKeywordSearch = async (payload: SocialSearchPayload) => {
+  try {
+    const res = await createSocialCampaign(user.id, payload);
+
+    if (res?.success === false) {
+      toast({
+              title: 'Campaign.',
+              description: `Campaign creation was not successful`,
+              variant: 'destructive',
+            });
+      return;
+    }
+
+    toast({
+              title: 'Campaign.',
+              description: `Campaign creation  was successful`,
+              variant: 'constructive',
+            });;
+    return res;
+  } catch (error) {
+    toast.error("Network error. Please try again.");
+  }
+};
+
   // Generate trend data for a campaign
   const generateTrendData = (campaignId: string) => {
     const campaignPostsList = posts
@@ -270,6 +321,7 @@ const handleDailyRequestSubmit = async (url: string) => {
                   onClick={() => {
                     setSelectedCampaignId(campaign.id);
                     setCurrentView("campaign-detail");
+                    
                   }}
                   className="bg-white rounded-xl p-5 shadow-md border border-gray-200 cursor-pointer group hover:shadow-xl transition-all hover:-translate-y-1"
                 >
@@ -296,6 +348,7 @@ const handleDailyRequestSubmit = async (url: string) => {
                       </div>
                     </div>
                   </div>
+                 
                 </motion.div>
               ))}
             </div>
@@ -328,6 +381,8 @@ const handleDailyRequestSubmit = async (url: string) => {
           onSelectCampaign={(campaignId) => {
             setSelectedCampaignId(campaignId);
             setCurrentView("campaign-detail");
+            alert("hello")
+            getCampaignData(campaignId)
           }}
           onBack={() => setCurrentView("overview")}
         />
@@ -357,7 +412,7 @@ const handleDailyRequestSubmit = async (url: string) => {
             Back to Campaigns
           </Button>
 
-          {/* Campaign Header */}
+          {/* Campaign Header 
           <div className="mb-6">
             <div className="flex items-start gap-4 mb-2">
               <div className={`w-16 h-16 rounded-xl bg-gradient-to-br ${campaign.color} flex items-center justify-center`}>
@@ -372,7 +427,7 @@ const handleDailyRequestSubmit = async (url: string) => {
             </div>
           </div>
 
-          {/* Stats */}
+          {/* Stats 
           <div className="grid md:grid-cols-4 gap-4 mb-6">
             <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
               <p className="text-sm text-gray-600 mb-1">Total Posts</p>
@@ -414,13 +469,14 @@ const handleDailyRequestSubmit = async (url: string) => {
             </div>
           </div>
 
-          {/* Trend Chart */}
+          {/* Trend Chart 
           {trendData.length > 0 && (
             <div className="mb-8">
               <TrendChart data={trendData} title={`${campaign.name} - Performance Trend`} />
             </div>
-          )}
-
+          )}**/}
+  {campaignData &&(       
+<CampaignView campaign={campaignData}/>)}
           {/* Posts Table */}
           <div>
             <h3 className="text-2xl mb-4 bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
@@ -563,18 +619,18 @@ const handleDailyRequestSubmit = async (url: string) => {
 </div>
 
             </div>
-<Button
+{/**<Button
   onClick={() => setIsDailyRequestOpen(true)}
   className="bg-gradient-to-r from-green-500 to-teal-600 text-white hover:from-green-600 hover:to-teal-700"
 >
   Request Daily Analysis
-</Button>
+</Button>**/}
             <Button
               onClick={() => setIsAddLinkOpen(true)}
               className="bg-gradient-to-r from-violet-600 to-purple-600 text-white hover:from-violet-700 hover:to-purple-700"
             >
               <LinkIcon className="w-4 h-4 mr-2" />
-              Analyze Post
+              Perfom Search Analaysis
             </Button>
           </div>
         </motion.div>
@@ -587,11 +643,16 @@ const handleDailyRequestSubmit = async (url: string) => {
           {renderContent()}
         </motion.div>
       </div>
-
+{/**
       <AddLinkDialog
         isOpen={isAddLinkOpen}
         onClose={() => setIsAddLinkOpen(false)}
         onAdd={handleAddLink}
+      />**/}
+      <SearchDialog
+        isOpen={isAddLinkOpen}
+        onClose={() => setIsAddLinkOpen(false)}
+        onSearch={handleKeywordSearch}
       />
 
       <AssignPostDialog
