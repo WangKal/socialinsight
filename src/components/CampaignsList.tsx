@@ -72,7 +72,7 @@ export function CampaignsList({ campaigns, onSelectCampaign, onBack }: Campaigns
           <p className="text-sm text-gray-600 mb-1">Total Posts</p>
           <p className="text-3xl text-gray-900">{totalPosts}</p>
         </motion.div>
-        <motion.div
+     {/**   <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
@@ -109,7 +109,7 @@ export function CampaignsList({ campaigns, onSelectCampaign, onBack }: Campaigns
           >
             {avgAgreement}%
           </p>
-        </motion.div>
+        </motion.div>*/}
       </div>
 
       {/* Campaigns Grid */}
@@ -144,7 +144,7 @@ export function CampaignsList({ campaigns, onSelectCampaign, onBack }: Campaigns
                   </div>
                 </div>
 
-                <h3 className="text-xl text-gray-900 mb-2">{campaign.name}</h3>
+                <h3 className="text-xl text-gray-900 mb-2">{(campaign.name).slice(2, -2)}</h3>
                 <p className="text-sm text-gray-600 mb-4 line-clamp-2">{campaign.description}</p>
 
                 <div className="flex items-center justify-between pt-4 border-t border-gray-100">

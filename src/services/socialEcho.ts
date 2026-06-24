@@ -1341,7 +1341,7 @@ export const createSocialCampaign = async (
 
   try {
     const res = await fetch(
-      "http://127.0.0.1:8000/api/insights/social_insight_search/",
+      "https://socialinsight.vercel.app/api/insights/social_insight_search/",
       {
         method: "POST",
         headers: {
@@ -1458,4 +1458,96 @@ export async function getCampaign(id: number): Promise<Campaign | null> {
     console.error("Campaign fetch error:", err);
     return null;
   }
+}
+
+export async function saveXAccount({
+  userId,
+  tenantId,
+  email,
+  cookies,
+}: {
+  userId: string;
+  tenantId?: string | null;
+  email: string;
+  cookies: string;
+}) {
+  const { data: existing, error: lookupError } =
+    await supabase
+      .from("x_accounts")
+      .select("id")
+      .eq("user_id", userId)
+      .maybeSingle();
+
+  if (lookupError) throw lookupError;
+
+  const payload = {
+    user_id: userId,
+    tenant_id: tenantId,
+    username: email,
+    email,
+    cookies,
+    status: "active",
+    updated_at: new Date().toISOString(),
+  };
+
+  if (existing) {
+    const { error } = await supabase
+      .from("x_accounts")
+      .update(payload)
+      .eq("id", existing.id);
+
+    if (error) throw error;
+
+    return existing.id;
+  }
+
+  const { data, error } = await supabase
+    .from("x_accounts")
+    .insert({
+      ...payload,
+      created_at: new Date().toISOString(),
+    })
+    .select("id")
+    .single();
+
+  if (error) throw error;
+
+  return data.id;
+}
+
+// services/socialEcho.ts
+
+
+export async function checkXAccount(
+  userId: string
+): Promise<boolean> {
+  const { data, error } = await supabase
+    .from("x_accounts")
+    .select("status,cookies")
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (error) {
+    throw error;
+  }
+
+  if (!data) {
+    return false;
+  }
+
+  if (data.status !== "active") {
+    return false;
+  }
+
+  const cookies = data.cookies || "";
+
+  if (!cookies.includes("auth_token=")) {
+    return false;
+  }
+
+  if (!cookies.includes("ct0=")) {
+    return false;
+  }
+
+  return true;
 }

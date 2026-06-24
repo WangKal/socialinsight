@@ -9,6 +9,7 @@ import { User, Bell, Shield, CreditCard } from "lucide-react";
 import {useAuth} from "@/hooks/use-auth";
 import {useToast } from "@/hooks/use-toast";
 import {getUserProfile, updateUserProfile } from "@/services/socialEcho"
+import { XAccountForm } from "@/components/XAccountForm";
 
 
 export default function Settings() {
@@ -123,6 +124,10 @@ const handleResetPassword = async () => {
             <Bell className="w-4 h-4" />
             Notifications
           </TabsTrigger>**/}
+          <TabsTrigger value="social" className="gap-2">
+  <Shield className="w-4 h-4" />
+  Social Accounts
+</TabsTrigger>
           <TabsTrigger value="security" className="gap-2">
             <Shield className="w-4 h-4" />
             Security
@@ -214,6 +219,18 @@ const handleResetPassword = async () => {
           </div>
         </TabsContent>
 **/}
+
+<TabsContent value="social">
+  <XAccountForm
+    user={user}
+    onSaved={() => {
+      toast({
+        title: "Success",
+        description: "X account updated successfully.",
+      });
+    }}
+  />
+</TabsContent>
         <TabsContent value="security">
           <div className="bg-card border border-border rounded-lg p-6 shadow-sm">
             <h2 className="text-xl font-bold text-foreground mb-6">Security Settings</h2>

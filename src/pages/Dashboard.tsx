@@ -13,6 +13,7 @@ import { TrendChart } from "@/components/TrendChart";
 import { Globe, User, Briefcase, Link as LinkIcon, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getPostsByUser, assignPost, getCampaignsByUser, submitDailyRequest, createSocialCampaign,getCampaign } from "@/services/socialEcho"
+
 import { CreditsBanner } from "@/components/CreditsBanner";
 import {useAuth } from "@/hooks/use-auth"
 import {useToast } from "@/hooks/use-toast"
@@ -333,7 +334,7 @@ const handleDailyRequestSubmit = async (url: string) => {
                       {campaign.postsCount} posts
                     </div>
                   </div>
-                  <h4 className="text-gray-900 mb-3 line-clamp-2">{campaign.name}</h4>
+                  <h4 className="text-gray-900 mb-3 line-clamp-2">{(campaign.name).slice(2, -2)}</h4>
                   <div className="flex items-center justify-between text-sm">
                     <div>
                       <div className="text-xs text-gray-500">Sentiment</div>
@@ -381,7 +382,7 @@ const handleDailyRequestSubmit = async (url: string) => {
           onSelectCampaign={(campaignId) => {
             setSelectedCampaignId(campaignId);
             setCurrentView("campaign-detail");
-            alert("hello")
+           
             getCampaignData(campaignId)
           }}
           onBack={() => setCurrentView("overview")}
