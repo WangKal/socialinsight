@@ -597,7 +597,7 @@ const handleDailyRequestSubmit = async (url: string) => {
           transition={{ duration: 0.6 }}
           className="mb-8"
         >
-          <div className="flex items-start justify-between">
+         <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <div>
               <h1 className="text-5xl mb-3 bg-gradient-to-r from-violet-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
                 Analytics Dashboard
@@ -631,7 +631,7 @@ const handleDailyRequestSubmit = async (url: string) => {
               className="bg-gradient-to-r from-violet-600 to-purple-600 text-white hover:from-violet-700 hover:to-purple-700"
             >
               <LinkIcon className="w-4 h-4 mr-2" />
-              Perfom Search Analaysis
+              Analyze
             </Button>
           </div>
         </motion.div>
