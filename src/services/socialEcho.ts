@@ -1341,7 +1341,7 @@ export const createSocialCampaign = async (
 
   try {
     const res = await fetch(
-      "https://socialinsight.vercel.app/api/insights/social_insight_search/",
+      "https://socialinsightbackend.onrender.com/api/insights/social_insight_search/",
       {
         method: "POST",
         headers: {
