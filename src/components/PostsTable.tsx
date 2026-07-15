@@ -77,6 +77,7 @@ export function PostsTable({ posts, onViewPost, onAssignPost, showAssignButton =
     if (agreement > 40) return "text-amber-600";
     return "text-red-600";
   };
+const completedPosts = posts.filter((post) => post.status === "completed");
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
@@ -93,7 +94,7 @@ export function PostsTable({ posts, onViewPost, onAssignPost, showAssignButton =
           </TableRow>
         </TableHeader>
         <TableBody>
-          {posts.map((post, index) => (
+          {completedPosts.map((post, index) => (
             <motion.tr
               key={post.id}
               initial={{ opacity: 0, y: 20 }}
