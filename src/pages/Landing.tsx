@@ -1,1399 +1,634 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { motion } from "motion/react";
-import { LiveDemo } from "@/components/LiveDemo";
+import { useState, useEffect, useRef } from 'react'
 import { AuthButtons } from "@/components/AuthButtons";
-import { HowItWorks } from "@/components/HowItWorks";
-import { GuideDialog } from "@/components/GuideDialog";
-import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/use-auth";
-import {
-  BarChart3,
-  TrendingUp,
-  Users,
-  Zap,
-  Shield,
-  Clock,
-  ArrowRight,
-  CheckCircle2,
-  Star,
-  MessageSquare,
-  Target,
-  Brain,
-  Sparkles,
-  ChevronRight,
-  Play,
-  Award,
-  Globe,
-  Lock,
-  Heart,
-  ThumbsUp,
-  ThumbsDown,
-  Minus,
-  PieChart,
-  Hash,
-  Lightbulb,
-  MousePointerClick,
-  Gift,
-    Trophy,
-  ExternalLink,
-  PlayCircle,
-  Shuffle,
-  UserPlus,
-  BarChart2,
-  Settings,
-  ChevronUp,
-  ChevronDown
-} from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+// ─── Data ───────────────────────────────────────────────────────────────────
 
-import { useState, useEffect } from "react";
-
-export default function Landing() {
-  const { user} = useAuth();
-  const navigate = useNavigate();
-  const [hoveredFeature, setHoveredFeature] = useState<number | null>(null);
-  const [activeDemo, setActiveDemo] = useState(0);
-  const [animatedStats, setAnimatedStats] = useState({ posts: 0, sentiment: 0, topics: 0 });
-  const [guideOpen, setGuideOpen] = useState(false)
-  const [showFullAnalytics, setShowFullAnalytics] = useState(false);
-  const [activePromoTour, setActivePromoTour] = useState(0);
-  const [activeDemoTab, setActiveDemoTab] = useState<"analytics" | "promos">("analytics");
-
-// optional auto-rotate
-useEffect(() => {
-  const timer = setInterval(() => {
-    setActiveDemoTab((prev) => (prev === "analytics" ? "promos" : "analytics"));
-  }, 5000);
-  return () => clearInterval(timer);
-}, []);
-  
-  
-  // Animate stats on load
-  useEffect(() => {
-    const duration = 2000;
-    const steps = 60;
-    const interval = duration / steps;
-    let step = 0;
-
-    const timer = setInterval(() => {
-      step++;
-      const progress = step / steps;
-      const easeOut = 1 - Math.pow(1 - progress, 3);
-      
-      setAnimatedStats({
-        posts: Math.floor(10000000 * easeOut),
-        sentiment: Math.floor(95 * easeOut),
-        topics: Math.floor(500 * easeOut),
-      });
-
-      if (step >= steps) clearInterval(timer);
-    }, interval);
-
-    return () => clearInterval(timer);
-  }, []);
-
-  // Auto-rotate demo
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setActiveDemo((prev) => (prev + 1) % 3);
-    }, 4000);
-    return () => clearInterval(timer);
-  }, []);
-
-  const features = [
-    {
-      icon: Brain,
-      title: "Sentiment Analysis",
-      description: "Detect positive, negative, and neutral sentiments in social posts and replies with 95% accuracy",
-      color: "from-violet-500 to-purple-600",
-      stat: "95%",
-      statLabel: "Accuracy",
-    },
-    {
-      icon: ThumbsUp,
-      title: "Agreement Detection",
-      description: "Understand who agrees, disagrees, or remains neutral to your content and why",
-      color: "from-emerald-500 to-teal-600",
-      stat: "3x",
-      statLabel: "More Insights",
-    },
-    {
-      icon: Hash,
-      title: "Topic Clustering",
-      description: "Automatically identify trending topics, themes, and conversation clusters",
-      color: "from-blue-500 to-cyan-600",
-      stat: "500+",
-      statLabel: "Topics/Day",
-    },
-    {
-      icon: Heart,
-      title: "Emotion Detection",
-      description: "Identify emotions like joy, anger, sadness, and surprise in user responses",
-      color: "from-rose-500 to-pink-600",
-      stat: "8",
-      statLabel: "Emotions",
-    },
-    {
-      icon: Lightbulb,
-      title: "Intent Analysis",
-      description: "Understand user intent - questions, complaints, praise, or suggestions",
-      color: "from-amber-500 to-orange-600",
-      stat: "12",
-      statLabel: "Intent Types",
-    },
-    {
-      icon: Sparkles,
-      title: "Novelty Scoring",
-      description: "Discover unique insights and fresh perspectives in your audience feedback",
-      color: "from-indigo-500 to-blue-600",
-      stat: "New",
-      statLabel: "Insights",
-    },
-    {
-      icon: PieChart,
-      title: "Visual Analytics",
-      description: "Beautiful charts and graphs that make complex data instantly understandable",
-      color: "from-cyan-500 to-blue-600",
-      stat: "20+",
-      statLabel: "Chart Types",
-    },
-    {
-      icon: Zap,
-      title: "Real-time Processing",
-      description: "Analyze thousands of posts and replies in seconds, not hours",
-      color: "from-yellow-500 to-amber-600",
-      stat: "<1s",
-      statLabel: "Processing",
-    },
-  ];
-  const promoTourSteps = [
-    {
-      icon: Gift,
-      title: "Create Promos",
-      description: "Launch giveaways and contests with customizable rules, prizes, and branding images",
-      color: "from-violet-500 to-purple-600",
-      image: "https://images.unsplash.com/photo-1513201099705-a9746e1e201f?w=800&q=80",
-    },
-    {
-      icon: Shuffle,
-      title: "Winner Selection",
-      description: "Choose winners randomly, first-come-first-served, or based on specific criteria",
-      color: "from-blue-500 to-cyan-600",
-      image: "https://images.unsplash.com/photo-1567427017947-545c5f8d16ad?w=800&q=80",
-    },
-    {
-      icon: BarChart2,
-      title: "Track Engagement",
-      description: "Monitor entries, replies, and participant engagement in real-time with beautiful analytics",
-      color: "from-emerald-500 to-teal-600",
-      image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80",
-    },
-    {
-      icon: Trophy,
-      title: "Manage Winners",
-      description: "Contact winners, track prize delivery, and manage the entire fulfillment process",
-      color: "from-amber-500 to-orange-600",
-      image: "https://images.unsplash.com/photo-1579888944880-d98341245702?w=800&q=80",
-    },
-  ];
-  const stats = [
-    { value: animatedStats.posts.toLocaleString() + "+", label: "Posts Analyzed", icon: BarChart3 },
-    { value: "50K+", label: "Active Users", icon: Users },
-    { value: animatedStats.sentiment + "%", label: "Accuracy Rate", icon: Target },
-    { value: "24/7", label: "Real-time Analysis", icon: Clock },
-  ];
-
-  const testimonials = [
-    {
-      name: "Sarah Johnson",
-      role: "Marketing Director",
-      company: "TechCorp",
-      content: "The sentiment analysis completely changed how we respond to our audience. We now catch negative trends before they escalate.",
-      rating: 5,
-      avatar: "SJ",
-    },
-    {
-      name: "Michael Chen",
-      role: "Content Strategist",
-      company: "Growth Labs",
-      content: "Topic clustering helped us identify content gaps we never knew existed. Our engagement increased by 300%.",
-      rating: 5,
-      avatar: "MC",
-    },
-    {
-      name: "Emily Rodriguez",
-      role: "Social Media Manager",
-      company: "Brand Studio",
-      content: "The agreement detection feature is brilliant. Understanding who agrees or disagrees with our posts transformed our strategy.",
-      rating: 5,
-      avatar: "ER",
-    },
-  ];
-
-  const demoData = [
-    {
-      title: "Sentiment Breakdown",
-      positive: 67,
-      negative: 18,
-      neutral: 15,
-    },
-    {
-      title: "Agreement Analysis",
-      agree: 72,
-      disagree: 15,
-      neutral: 13,
-    },
-    {
-      title: "Top Topics",
-      topics: ["Product Quality", "Customer Service", "Pricing", "Features", "UX Design"],
-    },
-  ];
-
-  const pricingPlans = [
-    {
-      name: "Early Access",
-      price: "----",
-      credits: "----",
-      pricePerCredit: "----",
-      features: [
-        "--------------",
-        "--------------",
-        "--------------",
-        "--------------",
-        "--------------",
-      ],
-      popular: false,
-    },
-     {
-    name: "Early Access",
-    price: "TBA",
-    credits: "5",
-    pricePerCredit: "TBA",
-    features: [
-      "Full AI analysis",
-      "Sentiment & emotion detection",
-      "Topic clustering",
-      "Agreement & disagreement detection",
-      "Unlimited posts during beta",
-      "Email support",
-      "Early tester priority",
-    ],
-    popular: true,
-    beta: true,
+const problems = [
+  {
+    number: '01',
+    title: 'The Challenge',
+    body: 'Brands and governments suffer from a critical perception gap between internal beliefs and public sentiment, operating in a blind state that costs them trust and relevance.',
   },
-    {
-      name: "Early Access",
-      price: "----",
-      credits: "----",
-      pricePerCredit: "----",
-      features: [
-        "--------------",
-        "--------------",
-        "--------------",
-        "--------------",
-        "--------------",
-      ],
-      popular: false,
-    },
-  ];
+  {
+    number: '02',
+    title: 'The Disconnect',
+    body: 'Acting on assumptions rather than reality leads to a total failure to connect with citizens and product users—strategies built on air rather than ground truth.',
+  },
+  {
+    number: '03',
+    title: 'The Volume Barrier',
+    body: 'Millions of high-frequency social media data streams make it impossible for manual teams to diagnose the why behind public discourse at the speed decisions require.',
+  },
+]
+
+const differentiators = [
+  {
+    label: 'Beyond Vanity Metrics',
+    traditional: 'Surface-level reach, impressions, and follower counts that tell you nothing about what people actually think.',
+    groundTruth: 'Deep dives into public comment and post streams to surface the real emotional drivers behind every number.',
+  },
+  {
+    label: 'Localized Linguistic Intent',
+    traditional: 'Generic Western sentiment models that miss code-switching, sarcasm, and regional nuance entirely.',
+    groundTruth: 'Built to decode Sheng, Pidgin, and complex regional contexts—so nothing gets lost in translation.',
+  },
+  {
+    label: 'Actionable Ground Truth',
+    traditional: 'Reports full of charts and jargon that leave you with more questions than answers.',
+    groundTruth: 'Unstructured regional chatter transformed into audited intelligence that eliminates strategic blind spots.',
+  },
+]
+
+const audiences = [
+  {
+    icon: '◈',
+    title: 'Local & Foreign Brands',
+    body: 'Consumer enterprises navigating fast-moving markets and real-time public forums.',
+  },
+  {
+    icon: '◉',
+    title: 'Governments & Public Sector',
+    body: 'Public institutions tracking policy reception, citizen understanding, and regulatory feedback.',
+  },
+  {
+    icon: '◫',
+    title: 'Research Teams',
+    body: 'Analysts cross-validating official surveys against organic public comment threads.',
+  },
+  {
+    icon: '◧',
+    title: 'Communications & PR',
+    body: 'Strategy teams auditing client brand health and identifying hidden reputational risks.',
+  },
+  {
+    icon: '◦',
+    title: 'Business Development',
+    body: 'Commercial professionals using data-driven shadow audits to secure high-value contracts.',
+  },
+]
+
+const useCaseTabs = [
+  {
+    label: 'Brand & Market',
+    title: 'Brand & Market Intelligence',
+    items: [
+      'Competitor tracking across social platforms in real time',
+      'Product and feature reaction audits from organic comment streams',
+      'Campaign messaging validation before and after launch',
+      'Unmet friction discovery hidden in public discourse',
+    ],
+  },
+  {
+    label: 'Risk & Reputation',
+    title: 'Risk & Reputation Management',
+    items: [
+      'Early crisis warning signals surfaced before they escalate',
+      'Narrative disconnect diagnosis between brand and public',
+      'Long-term brand trust auditing across market cycles',
+      'Reputational risk mapping tied to specific content or policy',
+    ],
+  },
+  {
+    label: 'Research & Verification',
+    title: 'Research & Ground-Truth Verification',
+    items: [
+      'Survey cross-validation against organic comment reality',
+      'Localized slang and sarcasm decoding for accurate sentiment',
+      'Academic and institutional research support',
+      'Media coverage analysis vs. actual public response',
+    ],
+  },
+  {
+    label: 'Public Sector',
+    title: 'Public Sector & Institutional Strategy',
+    items: [
+      'Policy pulse audits across citizen platforms',
+      'Platform-specific discourse analysis on TikTok and Reels',
+      'Public sector friction mapping for communication reform',
+      'Regulatory feedback aggregation and intent classification',
+    ],
+  },
+  {
+    label: 'Commercial Strategy',
+    title: 'Commercial Strategy',
+    items: [
+      'Diagnostic pitching with shadow audit evidence packages',
+      'High-value account acquisition through data-backed proposals',
+      'Consulting contract support with proprietary ground-truth data',
+      'Competitive intelligence positioning for growth teams',
+    ],
+  },
+]
+
+// ─── Data Pulse Visual ───────────────────────────────────────────────────────
+
+function DataPulse() {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    const W = canvas.width
+    const H = canvas.height
+    const accent = '#C2622A'
+    const accentLight = '#E8835A'
+
+    const nodes: { x: number; y: number; vx: number; vy: number; r: number; pulse: number; phase: number }[] = []
+    const COUNT = 18
+    for (let i = 0; i < COUNT; i++) {
+      nodes.push({
+        x: 60 + Math.random() * (W - 120),
+        y: 60 + Math.random() * (H - 120),
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: (Math.random() - 0.5) * 0.4,
+        r: 3 + Math.random() * 4,
+        pulse: 0,
+        phase: Math.random() * Math.PI * 2,
+      })
+    }
+
+    let frame = 0
+    let raf: number
+
+    const draw = () => {
+      frame++
+      ctx.clearRect(0, 0, W, H)
+
+      nodes.forEach(n => {
+        n.x += n.vx
+        n.y += n.vy
+        if (n.x < 40 || n.x > W - 40) n.vx *= -1
+        if (n.y < 40 || n.y > H - 40) n.vy *= -1
+        n.pulse = Math.sin(frame * 0.04 + n.phase) * 0.5 + 0.5
+      })
+
+      // Edges
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+          const dx = nodes[i].x - nodes[j].x
+          const dy = nodes[i].y - nodes[j].y
+          const dist = Math.sqrt(dx * dx + dy * dy)
+          if (dist < 130) {
+            const alpha = (1 - dist / 130) * 0.35
+            ctx.beginPath()
+            ctx.moveTo(nodes[i].x, nodes[i].y)
+            ctx.lineTo(nodes[j].x, nodes[j].y)
+            ctx.strokeStyle = `rgba(194, 98, 42, ${alpha})`
+            ctx.lineWidth = 1
+            ctx.stroke()
+          }
+        }
+      }
+
+      // Nodes
+      nodes.forEach(n => {
+        const glow = 8 + n.pulse * 16
+        const grad = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, glow)
+        grad.addColorStop(0, `rgba(194, 98, 42, ${0.15 + n.pulse * 0.1})`)
+        grad.addColorStop(1, 'rgba(194, 98, 42, 0)')
+        ctx.beginPath()
+        ctx.arc(n.x, n.y, glow, 0, Math.PI * 2)
+        ctx.fillStyle = grad
+        ctx.fill()
+
+        ctx.beginPath()
+        ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2)
+        ctx.fillStyle = n.pulse > 0.7 ? accentLight : accent
+        ctx.globalAlpha = 0.7 + n.pulse * 0.3
+        ctx.fill()
+        ctx.globalAlpha = 1
+      })
+
+      // Floating labels
+      if (frame % 180 === 0 || frame === 1) {
+        const labels = ['Sentiment', 'Trust', 'Reach', 'Intent', 'Slang', 'Pulse']
+        const node = nodes[Math.floor(Math.random() * nodes.length)]
+        ctx.font = '11px Plus Jakarta Sans, sans-serif'
+        ctx.fillStyle = 'rgba(194, 98, 42, 0.6)'
+        ctx.fillText(labels[Math.floor(Math.random() * labels.length)], node.x + 10, node.y - 6)
+      }
+
+      raf = requestAnimationFrame(draw)
+    }
+
+    draw()
+    return () => cancelAnimationFrame(raf)
+  }, [])
 
   return (
-    <div className="min-h-screen bg-background overflow-hidden">
-      {/* Animated Background */}
-      <div className="fixed inset-0 -z-10 overflow-hidden">
-        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px] animate-float" />
-        <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-accent/5 rounded-full blur-[100px] animate-float" style={{ animationDelay: "3s" }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/3 rounded-full blur-[120px] animate-pulse-slow" />
-      </div>
+    <canvas
+      ref={canvasRef}
+      width={460}
+      height={400}
+      className="w-full max-w-[460px] h-auto opacity-90"
+    />
+  )
+}
 
-      {/* Header */}
-      <header className="border-b border-border/50 bg-background/80 backdrop-blur-xl sticky top-0 z-50">
-        <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3 group cursor-pointer">
-            <div className="relative">
-              <div className="w-11 h-11 rounded-xl  flex items-center justify-center shadow-lg shadow-primary/25 group-hover:shadow-primary/40 transition-shadow">
-              <img src="/images/SocialInsightLogo.png" alt="Logo" /> </div>
-              <div className="absolute -top-1 -right-1 w-3 h-3 bg-success rounded-full animate-pulse" />
-            </div>
-            <div>
-              <span className="text-xl font-bold text-foreground">SocialInsight</span>
-              <span className="block text-[10px] text-muted-foreground -mt-1">Analytics Platform</span>
-            </div>
-          </div>
-          <nav className="hidden md:flex items-center gap-8">
-            <a href="#features" className="text-muted-foreground hover:text-foreground transition-colors relative group">
-              Features
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300" />
-            </a>
-            <a href="/guide" className="text-muted-foreground hover:text-foreground transition-colors relative group">
-              Guide
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300" />
-            </a>
-            <a href="#pricing" className="text-muted-foreground hover:text-foreground transition-colors relative group">
-              Pricing
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300" />
-            </a>
-          </nav>
-          <div className="flex items-center gap-3">
-            <AuthButtons/>
-          </div>
-        </div>
-      </header>
+// ─── Hero ─────────────────────────────────────────────────────────────────────
 
-      {/* Hero Section */}
-      <section className="relative container mx-auto px-6 py-20 lg:py-28">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* Left Content */}
-<div className="space-y-8">
-  {/* Badge */}
-  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium animate-fade-in">
-    <Sparkles className="w-4 h-4" />
-    AI-Powered Social Insights & Promos
-    <span className="flex h-2 w-2">
-      <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-primary opacity-75"></span>
-      <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-    </span>
-  </div>
-
-  {/* Heading */}
-  <h1
-    className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground leading-tight animate-fade-in"
-    style={{ animationDelay: "0.1s" }}
-  >
-    Understand & Engage Your
-    <span className="relative">
-      <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient">
-        {" "}Audience in Real Time
-      </span>
-    </span>
-  </h1>
-
-  {/* Description */}
-  <p
-    className="text-lg text-muted-foreground max-w-xl animate-fade-in"
-    style={{ animationDelay: "0.2s" }}
-  >
-    Analyze conversations to uncover{" "}
-    <span className="text-foreground font-medium">sentiments</span>,{" "}
-    <span className="text-foreground font-medium">agreements</span>, and{" "}
-    <span className="text-foreground font-medium">trends</span> — or launch{" "}
-    <span className="text-foreground font-medium">interactive promos</span> to engage your audience and reward participation.
-  </p>
-
-  {/* Buttons */}
-  <div
-    className="flex flex-col sm:flex-row gap-4 animate-fade-in"
-    style={{ animationDelay: "0.3s" }}
-  >
-    {/* View Analysis */}
-    <Button
-      size="lg"
-      className="gap-2 text-lg px-8 py-6 shadow-xl shadow-primary/30 hover:shadow-primary/50 transition-all group"
-      onClick={() => navigate("/analytics-list/general")}
-    >
-      View Analysis
-      <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-    </Button>
-
-    {/* Public Promos */}
-    <Button
-      size="lg"
-      variant="outline"
-      className="gap-2 text-lg px-8 py-6 group"
-      onClick={() => navigate("/promos")}
-    >
-      <Gift className="w-5 h-5 group-hover:scale-110 transition-transform" />
-      Explore Promos
-    </Button>
-  </div>
-
-  {/* Trust Points */}
-  <div
-    className="flex flex-wrap items-center gap-6 pt-4 animate-fade-in"
-    style={{ animationDelay: "0.4s" }}
-  >
-    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-      <CheckCircle2 className="w-5 h-5 text-success" />
-      Real-time insights
-    </div>
-    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-      <CheckCircle2 className="w-5 h-5 text-success" />
-      Run giveaways & promos
-    </div>
-    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-      <CheckCircle2 className="w-5 h-5 text-success" />
-      Instant results
-    </div>
-  </div>
-</div>
-            {/* Right - Interactive Demo */}
-            <div className="relative animate-fade-in" style={{ animationDelay: "0.3s" }}>
-  <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 rounded-3xl blur-3xl" />
-
-  <Card className="relative bg-card/80 backdrop-blur-xl border-border/50 shadow-2xl overflow-hidden">
-    
-    {/* Top Gradient */}
-    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-accent to-primary animate-gradient bg-[length:200%_auto]" />
-
-    <CardContent className="p-5 space-y-5">
-
-      {/* Tabs */}
-      <div className="flex gap-2 mb-2">
-        <button
-          onClick={() => setActiveDemoTab("analytics")}
-          className={`flex-1 py-2 rounded-lg text-sm font-medium transition ${
-            activeDemoTab === "analytics"
-              ? "bg-primary text-white"
-              : "bg-muted text-muted-foreground"
-          }`}
-        >
-          Analytics
-        </button>
-
-        <button
-          onClick={() => setActiveDemoTab("promos")}
-          className={`flex-1 py-2 rounded-lg text-sm font-medium transition ${
-            activeDemoTab === "promos"
-              ? "bg-violet-600 text-white"
-              : "bg-muted text-muted-foreground"
-          }`}
-        >
-          Promos
-        </button>
-      </div>
-
-      {/* ================= ANALYTICS ================= */}
-      {activeDemoTab === "analytics" && (
-<div className="relative animate-fade-in" style={{ animationDelay: "0.3s" }}>
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 rounded-3xl blur-3xl" />
-              <Card className="relative bg-card/80 backdrop-blur-xl border-border/50 shadow-2xl overflow-hidden">
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-accent to-primary animate-gradient bg-[length:200%_auto]" />
-                <CardContent className="p-6 space-y-6">
-                  {/* Sample Post */}
-                  <div className="bg-muted/50 rounded-xl p-4 border border-border/50">
-                    <div className="flex items-start gap-3">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-primary-foreground font-bold text-sm">
-                        P
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-foreground">Sample Post</p>
-                        <p className="text-xs text-muted-foreground mb-2">Just now</p>
-                        <p className="text-sm text-foreground">
-                          "Just launched our new feature! 🚀 What do you all think?"
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Animated Analysis Results */}
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-foreground">Analysis Results</span>
-                      <Badge variant="secondary" className="bg-success/10 text-success animate-pulse">
-                        Live
-                      </Badge>
-                    </div>
-
-                    {/* Sentiment Bar */}
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-xs">
-                        <span className="text-muted-foreground">Sentiment Distribution</span>
-                        <span className="text-foreground font-medium">847 replies</span>
-                      </div>
-                      <div className="h-4 rounded-full overflow-hidden flex bg-muted">
-                        <div 
-                          className="bg-success transition-all duration-1000 ease-out flex items-center justify-center"
-                          style={{ width: `${demoData[0].positive}%` }}
-                        >
-                          <span className="text-[10px] text-success-foreground font-medium">
-                            {demoData[0].positive}%
-                          </span>
-                        </div>
-                        <div 
-                          className="bg-destructive transition-all duration-1000 ease-out flex items-center justify-center"
-                          style={{ width: `${demoData[0].negative}%` }}
-                        >
-                          <span className="text-[10px] text-destructive-foreground font-medium">
-                            {demoData[0].negative}%
-                          </span>
-                        </div>
-                        <div 
-                          className="bg-neutral transition-all duration-1000 ease-out flex items-center justify-center"
-                          style={{ width: `${demoData[0].neutral}%` }}
-                        >
-                          <span className="text-[10px] text-neutral-foreground font-medium">
-                            {demoData[0].neutral}%
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flex justify-between text-xs text-muted-foreground">
-                        <span className="flex items-center gap-1"><ThumbsUp className="w-3 h-3 text-success" /> Positive</span>
-                        <span className="flex items-center gap-1"><ThumbsDown className="w-3 h-3 text-destructive" /> Negative</span>
-                        <span className="flex items-center gap-1"><Minus className="w-3 h-3 text-neutral" /> Neutral</span>
-                      </div>
-                    </div>
-
-                    {/* Topics */}
-                    <div className="space-y-2">
-                      <span className="text-xs text-muted-foreground">Trending Topics</span>
-                      <div className="flex flex-wrap gap-2">
-                        {["New Feature", "UX Design", "Performance", "Pricing"].map((topic, i) => (
-                          <Badge 
-                            key={topic} 
-                            variant="outline" 
-                            className="text-xs animate-fade-in"
-                            style={{ animationDelay: `${i * 0.1}s` }}
-                          >
-                            <Hash className="w-3 h-3 mr-1" />
-                            {topic}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Quick Stats */}
-                    <div className="grid grid-cols-3 gap-3">
-                      <div className="bg-success/10 rounded-lg p-3 text-center">
-                        <p className="text-2xl font-bold text-success">72%</p>
-                        <p className="text-xs text-muted-foreground">Agree</p>
-                      </div>
-                      <div className="bg-destructive/10 rounded-lg p-3 text-center">
-                        <p className="text-2xl font-bold text-destructive">15%</p>
-                        <p className="text-xs text-muted-foreground">Disagree</p>
-                      </div>
-                      <div className="bg-primary/10 rounded-lg p-3 text-center">
-                        <p className="text-2xl font-bold text-primary">4.2</p>
-                        <p className="text-xs text-muted-foreground">Novelty</p>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Floating Elements */}
-              <div className="absolute -top-4 -right-4 bg-success text-success-foreground px-3 py-1 rounded-full text-sm font-medium shadow-lg animate-bounce-slow">
-                +847 replies analyzed
-              </div>
-              <div className="absolute -bottom-4 -left-4 bg-card border border-border px-3 py-2 rounded-lg shadow-lg animate-float">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-success rounded-full animate-pulse" />
-                  <span className="text-xs font-medium">Real-time processing</span>
-                </div>
-              </div>
-            </div>
-                )}
-
-      {/* ================= PROMOS ================= */}
-      {activeDemoTab === "promos" && (
-        <div className="space-y-4">
-
-          {/* Right - Promo Interactive Demo */}
-<div className="relative animate-fade-in" style={{ animationDelay: "0.3s" }}>
-  {/* Glow */}
-  <div className="absolute inset-0 bg-gradient-to-r from-violet-500/20 to-purple-500/20 rounded-3xl blur-3xl" />
-
-  <Card className="relative bg-card/80 backdrop-blur-xl border-border/50 shadow-2xl overflow-hidden">
-    {/* Top animated border */}
-    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-violet-500 via-purple-500 to-violet-500 animate-gradient bg-[length:200%_auto]" />
-
-    <CardContent className="p-5 space-y-5">
-      
-      {/* Promo Header */}
-      <div className="relative rounded-xl overflow-hidden border border-border/50">
-        <img
-          src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678"
-          className="w-full h-28 object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
-
-        <div className="absolute bottom-2 left-3 right-3">
-          <p className="text-xs text-white/80">🔥 Active Promo</p>
-          <p className="text-sm text-white font-semibold line-clamp-1">
-            Guess our next AI feature & win big!
-          </p>
-        </div>
-
-        <Badge className="absolute top-2 right-2 bg-green-500 text-white text-xs">
-          Active
-        </Badge>
-      </div>
-
-      {/* Prize + Time */}
-      <div className="grid grid-cols-2 gap-3">
-        <div className="bg-violet-50 rounded-lg p-3 border border-violet-200">
-          <p className="text-xs text-muted-foreground">Prize</p>
-          <p className="text-sm font-semibold text-violet-700">
-            1 Year Pro 🚀
-          </p>
-        </div>
-
-        <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
-          <p className="text-xs text-muted-foreground">Time Left</p>
-          <p className="text-sm font-semibold text-blue-600">
-            12h remaining
-          </p>
-        </div>
-      </div>
-
-      {/* Live Stats */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between text-xs">
-          <span className="text-muted-foreground">Entries</span>
-          <span className="font-medium text-foreground">1,284 users</span>
-        </div>
-
-        {/* Progress bar */}
-        <div className="h-3 bg-muted rounded-full overflow-hidden">
-          <div className="h-full bg-gradient-to-r from-violet-500 to-purple-500 w-[75%] transition-all duration-1000" />
-        </div>
-
-        <div className="flex justify-between text-xs text-muted-foreground">
-          <span>Target: 1.5k</span>
-          <span>🔥 Trending</span>
-        </div>
-      </div>
-
-      {/* Winners Preview */}
-      <div className="space-y-2">
-        <p className="text-xs text-muted-foreground">Top Participants</p>
-
-        <div className="space-y-2">
-          {["@sam_ai", "@techguru", "@devqueen"].map((user, i) => (
-            <div
-              key={user}
-              className="flex items-center gap-2 bg-muted/50 rounded-lg px-3 py-2 text-xs"
-            >
-              <div className="w-6 h-6 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 text-white flex items-center justify-center text-[10px]">
-                {i === 0 ? "🥇" : i === 1 ? "🥈" : "🥉"}
-              </div>
-              <span className="text-foreground">{user}</span>
-              <span className="ml-auto text-muted-foreground">
-                {i === 0 ? "Winning" : "Close"}
+function Hero() {
+  return (
+    <section className="min-h-screen flex items-center pt-20" style={{ backgroundColor: '#F7F7F7' }}>
+      <div className="max-w-6xl mx-auto px-6 py-24 w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          {/* Left: copy */}
+          <div className="flex flex-col gap-8">
+            <div className="inline-flex items-center gap-2 self-start">
+              <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#C2622A' }} />
+              <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: '#C2622A' }}>
+                Ground-Truth Intelligence
               </span>
+            </div>
+            <h1
+              className="text-5xl lg:text-6xl font-bold leading-[1.05] tracking-tight"
+              style={{ color: '#222222' }}
+            >
+              Bridging the Reality Gap Between Leadership and Public Sentiment.
+            </h1>
+            <p className="text-lg leading-relaxed max-w-lg" style={{ color: '#555555' }}>
+              SocialInsight decodes high-volume public comment streams, slang, and localized nuances to reveal the unvarnished ground-truth intelligence brands and governments miss.
+            </p>
+            <div className="flex flex-wrap items-center gap-3 pt-2">
+              <button
+                className="px-7 py-3.5 rounded-full text-sm font-semibold transition-all duration-200 hover:opacity-90 active:scale-95"
+                style={{ backgroundColor: '#C2622A', color: '#FFFFFF' }}
+              >
+                Request a Diagnostic Audit
+              </button>
+              <a
+                href="#use-cases"
+                className="px-7 py-3.5 rounded-full text-sm font-semibold border transition-all duration-200 hover:border-neutral-400"
+                style={{ borderColor: '#D4D4D4', color: '#222222' }}
+              >
+                Explore Use Cases
+              </a>
+            </div>
+            {/* Stat bar */}
+            <div className="flex gap-8 pt-4 border-t" style={{ borderColor: '#E5E5E5' }}>
+              {[
+                { value: '40M+', label: 'Comments Analyzed' },
+                { value: '12', label: 'Local Languages Decoded' },
+                { value: '98%', label: 'Narrative Accuracy' },
+              ].map(s => (
+                <div key={s.label}>
+                  <div className="text-2xl font-bold" style={{ color: '#222222' }}>
+                    {s.value}
+                  </div>
+                  <div className="text-xs font-medium mt-0.5" style={{ color: '#888888' }}>
+                    {s.label}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Right: data pulse */}
+          <div className="flex items-center justify-center">
+            <div
+              className="relative w-full max-w-[460px] rounded-3xl overflow-hidden border"
+              style={{ backgroundColor: '#FAFAFA', borderColor: '#E5E5E5', aspectRatio: '1.15' }}
+            >
+              <div className="absolute inset-0 flex items-center justify-center">
+                <DataPulse />
+              </div>
+              {/* Floating badge */}
+              <div
+                className="absolute bottom-5 left-5 px-4 py-2 rounded-2xl border text-xs font-semibold"
+                style={{ backgroundColor: '#FFFFFF', borderColor: '#E5E5E5', color: '#222222' }}
+              >
+                Live Sentiment Pulse ·{' '}
+                <span style={{ color: '#C2622A' }}>Active</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// ─── Core Problem ──────────────────────────────────────────────────────────────
+
+function CoreProblem() {
+  return (
+    <section className="py-28" style={{ backgroundColor: '#FFFFFF' }}>
+      <div className="max-w-6xl mx-auto px-6">
+        <div className="mb-16">
+          <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#C2622A' }}>
+            The Perception Gap
+          </p>
+          <h2 className="text-4xl font-bold tracking-tight" style={{ color: '#222222' }}>
+            Why organizations operate blind.
+          </h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x" style={{ borderColor: '#E5E5E5', border: '1px solid #E5E5E5', borderRadius: '16px', overflow: 'hidden' }}>
+          {problems.map((p, i) => (
+            <div key={i} className="p-8 lg:p-10" style={{ backgroundColor: '#FAFAFA' }}>
+              <span className="text-xs font-mono font-semibold" style={{ color: '#C2622A' }}>
+                {p.number}
+              </span>
+              <h3 className="text-xl font-bold mt-4 mb-3" style={{ color: '#222222' }}>
+                {p.title}
+              </h3>
+              <p className="text-sm leading-relaxed" style={{ color: '#666666' }}>
+                {p.body}
+              </p>
             </div>
           ))}
         </div>
       </div>
+    </section>
+  )
+}
 
-      {/* CTA */}
-      <Button className="w-full bg-gradient-to-r from-violet-600 to-purple-600 text-white group">
-        Enter Promo
-        <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-      </Button>
-    </CardContent>
-  </Card>
+// ─── What We Do ────────────────────────────────────────────────────────────────
 
-  {/* Floating Activity */}
-  <div className="absolute -top-4 -right-4 bg-violet-600 text-white px-3 py-1 rounded-full text-xs shadow-lg animate-bounce">
-    +324 entries
-  </div>
-
-  <div className="absolute -bottom-4 -left-4 bg-card border border-border px-3 py-2 rounded-lg shadow-lg animate-float">
-    <div className="flex items-center gap-2">
-      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-      <span className="text-xs font-medium">Live submissions</span>
-    </div>
-  </div>
-</div>        </div>
-      )}
-    </CardContent>
-  </Card>
-
-  {/* Floating Indicator */}
-  <div className="absolute -top-4 -right-4 px-3 py-1 rounded-full text-xs font-medium shadow-lg bg-primary text-white animate-bounce-slow">
-    {activeDemoTab === "analytics" ? "Live Analysis" : "Live Promo"}
-  </div>
-
-  <div className="absolute -bottom-4 -left-4 bg-card border px-3 py-2 rounded-lg shadow-lg">
-    <span className="text-xs font-medium">
-      {activeDemoTab === "analytics"
-        ? "Real-time insights"
-        : "Auto winner selection"}
-    </span>
-  </div>
-</div>
-</div>
-</div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="container mx-auto px-6 py-16">
-        <div className="max-w-5xl mx-auto">
-          <div className="bg-card/50 backdrop-blur-xl border border-border/50 rounded-2xl p-8 shadow-xl">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-              {stats.map((stat, index) => (
-                <div 
-                  key={index} 
-                  className="text-center space-y-2 group cursor-pointer"
-                >
-                  <div className="w-14 h-14 mx-auto rounded-xl bg-primary/10 flex items-center justify-center mb-3 group-hover:scale-110 group-hover:bg-primary/20 transition-all">
-                    <stat.icon className="w-7 h-7 text-primary" />
-                  </div>
-                  <p className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-                    {stat.value}
-                  </p>
-                  <p className="text-sm text-muted-foreground">{stat.label}</p>
-                </div>
-              ))}
-            </div>
-          </div>
+function WhatWeDo() {
+  return (
+    <section className="py-28" style={{ backgroundColor: '#F7F7F7' }}>
+      <div className="max-w-6xl mx-auto px-6">
+        <div className="mb-16">
+          <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#C2622A' }}>
+            What We Do
+          </p>
+          <h2 className="text-4xl font-bold tracking-tight" style={{ color: '#222222' }}>
+            Ground truth, not guesswork.
+          </h2>
         </div>
-      </section>
-
-
-{/* What You Can Analyze Section */}
-<section id="demo" className="container mx-auto px-6 py-20 bg-muted/30">
-  <div className="max-w-6xl mx-auto">
-
-    {/* Header */}
-    <div className="text-center space-y-4 mb-12">
-      <Badge className="px-4 py-2 bg-accent/10 text-accent border-accent/20">
-        <MousePointerClick className="w-4 h-4 mr-2" />
-        Powerful Analysis
-      </Badge>
-      <h2 className="text-3xl lg:text-5xl font-bold text-foreground">
-        What Can You Discover?
-      </h2>
-      <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-        Our AI dives deep into every post and reply to extract meaningful insights you can act on
-      </p>
-    </div>
-
-    {/* 🔹 TOP VISIBLE ANALYTICS (High Impact Only) */}
-    <div className="grid lg:grid-cols-3 gap-8 mb-8">
-
-      {/* Sentiment */}
-      <Card className="group hover:shadow-xl transition-all duration-300 border-border/50 overflow-hidden">
-        <div className="h-2 bg-gradient-to-r from-success via-neutral to-destructive" />
-        <CardContent className="p-6 space-y-4">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-success/20 to-success/5 flex items-center justify-center">
-            <Heart className="w-6 h-6 text-success" />
-          </div>
-          <h3 className="text-xl font-semibold text-foreground">Sentiment Analysis</h3>
-          <p className="text-muted-foreground text-sm">
-            Instantly know if responses are positive, negative, or neutral.
-          </p>
-          <div className="pt-4 space-y-3">
-            <div className="flex items-center justify-between text-sm">
-              <span className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-success" />
-                Positive
-              </span>
-              <span className="font-medium">67%</span>
-            </div>
-            <div className="flex items-center justify-between text-sm">
-              <span className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-destructive" />
-                Negative
-              </span>
-              <span className="font-medium">18%</span>
-            </div>
-            <div className="flex items-center justify-between text-sm">
-              <span className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-neutral" />
-                Neutral
-              </span>
-              <span className="font-medium">15%</span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Agreement */}
-      <Card className="group hover:shadow-xl transition-all duration-300 border-border/50 overflow-hidden">
-        <div className="h-2 bg-gradient-to-r from-primary to-accent" />
-        <CardContent className="p-6 space-y-4">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
-            <ThumbsUp className="w-6 h-6 text-primary" />
-          </div>
-          <h3 className="text-xl font-semibold text-foreground">Agreement Detection</h3>
-          <p className="text-muted-foreground text-sm">
-            Understand who agrees, disagrees, or stays neutral.
-          </p>
-          <div className="pt-4 flex gap-2">
-            <div className="flex-1 bg-success/10 rounded-lg p-3 text-center">
-              <ThumbsUp className="w-5 h-5 text-success mx-auto mb-1" />
-              <p className="text-lg font-bold text-success">72%</p>
-              <p className="text-xs text-muted-foreground">Agree</p>
-            </div>
-            <div className="flex-1 bg-destructive/10 rounded-lg p-3 text-center">
-              <ThumbsDown className="w-5 h-5 text-destructive mx-auto mb-1" />
-              <p className="text-lg font-bold text-destructive">15%</p>
-              <p className="text-xs text-muted-foreground">Disagree</p>
-            </div>
-            <div className="flex-1 bg-muted rounded-lg p-3 text-center">
-              <Minus className="w-5 h-5 text-muted-foreground mx-auto mb-1" />
-              <p className="text-lg font-bold text-foreground">13%</p>
-              <p className="text-xs text-muted-foreground">Neutral</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Topics Preview */}
-      <Card className="group hover:shadow-xl transition-all duration-300 border-border/50 overflow-hidden">
-        <div className="h-2 bg-gradient-to-r from-violet-500 to-purple-500" />
-        <CardContent className="p-6 space-y-4">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500/20 to-violet-500/5 flex items-center justify-center">
-            <Hash className="w-6 h-6 text-violet-500" />
-          </div>
-          <h3 className="text-xl font-semibold text-foreground">Trending Topics</h3>
-          <p className="text-muted-foreground text-sm">
-            Quickly see what people are talking about.
-          </p>
-          <div className="pt-4 flex flex-wrap gap-2">
-            {["Product", "UX", "Pricing"].map((topic) => (
-              <Badge key={topic} variant="outline">#{topic}</Badge>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-
-    {/* 🔹 ACTION BUTTONS */}
-  
-<div className="flex flex-col sm:flex-row justify-center gap-4 mb-6">
-  
-  {/* Start Analyzing */}
-  <Button
-    size="lg"
-    className="px-8 py-6"
-    onClick={() => {
-      if (user) {
-        navigate("/analytics");
-      } else {
-        navigate("/auth");
-      }
-    }}
-  >
-    Start Analyzing
-  </Button>
-
-  {/* General Open Analysis */}
-  <Button
-    size="lg"
-    variant="outline"
-    onClick={() => navigate("/analytics-list/general")}
-  >
-    General Open Analysis
-  </Button>
-</div>
-
-{/* Toggle */}
-<div className="text-center mb-10">
-  <button
-    onClick={() => setShowFullAnalytics(!showFullAnalytics)}
-    className="inline-flex items-center gap-2 text-primary font-medium hover:underline transition"
-  >
-    {showFullAnalytics ? (
-      <>
-        Hide Detailed Analytics
-        <ChevronUp className="w-4 h-4 transition-transform" />
-      </>
-    ) : (
-      <>
-        Understand Our Analytics
-        <ChevronDown className="w-4 h-4 transition-transform" />
-      </>
-    )}
-  </button>
-</div>
-
-    {/* 🔹 EXPANDED ANALYTICS (ALL YOUR ORIGINAL CONTENT) */}
-    {showFullAnalytics && (
-      <div className="mt-10 space-y-10">
-
-        {/* FULL TOPIC CLUSTERING */}
-        <Card className="group hover:shadow-xl transition-all duration-300 border-border/50 overflow-hidden">
-          <div className="h-2 bg-gradient-to-r from-violet-500 to-purple-500" />
-          <CardContent className="p-6 space-y-4">
-            <h3 className="text-xl font-semibold text-foreground">Topic Clustering</h3>
-            <p className="text-muted-foreground text-sm">
-              Automatically group conversations by theme and discover what resonates most.
-            </p>
-            <div className="pt-4 flex flex-wrap gap-2">
-              {["Product", "UX", "Price", "Support", "Speed"].map((topic, i) => (
-                <Badge key={topic} variant="outline">
-                  #{topic}
-                </Badge>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* FEATURES GRID (UNCHANGED) */}
-        <section id="features">
-          <div className="text-center space-y-4 mb-10">
-            <Badge className="px-4 py-2 bg-primary/10 text-primary border-primary/20">
-              <Star className="w-4 h-4 mr-2" />
-              Full Feature Suite
-            </Badge>
-            <h2 className="text-3xl lg:text-5xl font-bold text-foreground">
-              Everything You Need to Understand Your Audience
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Powerful AI tools that transform raw data into insights
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
-            {features.map((feature, index) => (
-              <Card
-                key={index}
-                className="relative overflow-hidden border-border/50 hover:border-primary/50 transition-all duration-300 group cursor-pointer"
-                onMouseEnter={() => setHoveredFeature(index)}
-                onMouseLeave={() => setHoveredFeature(null)}
+        <div className="flex flex-col gap-6">
+          {differentiators.map((d, i) => (
+            <div
+              key={i}
+              className="grid grid-cols-1 lg:grid-cols-5 rounded-2xl border overflow-hidden"
+              style={{ borderColor: '#E5E5E5', backgroundColor: '#FFFFFF' }}
+            >
+              {/* Label column */}
+              <div
+                className="lg:col-span-1 p-6 flex items-start"
+                style={{ backgroundColor: '#222222' }}
               >
-                <CardContent className="p-5 space-y-3">
-                  <div className="flex items-start justify-between">
-                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${feature.color} flex items-center justify-center`}>
-                      <feature.icon className="w-6 h-6 text-white" />
-                    </div>
-                    <div className="text-right">
-                      <p className="text-xl font-bold text-foreground">{feature.stat}</p>
-                      <p className="text-xs text-muted-foreground">{feature.statLabel}</p>
-                    </div>
-                  </div>
-                  <h3 className="text-base font-semibold text-foreground">
-                    {feature.title}
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
-                    {feature.description}
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </section>
-
-        {/* KEEP THESE */}
-        <LiveDemo />
-        <HowItWorks />
-
-      </div>
-    )}
-  </div>
-</section>
-
-      {/* Promo Engine Section - Interactive Tour */}
-      <section id="promos" className="container mx-auto px-6 py-20 bg-muted/30">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center space-y-4 mb-16">
-            <Badge className="px-4 py-2 bg-gradient-to-r from-violet-500/10 to-purple-500/10 text-violet-600 border-violet-500/20">
-              <Gift className="w-4 h-4 mr-2" />
-              Promo & Giveaway Engine
-            </Badge>
-            <h2 className="text-3xl lg:text-5xl font-bold text-foreground">
-              Launch Engaging Promos & Contests
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Create, manage, and track social media giveaways with our complete promo engine
-            </p>
-          </div>
-
-          {/* Interactive Tour */}
-          <div className="grid lg:grid-cols-2 gap-12 items-center mb-16">
-            {/* Left - Tour Steps */}
-            <div className="space-y-4">
-              {promoTourSteps.map((step, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  onClick={() => setActivePromoTour(index)}
-                  className={`p-6 rounded-xl border-2 cursor-pointer transition-all ${
-                    activePromoTour === index
-                      ? 'border-primary bg-primary/5 shadow-lg'
-                      : 'border-border/50 hover:border-border bg-card/50'
-                  }`}
-                >
-                  <div className="flex items-start gap-4">
-                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${step.color} flex items-center justify-center flex-shrink-0 shadow-lg ${
-                      activePromoTour === index ? 'scale-110' : ''
-                    } transition-transform`}>
-                      <step.icon className="w-6 h-6 text-white" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <h3 className="text-lg font-semibold text-foreground">{step.title}</h3>
-                        {activePromoTour === index && (
-                          <Badge className="bg-primary text-primary-foreground text-xs">Active</Badge>
-                        )}
-                      </div>
-                      <p className="text-sm text-muted-foreground">{step.description}</p>
-                    </div>
-                    <ChevronRight className={`w-5 h-5 text-primary transition-transform ${
-                      activePromoTour === index ? 'translate-x-1' : ''
-                    }`} />
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-
-            {/* Right - Visual Demonstration */}
-            <motion.div
-              key={activePromoTour}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5 }}
-              className="relative"
-            >
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl border-2 border-border/50">
-                <img
-                  src={promoTourSteps[activePromoTour].image}
-                  alt={promoTourSteps[activePromoTour].title}
-                  className="w-full h-[500px] object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-8">
-                  <Badge className={`mb-4 bg-gradient-to-r ${promoTourSteps[activePromoTour].color} text-white`}>
-                    Step {activePromoTour + 1} of {promoTourSteps.length}
-                  </Badge>
-                  <h3 className="text-3xl font-bold text-white mb-3">
-                    {promoTourSteps[activePromoTour].title}
-                  </h3>
-                  <p className="text-lg text-white/90">
-                    {promoTourSteps[activePromoTour].description}
-                  </p>
-                </div>
+                <h3 className="text-sm font-bold leading-snug" style={{ color: '#F7F7F7' }}>
+                  {d.label}
+                </h3>
               </div>
-
-              {/* Progress Indicators */}
-              <div className="flex gap-2 justify-center mt-6">
-                {promoTourSteps.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setActivePromoTour(index)}
-                    className={`h-2 rounded-full transition-all ${
-                      activePromoTour === index
-                        ? 'w-8 bg-primary'
-                        : 'w-2 bg-border hover:bg-border/80'
-                    }`}
-                  />
-                ))}
-              </div>
-            </motion.div>
-          </div>
-
-          {/* Quick Access Cards */}
-          <div className="grid md:grid-cols-2 gap-6">
-            {/* Public Promo Access */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              whileHover={{ y: -5 }}
-            >
-              <Card className="relative overflow-hidden border-2 border-border/50 hover:border-violet-500/50 transition-all group">
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-violet-500 to-purple-600" />
-                <CardContent className="p-8">
-                  <div className="flex items-start gap-4 mb-6">
-                    <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                      <UserPlus className="w-7 h-7 text-white" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-2xl font-bold text-foreground mb-2">Join Active Promos</h3>
-                      <p className="text-muted-foreground">
-                        Browse and participate in live giveaways, contests, and community events
-                      </p>
-                    </div>
-                  </div>
-                  <div className="space-y-3 mb-6">
-                    <div className="flex items-center gap-3 text-sm">
-                      <CheckCircle2 className="w-5 h-5 text-success flex-shrink-0" />
-                      <span className="text-foreground">View all active promos and winners</span>
-                    </div>
-                    <div className="flex items-center gap-3 text-sm">
-                      <CheckCircle2 className="w-5 h-5 text-success flex-shrink-0" />
-                      <span className="text-foreground">Easy entry with one-click participation</span>
-                    </div>
-                    <div className="flex items-center gap-3 text-sm">
-                      <CheckCircle2 className="w-5 h-5 text-success flex-shrink-0" />
-                      <span className="text-foreground">Track your entries and prizes won</span>
-                    </div>
-                  </div>
-                  <Button 
-                    onClick={() => navigate("/promos")}
-                    className="w-full bg-gradient-to-r from-violet-600 to-purple-600 text-white group/btn"
-                  >
-                    <ExternalLink className="w-4 h-4 mr-2 group-hover/btn:translate-x-1 transition-transform" />
-                    View Public Promos
-                    <ArrowRight className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />
-                  </Button>
-                </CardContent>
-              </Card>
-            </motion.div>
-
-            {/* Admin Promo Access */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              whileHover={{ y: -5 }}
-            >
-              <Card className="relative overflow-hidden border-2 border-border/50 hover:border-blue-500/50 transition-all group">
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-cyan-600" />
-                <CardContent className="p-8">
-                  <div className="flex items-start gap-4 mb-6">
-                    <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                      <Settings className="w-7 h-7 text-white" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-2xl font-bold text-foreground mb-2">Create & Manage</h3>
-                      <p className="text-muted-foreground">
-                        Launch your own promos, select winners, and track all engagement metrics
-                      </p>
-                    </div>
-                  </div>
-                  <div className="space-y-3 mb-6">
-                    <div className="flex items-center gap-3 text-sm">
-                      <CheckCircle2 className="w-5 h-5 text-success flex-shrink-0" />
-                      <span className="text-foreground">Create unlimited promos with custom rules</span>
-                    </div>
-                    <div className="flex items-center gap-3 text-sm">
-                      <CheckCircle2 className="w-5 h-5 text-success flex-shrink-0" />
-                      <span className="text-foreground">Smart winner selection algorithms</span>
-                    </div>
-                    <div className="flex items-center gap-3 text-sm">
-                      <CheckCircle2 className="w-5 h-5 text-success flex-shrink-0" />
-                      <span className="text-foreground">Real-time analytics and reporting</span>
-                    </div>
-                  </div>
-                  <Button 
-                    onClick={() => navigate("/admin-promos")}
-                    className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 text-white group/btn"
-                  >
-                    <Trophy className="w-4 h-4 mr-2 group-hover/btn:scale-110 transition-transform" />
-                    Admin Dashboard
-                    <ArrowRight className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />
-                  </Button>
-                </CardContent>
-              </Card>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section id="testimonials" className="container mx-auto px-6 py-20 bg-muted/30">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center space-y-4 mb-16">
-            <Badge className="px-4 py-2 bg-success/10 text-success border-success/20">
-              <Award className="w-4 h-4 mr-2" />
-              Trusted by Thousands
-            </Badge>
-            <h2 className="text-3xl lg:text-5xl font-bold text-foreground">
-              What Our Users Say
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Join thousands of marketers and content creators who trust SocialInsight
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <Card key={index} className="border-border/50 hover:shadow-xl transition-all duration-300 group">
-                <CardContent className="p-6 space-y-4">
-                  <div className="flex gap-1">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="w-5 h-5 fill-amber-500 text-amber-500" />
-                    ))}
-                  </div>
-                  <p className="text-foreground leading-relaxed">"{testimonial.content}"</p>
-                  <div className="pt-4 border-t border-border/50 flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-primary-foreground font-bold text-sm">
-                      {testimonial.avatar}
-                    </div>
-                    <div>
-                      <p className="font-semibold text-foreground">{testimonial.name}</p>
-                      <p className="text-sm text-muted-foreground">{testimonial.role} at {testimonial.company}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing Section */}
-      <section id="pricing" className="container mx-auto px-6 py-20">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center space-y-4 mb-16">
-            <Badge className="px-4 py-2 bg-primary/10 text-primary border-primary/20">
-              <Zap className="w-4 h-4 mr-2" />
-              Credit-Based Pricing
-            </Badge>
-            <h2 className="text-3xl lg:text-5xl font-bold text-foreground">
-              Pay For What You Use
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Buy credits and use them whenever you need. No monthly commitments, no wasted spend.
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-3 gap-8">
-            {pricingPlans.map((plan, index) => (
-              <Card 
-                key={index} 
-                className={`relative overflow-hidden transition-all duration-300 ${plan.popular ? 'border-primary shadow-2xl shadow-primary/20 scale-105' : 'border-border/50 hover:border-primary/50'}`}
-              >
-                {plan.popular && (
-                  <div className="absolute -top-px left-0 right-0 h-1 bg-gradient-to-r from-primary via-accent to-primary" />
-                )}
-                {plan.popular && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <Badge className="px-4 py-1 bg-primary text-primary-foreground shadow-lg">
-                      Most Popular
-                    </Badge>
-                  </div>
-                )}
-                <CardContent className="p-8 space-y-6">
-                  <div className="space-y-2">
-                    <h3 className="text-2xl font-bold text-foreground">{plan.name}</h3>
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-4xl font-bold text-foreground">{plan.credits}</span>
-                      <span className="text-muted-foreground">credits</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-2xl font-semibold text-primary">${plan.price}</span>
-                      <span className="text-sm text-muted-foreground">({plan.pricePerCredit}/credit)</span>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-3">
-                    {plan.features.map((feature, i) => (
-                      <div key={i} className="flex items-start gap-3">
-                        <CheckCircle2 className="w-5 h-5 text-success shrink-0 mt-0.5" />
-                        <span className="text-sm text-foreground">{feature}</span>
-                      </div>
-                    ))}
-                  </div>
-                  
-                  <Link to="/payments" className="block">
-                    <Button 
-                      className={`w-full ${plan.popular ? 'shadow-lg shadow-primary/25' : ''}`}
-                      variant={plan.popular ? "default" : "outline"}
-                      size="lg"
-                    >
-                      {plan.popular ? 'Get Started' : 'Buy Credits'}
-                    </Button>
-                  </Link>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          <p className="text-center text-muted-foreground mt-8">
-            Need more? <Link to="/payments" className="text-primary hover:underline">Buy custom credit amounts</Link> at competitive rates.
-          </p>
-        </div>
-      </section>
-
-      
-      {/* Trust Badges */}
-      <section className="container mx-auto px-6 py-12 border-y border-border/50">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex flex-wrap items-center justify-center gap-12 text-muted-foreground">
-            <div className="flex items-center gap-2 hover:text-foreground transition-colors">
-              <Globe className="w-5 h-5" />
-              <span className="font-medium">Global Coverage</span>
-            </div>
-            
-            <div className="flex items-center gap-2 hover:text-foreground transition-colors">
-              <Shield className="w-5 h-5" />
-              <span className="font-medium">GDPR Compliant</span>
-            </div>
-            <div className="flex items-center gap-2 hover:text-foreground transition-colors">
-              <Award className="w-5 h-5" />
-              <span className="font-medium">Award Winning</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Final CTA */}
-      <section className="container mx-auto px-6 py-20">
-        <div className="max-w-4xl mx-auto">
-          <Card className="relative overflow-hidden border-primary/20 bg-gradient-to-br from-card to-card/50">
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5" />
-            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl" />
-            <div className="absolute bottom-0 left-0 w-64 h-64 bg-accent/10 rounded-full blur-3xl" />
-            <CardContent className="relative p-12 text-center space-y-8">
-              <div className="space-y-4">
-                <h2 className="text-3xl lg:text-5xl font-bold text-foreground">
-                  Ready to Understand Your Audience?
-                </h2>
-                <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                  Start analyzing social posts today with 50 free credits. No credit card required.
+              {/* Traditional */}
+              <div className="lg:col-span-2 p-6 border-b lg:border-b-0 lg:border-r" style={{ borderColor: '#E5E5E5' }}>
+                <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: '#AAAAAA' }}>
+                  Traditional Approach
+                </p>
+                <p className="text-sm leading-relaxed" style={{ color: '#888888' }}>
+                  {d.traditional}
                 </p>
               </div>
-              
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                
-                  <Button size="lg" className="gap-2 text-lg px-10 py-6 shadow-xl shadow-primary/30 hover:shadow-primary/50 transition-all group"
-                  onClick={()=>{
-                    {user ? navigate("/analytics"): navigate("/auth")}
-                  }}
-                  >
-                    {user ? "Analyze" : "Get Started For Free"}
-                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-               
-                <Button size="lg" variant="outline" className="gap-2 text-lg px-10 py-6">
-                  <MessageSquare className="w-5 h-5" />
-                  Contact Sales
-                </Button>
+              {/* Ground truth */}
+              <div className="lg:col-span-2 p-6" style={{ backgroundColor: '#FFFAF7' }}>
+                <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: '#C2622A' }}>
+                  SocialInsight Ground Truth
+                </p>
+                <p className="text-sm leading-relaxed" style={{ color: '#222222' }}>
+                  {d.groundTruth}
+                </p>
               </div>
-              
-              <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-success" />
-                   free credits
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-success" />
-                  No credit card
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-success" />
-                  Cancel anytime
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+            </div>
+          ))}
         </div>
-      </section>
+      </div>
+    </section>
+  )
+}
 
-      {/* Footer */}
-      <footer className="border-t border-border/50 bg-card/50">
-        <div className="container mx-auto px-6 py-12">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-                 <img src="/images/SocialInsightLogo.png" alt="Logo" />
+// ─── Audiences ─────────────────────────────────────────────────────────────────
+
+function Audiences() {
+  return (
+    <section id="audiences" className="py-28" style={{ backgroundColor: '#FFFFFF' }}>
+      <div className="max-w-6xl mx-auto px-6">
+        <div className="mb-16">
+          <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#C2622A' }}>
+            Who Uses It
+          </p>
+          <h2 className="text-4xl font-bold tracking-tight" style={{ color: '#222222' }}>
+            Built for those who need the truth.
+          </h2>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          {audiences.map((a, i) => (
+            <div
+              key={i}
+              className="p-6 rounded-2xl border flex flex-col gap-4 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 cursor-default"
+              style={{ borderColor: '#E5E5E5', backgroundColor: '#FAFAFA' }}
+            >
+              <div
+                className="w-9 h-9 rounded-xl flex items-center justify-center text-lg font-light"
+                style={{ backgroundColor: '#FFF0E8', color: '#C2622A' }}
+              >
+                {a.icon}
               </div>
-              <span className="text-lg font-bold text-foreground">SocialInsight</span>
+              <h3 className="text-sm font-bold leading-snug" style={{ color: '#222222' }}>
+                {a.title}
+              </h3>
+              <p className="text-xs leading-relaxed" style={{ color: '#777777' }}>
+                {a.body}
+              </p>
             </div>
-            <div className="flex items-center gap-8 text-sm text-muted-foreground">
-              <a href="/terms" className="hover:text-foreground transition-colors">Privacy</a>
-              <a href="/terms" className="hover:text-foreground transition-colors">Terms</a>
-              <a href="/terms" className="hover:text-foreground transition-colors">Contact</a>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// ─── Use Cases ─────────────────────────────────────────────────────────────────
+
+function UseCases() {
+  const [active, setActive] = useState(0)
+  const tab = useCaseTabs[active]
+
+  return (
+    <section id="use-cases" className="py-28" style={{ backgroundColor: '#F7F7F7' }}>
+      <div className="max-w-6xl mx-auto px-6">
+        <div className="mb-12">
+          <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#C2622A' }}>
+            Comprehensive Use Cases
+          </p>
+          <h2 className="text-4xl font-bold tracking-tight" style={{ color: '#222222' }}>
+            Five domains. One intelligence layer.
+          </h2>
+        </div>
+
+        {/* Tab bar */}
+        <div className="flex flex-wrap gap-2 mb-8">
+          {useCaseTabs.map((t, i) => (
+            <button
+              key={i}
+              onClick={() => setActive(i)}
+              className="px-4 py-2 rounded-full text-xs font-semibold transition-all duration-200"
+              style={
+                active === i
+                  ? { backgroundColor: '#222222', color: '#F7F7F7' }
+                  : { backgroundColor: '#FFFFFF', color: '#555555', border: '1px solid #E5E5E5' }
+              }
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Tab content */}
+        <div
+          key={active}
+          className="rounded-2xl border overflow-hidden"
+          style={{ borderColor: '#E5E5E5', backgroundColor: '#FFFFFF' }}
+        >
+          <div className="grid grid-cols-1 lg:grid-cols-2">
+            {/* Left: title + number */}
+            <div className="p-10 lg:p-12 flex flex-col justify-between" style={{ backgroundColor: '#222222' }}>
+              <div>
+                <span className="text-xs font-mono" style={{ color: '#C2622A' }}>
+                  0{active + 1} / 05
+                </span>
+                <h3 className="text-2xl font-bold mt-4 leading-snug" style={{ color: '#F7F7F7' }}>
+                  {tab.title}
+                </h3>
+              </div>
+              <p className="text-xs mt-8" style={{ color: '#888888' }}>
+                Navigate tabs to explore all five operational categories.
+              </p>
             </div>
-            <p className="text-sm text-muted-foreground">
-              © 2025 SocialInsight. All rights reserved.
-            </p>
+            {/* Right: items */}
+            <div className="p-10 lg:p-12 flex flex-col gap-5">
+              {tab.items.map((item, j) => (
+                <div key={j} className="flex items-start gap-4">
+                  <div
+                    className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+                    style={{ backgroundColor: '#FFF0E8' }}
+                  >
+                    <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#C2622A' }} />
+                  </div>
+                  <p className="text-sm leading-relaxed" style={{ color: '#333333' }}>
+                    {item}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
-      </footer>
+      </div>
+    </section>
+  )
+}
 
-      <GuideDialog
-    open={guideOpen}
-    setOpen ={() => setGuideOpen(false)}
-      />
-    
+// ─── Footer CTA ────────────────────────────────────────────────────────────────
+
+function FooterCTA() {
+  return (
+    <section className="py-28" style={{ backgroundColor: '#222222' }}>
+      <div className="max-w-6xl mx-auto px-6 text-center flex flex-col items-center gap-8">
+        <div
+          className="w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold text-white"
+          style={{ backgroundColor: '#C2622A' }}
+        >
+          S
+        </div>
+        <h2
+          className="text-4xl lg:text-5xl font-bold tracking-tight max-w-2xl leading-tight"
+          style={{ color: '#F7F7F7' }}
+        >
+          Stop operating in the blind.
+        </h2>
+        <p className="text-lg max-w-xl" style={{ color: '#AAAAAA' }}>
+          Uncover the narrative ground-truth today. Your public has been speaking. It's time to actually listen.
+        </p>
+        <button
+          className="px-8 py-4 rounded-full text-sm font-semibold transition-all duration-200 hover:opacity-90 active:scale-95"
+          style={{ backgroundColor: '#C2622A', color: '#FFFFFF' }}
+        >
+          Book a Consultation
+        </button>
+        <p className="text-xs" style={{ color: '#555555' }}>
+          © 2024 SocialInsight. All rights reserved.
+        </p>
+      </div>
+    </section>
+  )
+}
+
+// ─── App ──────────────────────────────────────────────────────────────────────
+
+export default function Landing() {
+
+  const navigate = useNavigate();
+
+
+
+
+// ─── Nav ─────────────────────────────────────────────────────────────────────
+
+function Nav() {
+  const [scrolled, setScrolled] = useState(false)
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20)
+    window.addEventListener('scroll', onScroll)
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  return (
+    <nav
+      className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
+      style={{
+        backgroundColor: scrolled ? 'rgba(247,247,247,0.95)' : 'transparent',
+        backdropFilter: scrolled ? 'blur(12px)' : 'none',
+        borderBottom: scrolled ? '1px solid #E5E5E5' : '1px solid transparent',
+      }}
+    >
+      <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className="w-11 h-11 rounded-xl  flex items-center justify-center shadow-lg shadow-primary/25 group-hover:shadow-primary/40 transition-shadow">
+              <img src="/images/SocialInsightLogo.png" alt="Logo" /> </div>
+          <span className="font-semibold text-base tracking-tight" style={{ color: '#222222' }}>
+            SocialInsight
+          </span>
+        </div>
+        <div className="flex items-center gap-4">
+          <a href="#use-cases" className="text-sm font-medium" style={{ color: '#888888' }}>
+            Use Cases
+          </a>
+          <a href="#audiences" className="text-sm font-medium" style={{ color: '#888888' }}>
+            Who It's For
+          </a>
+         {/**} <button
+            className="text-sm font-semibold px-4 py-2 rounded-full transition-all duration-200 hover:opacity-90 active:scale-95"
+            style={{ backgroundColor: '#222222', color: '#F7F7F7' }}
+          >
+            Request Audit
+          </button>**/}
+
+          <div className="flex items-center gap-3">
+            <AuthButtons/>
+          </div>
+        </div>
+      </div>
+    </nav>
+  )
+}
+
+
+
+  return (
+    <div style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}>
+      <Nav />
+      <Hero />
+      <CoreProblem />
+      <WhatWeDo />
+      <Audiences />
+      <UseCases />
+      <FooterCTA />
     </div>
-  );
+  )
 }

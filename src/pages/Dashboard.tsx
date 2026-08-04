@@ -90,7 +90,8 @@ useEffect(() => {
         : 0,
     };
   });
-
+    const sanitizeName = (str) => 
+  String(str || '').replace(/^\[\s*["']?|["']?\s*\]$/g, '').replace(/^["']|["']$/g, '').trim();
 const calculateAvg = (
   postsList: Post[],
   field: "sentiment" | "agreement"
@@ -321,7 +322,9 @@ const handleDailyRequestSubmit = async (url: string) => {
                   transition={{ delay: index * 0.1 }}
                   onClick={() => {
                     setSelectedCampaignId(campaign.id);
-                    setCurrentView("campaign-detail");
+            setCurrentView("campaign-detail");
+           
+            getCampaignData(campaign.id)
                     
                   }}
                   className="bg-white rounded-xl p-5 shadow-md border border-gray-200 cursor-pointer group hover:shadow-xl transition-all hover:-translate-y-1"
@@ -334,7 +337,7 @@ const handleDailyRequestSubmit = async (url: string) => {
                       {campaign.postsCount} posts
                     </div>
                   </div>
-                  <h4 className="text-gray-900 mb-3 line-clamp-2">{(campaign.name).slice(2, -2)}</h4>
+                  <h4 className="text-gray-900 mb-3 line-clamp-2">{sanitizeName(campaign.name)}</h4>
                   <div className="flex items-center justify-between text-sm">
                     <div>
                       <div className="text-xs text-gray-500">Sentiment</div>

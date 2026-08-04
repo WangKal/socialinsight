@@ -1,18 +1,16 @@
 import { motion, AnimatePresence } from "motion/react";
-import { X, Search, Tag, Clock } from "lucide-react";
-import { useState, useRef, KeyboardEvent } from "react";
+import { X, Search, Tag, Clock, FileText, Plus, Sparkles, MonitorCheck } from "lucide-react";
+import { useState } from "react";
 import { SocialSearchPayload } from "@/services/socialSearch";
 import { buildSocialSearchPayload } from "@/services/socialSearch";
 import { XAccountForm } from "@/components/XAccountForm";
-import {useAuth} from "@/hooks/use-auth";
-import { checkXAccount} from "@/services/socialEcho";
-
+import { useAuth } from "@/hooks/use-auth";
+import { GuideDialog } from "@/components/GuideDialog";
+import { Button } from "@/components/ui/button";
 
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
 } from "@/components/ui/dialog";
 
 interface SearchDialogProps {
@@ -44,7 +42,6 @@ export interface DurationValue {
   unit: DurationUnit;
 }
 
-
 type Platform = "x" | "tiktok" | "instagram";
 
 const PLATFORMS: {
@@ -71,7 +68,7 @@ const PLATFORMS: {
       </svg>
     ),
   },
- /* {
+  {
     id: "tiktok",
     label: "TikTok",
     color: "text-white",
@@ -85,60 +82,22 @@ const PLATFORMS: {
       </svg>
     ),
   },
-  {
-    id: "instagram",
-    label: "Instagram",
-    color: "text-white",
-    ring: "ring-[#e1306c]",
-    bg: "bg-white border border-gray-200",
-    selectedBg:
-      "bg-gradient-to-br from-[#f9ce34] via-[#ee2a7b] to-[#6228d7]",
-    selectedText: "text-white",
-    icon: (
-      <svg viewBox="0 0 24 24" className="w-5 h-5" fill="currentColor">
-        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
-      </svg>
-    ),
-  },*/
 ];
 
 export function SearchDialog({ isOpen, onClose, onSearch }: SearchDialogProps) {
-    const { user } = useAuth();
-  const [keywords, setKeywords] = useState<string[]>([]);
-  const [inputValue, setInputValue] = useState("");
+  const { user } = useAuth();
+  
+  const [keyword, setKeyword] = useState("");
+  const [context, setContext] = useState("");
+
   const [selectedPlatforms, setSelectedPlatforms] = useState<Platform[]>([]);
   const [durationAmount, setDurationAmount] = useState<string>("30");
   const [durationUnit, setDurationUnit] = useState<DurationUnit>("days");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [showXDialog, setShowXDialog] =
-  useState(false);
-
-
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  const addKeyword = (value: string) => {
-    const trimmed = value.trim();
-    if (trimmed && !keywords.includes(trimmed)) {
-      setKeywords((prev) => [...prev, trimmed]);
-      setError("");
-    }
-    setInputValue("");
-  };
-
-  const removeKeyword = (kw: string) => {
-    setKeywords((prev) => prev.filter((k) => k !== kw));
-  };
-
-  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" || e.key === ",") {
-      e.preventDefault();
-      addKeyword(inputValue);
-    } else if (e.key === "Backspace" && !inputValue && keywords.length > 0) {
-      setKeywords((prev) => prev.slice(0, -1));
-    }
-  };
+  const [showXDialog, setShowXDialog] = useState(false);
+  const [guideOpen, setGuideOpen] = useState(false);
 
   const togglePlatform = (id: Platform) => {
     setSelectedPlatforms((prev) =>
@@ -147,44 +106,28 @@ export function SearchDialog({ isOpen, onClose, onSearch }: SearchDialogProps) {
     setError("");
   };
 
-
-async function validateXAccount(userId: string) {
-
-
-return false
-}
-
-
-const handleAnalyze = () => {
-
-  try {
-    if (
-      selectedPlatforms?.includes("x")
-    ) {
-      const valid = false//await checkXAccount(user.id);
-
-      if (!valid) {
-      
-        setShowXDialog(true);
-        return;
+  const handleAnalyze = () => {
+    try {
+      if (selectedPlatforms?.includes("x")) {
+        const valid = false;
+        if (!valid) {
+          setShowXDialog(true);
+          return;
+        }
       }
+    } catch (error) {
+      console.error(error);
     }
+  };
 
-  } catch (error) {
-    console.error(error);
-  }
-};
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isSubmitting) return;
-    
 
-    const allKeywords = inputValue.trim()
-      ? [...keywords, inputValue.trim()]
-      : keywords;
+    const trimmedKeyword = keyword.trim();
 
-    if (allKeywords.length === 0) {
-      setError("Please enter at least one keyword or search term.");
+    if (!trimmedKeyword) {
+      setError("Please enter a keyword.");
       return;
     }
     if (selectedPlatforms.length === 0) {
@@ -200,16 +143,18 @@ const handleAnalyze = () => {
         setIsSubmitting(false);
         return;
       }
-      const payload = buildSocialSearchPayload(
-  allKeywords,
-  selectedPlatforms,
-  {
-    amount,
-    unit: durationUnit,
-  }
-);
 
-await onSearch(payload);
+      const payload = buildSocialSearchPayload(
+        trimmedKeyword,
+        selectedPlatforms,
+        {
+          amount,
+          unit: durationUnit,
+        },
+        context.trim(),
+      );
+
+      await onSearch(payload);
       handleClose();
     } catch {
       setError("Search failed. Please try again.");
@@ -219,8 +164,8 @@ await onSearch(payload);
   };
 
   const handleClose = () => {
-    setKeywords([]);
-    setInputValue("");
+    setKeyword("");
+    setContext("");
     setSelectedPlatforms([]);
     setDurationAmount("30");
     setDurationUnit("days");
@@ -229,310 +174,345 @@ await onSearch(payload);
   };
 
   return (
-    <AnimatePresence className=" z-[9999] h-[calc(100vh-64px)] overflow-y-auto pb-24">
-      {isOpen && (
-        <>
-          {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={handleClose}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 "
-          />
+    <>
+      <AnimatePresence>
+        {isOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={handleClose}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+            />
 
-          {/* Dialog */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 24 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 24 }}
-            transition={{ type: "spring", stiffness: 340, damping: 30 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 z-[100]"
-          >
-            <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden">
-              {/* Gradient Header */}
-              <div className="relative bg-gradient-to-br from-violet-600 via-purple-600 to-indigo-700 px-8 pt-8 pb-10">
-                {/* Close */}
-                <button
-                  onClick={handleClose}
-                  className="absolute top-4 right-4 p-2 rounded-xl bg-white/10 hover:bg-white/20 transition-colors text-white"
-                >
-                  <X className="w-4 h-4" />
-                </button>
+            {/* Dialog Container */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 24 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 24 }}
+              transition={{ type: "spring", stiffness: 340, damping: 30 }}
+              className="fixed inset-0 flex items-center justify-center p-4 z-50 pointer-events-none"
+            >
+              <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full flex flex-col max-h-[90vh] overflow-hidden pointer-events-auto">
+                
+                {/* Fixed Header */}
+                <div className="relative bg-gradient-to-br from-violet-600 via-purple-600 to-indigo-700 px-8 pt-6 pb-8 flex-shrink-0">
+                  <button
+                    type="button"
+                    onClick={handleClose}
+                    className="absolute top-4 right-4 p-2 rounded-xl bg-white/10 hover:bg-white/20 transition-colors text-white"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
 
-                {/* Icon + Title */}
-                <div className="flex items-center gap-4 mb-1">
-                  <div className="w-12 h-12 rounded-2xl bg-white/15 flex items-center justify-center shadow-inner">
-                    <Search className="w-6 h-6 text-white" />
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-white/15 flex items-center justify-center shadow-inner">
+                      <Search className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h2 className="text-white text-xl font-semibold">Search Options</h2>
+                      <p className="text-white/70 text-sm mt-0.5">
+                        Choose online keyword search or browser extension method
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h2 className="text-white text-xl">Keyword Search</h2>
-                    <p className="text-white/70 text-sm mt-0.5">
-                      Search social media by topic or hashtag
-                    </p>
-                  </div>
+
+                  <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-white/5 -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+                  <div className="absolute bottom-0 left-8 w-20 h-20 rounded-full bg-white/5 translate-y-1/2 pointer-events-none" />
                 </div>
 
-                {/* Decorative blobs */}
-                <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-white/5 -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-                <div className="absolute bottom-0 left-8 w-20 h-20 rounded-full bg-white/5 translate-y-1/2 pointer-events-none" />
-              </div>
+                {/* Scrollable Content Area */}
+                <div className="bg-white -mt-4 rounded-t-3xl px-8 pt-6 pb-8 overflow-y-auto flex-1 space-y-6">
 
-              {/* Card body lifted over gradient */}
-              <div className="bg-white -mt-4 rounded-t-3xl px-8 pt-6 pb-8">
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  {/* Keywords field */}
-                  <div>
-                    <label className="block text-sm text-gray-700 mb-2">
-                      Keywords / Search Terms
-                      <span className="text-violet-500 ml-1">*</span>
-                    </label>
-                    <div
-                      onClick={() => inputRef.current?.focus()}
-                      className="min-h-[52px] flex flex-wrap gap-2 items-center px-4 py-3 border border-gray-200 rounded-2xl focus-within:ring-2 focus-within:ring-violet-500 focus-within:border-transparent cursor-text transition-all bg-gray-50/50"
-                    >
-                      {keywords.map((kw) => (
-                        <motion.span
-                          key={kw}
-                          initial={{ opacity: 0, scale: 0.8 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          exit={{ opacity: 0, scale: 0.8 }}
-                          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-violet-100 text-violet-700 text-sm"
-                        >
-                          <Tag className="w-3 h-3" />
-                          {kw}
-                          <button
-                            type="button"
-                            onClick={() => removeKeyword(kw)}
-                            className="ml-0.5 hover:text-violet-900 transition-colors"
-                          >
-                            <X className="w-3 h-3" />
-                          </button>
-                        </motion.span>
-                      ))}
+                  {/* OPTION A: Separate Form Section */}
+                  <form onSubmit={handleSubmit} className="space-y-5 border-b border-gray-100 pb-6">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Search className="w-4 h-4 text-violet-600" />
+                      <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider">
+                        Option 1: Direct Keyword Search
+                      </h3>
+                    </div>
+
+                    {/* Single Keyword field */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5 flex items-center gap-1.5">
+                        <Tag className="w-3.5 h-3.5 text-violet-500" />
+                        Keyword
+                        <span className="text-violet-500 ml-0.5">*</span>
+                      </label>
                       <input
-                        ref={inputRef}
                         type="text"
-                        value={inputValue}
+                        value={keyword}
                         onChange={(e) => {
-                          setInputValue(e.target.value);
+                          setKeyword(e.target.value);
                           setError("");
                         }}
-                        onKeyDown={handleKeyDown}
-                        onBlur={() => {
-                          if (inputValue.trim()) addKeyword(inputValue);
-                        }}
-                        placeholder={
-                          keywords.length === 0
-                            ? "Type keyword and press Enter…"
-                            : "Add another…"
-                        }
-                        className="flex-1 min-w-[140px] bg-transparent outline-none text-sm text-gray-700 placeholder:text-gray-400"
+                        placeholder="e.g. innovation"
+                        className="w-full px-4 py-3 border border-gray-200 rounded-2xl text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent bg-gray-50/50 transition-all"
                       />
                     </div>
-                    <p className="text-xs text-gray-400 mt-1.5 ml-1">
-                      Press <kbd className="px-1 py-0.5 bg-gray-100 rounded text-gray-500">Enter</kbd> or{" "}
-                      <kbd className="px-1 py-0.5 bg-gray-100 rounded text-gray-500">,</kbd> to add a term
-                    </p>
-                  </div>
 
-                  {/* Platform selector */}
-                  <div>
-                    <label className="block text-sm text-gray-700 mb-3">
-                      Platforms
-                      <span className="text-violet-500 ml-1">*</span>
-                    </label>
-                    <div className="grid grid-cols-3 gap-3">
-                      {PLATFORMS.map((p) => {
-                        const selected = selectedPlatforms.includes(p.id);
-                        return (
-                          <motion.button
-                            key={p.id}
-                            type="button"
-                            whileTap={{ scale: 0.96 }}
-                            onClick={() => {togglePlatform(p.id);handleAnalyze();}}
-                            className={`relative flex flex-col items-center gap-2 py-4 px-3 rounded-2xl border-2 transition-all duration-200 ${
-                              selected
-                                ? `${p.selectedBg} border-transparent shadow-lg shadow-violet-200`
-                                : "bg-white border-gray-200 hover:border-violet-300 hover:shadow-md"
-                            }`}
-                          >
-                            {selected && (
-                              <motion.div
-                                initial={{ scale: 0 }}
-                                animate={{ scale: 1 }}
-                                className="absolute top-2 right-2 w-4 h-4 rounded-full bg-white/30 flex items-center justify-center"
-                              >
-                                <svg viewBox="0 0 12 12" className="w-2.5 h-2.5" fill="none" stroke="white" strokeWidth="2">
-                                  <polyline points="2,6 5,9 10,3" />
-                                </svg>
-                              </motion.div>
-                            )}
-                            <span className={`${selected ? "text-white" : "text-gray-700"} transition-colors`}>
-                              {p.icon}
-                            </span>
-                            <span className={`text-xs ${selected ? "text-white" : "text-gray-600"} transition-colors`}>
-                              {p.label}
-                            </span>
-                          </motion.button>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Duration */}
-                  <div>
-                    <label className="block text-sm text-gray-700 mb-2 flex items-center gap-1.5">
-                      <Clock className="w-3.5 h-3.5 text-violet-500" />
-                      Duration
-                    </label>
-
-                    {/* Quick picks */}
-                    <div className="flex gap-1.5 flex-wrap mb-3">
-                      {QUICK_PICKS.map((q) => {
-                        const active = durationAmount === String(q.value) && durationUnit === q.unit;
-                        return (
-                          <motion.button
-                            key={q.label}
-                            type="button"
-                            whileTap={{ scale: 0.93 }}
-                            onClick={() => {
-                              setDurationAmount(String(q.value));
-                              setDurationUnit(q.unit);
-                            }}
-                            className={`px-3 py-1 rounded-full text-xs border transition-all duration-150 ${
-                              active
-                                ? "bg-violet-600 border-violet-600 text-white shadow-sm"
-                                : "bg-white border-gray-200 text-gray-500 hover:border-violet-300 hover:text-violet-600"
-                            }`}
-                          >
-                            {q.label}
-                          </motion.button>
-                        );
-                      })}
-                    </div>
-
-                    {/* Custom number + unit */}
-                    <div className="flex gap-2">
+                    {/* Context field */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5 flex items-center gap-1.5">
+                        <FileText className="w-3.5 h-3.5 text-violet-500" />
+                        Context
+                      </label>
                       <input
-                        type="number"
-                        min={1}
-                        max={DURATION_UNITS.find((u) => u.id === durationUnit)?.max ?? 9999}
-                        value={durationAmount}
-                        onChange={(e) => {
-                          setDurationAmount(e.target.value);
-                          setError("");
-                        }}
-                        className="w-24 px-3 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent text-center bg-gray-50/50"
-                        placeholder="e.g. 48"
+                        type="text"
+                        value={context}
+                        onChange={(e) => setContext(e.target.value)}
+                        placeholder="e.g. Tech industry trends in 2026"
+                        className="w-full px-4 py-3 border border-gray-200 rounded-2xl text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent bg-gray-50/50 transition-all"
                       />
-                      <div className="flex flex-1 gap-1.5">
-                        {DURATION_UNITS.map((u) => {
-                          const active = durationUnit === u.id;
+                    </div>
+
+                    {/* Platform selector */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2.5">
+                        Platforms
+                        <span className="text-violet-500 ml-1">*</span>
+                      </label>
+                      <div className="grid grid-cols-2 gap-3">
+                        {PLATFORMS.map((p) => {
+                          const selected = selectedPlatforms.includes(p.id);
                           return (
                             <motion.button
-                              key={u.id}
+                              key={p.id}
                               type="button"
-                              whileTap={{ scale: 0.95 }}
-                              onClick={() => setDurationUnit(u.id)}
-                              className={`flex-1 py-2 rounded-xl border-2 text-xs transition-all duration-150 ${
-                                active
-                                  ? "border-violet-500 bg-violet-50 text-violet-700"
-                                  : "border-gray-200 bg-white text-gray-500 hover:border-violet-300"
+                              whileTap={{ scale: 0.96 }}
+                              onClick={() => {
+                                togglePlatform(p.id);
+                                handleAnalyze();
+                              }}
+                              className={`relative flex flex-col items-center gap-2 py-3.5 px-3 rounded-2xl border-2 transition-all duration-200 ${
+                                selected
+                                  ? `${p.selectedBg} border-transparent shadow-lg shadow-violet-200`
+                                  : "bg-white border-gray-200 hover:border-violet-300 hover:shadow-md"
                               }`}
                             >
-                              {u.label}
+                              {selected && (
+                                <motion.div
+                                  initial={{ scale: 0 }}
+                                  animate={{ scale: 1 }}
+                                  className="absolute top-2 right-2 w-4 h-4 rounded-full bg-white/30 flex items-center justify-center"
+                                >
+                                  <svg viewBox="0 0 12 12" className="w-2.5 h-2.5" fill="none" stroke="white" strokeWidth="2">
+                                    <polyline points="2,6 5,9 10,3" />
+                                  </svg>
+                                </motion.div>
+                              )}
+                              <span className={`${selected ? "text-white" : "text-gray-700"} transition-colors`}>
+                                {p.icon}
+                              </span>
+                              <span className={`text-xs ${selected ? "text-white" : "text-gray-600"} transition-colors`}>
+                                {p.label}
+                              </span>
                             </motion.button>
                           );
                         })}
                       </div>
                     </div>
 
-                    {/* Human-readable summary */}
-                    {durationAmount && parseInt(durationAmount) > 0 && (
-                      <motion.p
-                        key={`${durationAmount}-${durationUnit}`}
-                        initial={{ opacity: 0, y: -4 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="text-xs text-violet-500 mt-2 ml-1"
-                      >
-                        Searching the last {durationAmount} {parseInt(durationAmount) === 1 ? durationUnit.replace(/s$/, "") : durationUnit}
-                      </motion.p>
-                    )}
-                  </div>
+                    {/* Duration */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-1.5">
+                        <Clock className="w-3.5 h-3.5 text-violet-500" />
+                        Duration
+                      </label>
 
-                  {/* Error */}
-                  <AnimatePresence>
-                    {error && (
-                      <motion.div
-                        initial={{ opacity: 0, y: -4 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -4 }}
-                        className="p-3 bg-red-50 border border-red-200 rounded-xl"
-                      >
-                        <p className="text-sm text-red-600">{error}</p>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                      {/* Quick picks */}
+                      <div className="flex gap-1.5 flex-wrap mb-3">
+                        {QUICK_PICKS.map((q) => {
+                          const active = durationAmount === String(q.value) && durationUnit === q.unit;
+                          return (
+                            <motion.button
+                              key={q.label}
+                              type="button"
+                              whileTap={{ scale: 0.93 }}
+                              onClick={() => {
+                                setDurationAmount(String(q.value));
+                                setDurationUnit(q.unit);
+                              }}
+                              className={`px-3 py-1 rounded-full text-xs border transition-all duration-150 ${
+                                active
+                                  ? "bg-violet-600 border-violet-600 text-white shadow-sm"
+                                  : "bg-white border-gray-200 text-gray-500 hover:border-violet-300 hover:text-violet-600"
+                              }`}
+                            >
+                              {q.label}
+                            </motion.button>
+                          );
+                        })}
+                      </div>
 
-                  {/* Actions */}
-                  <div className="flex gap-3 pt-1">
-                    <button
-                      type="button"
-                      onClick={handleClose}
-                      className="flex-1 py-3 rounded-2xl border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition-colors"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      disabled={isSubmitting}
-                      className="flex-[2] py-3 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white text-sm shadow-md shadow-violet-200 hover:opacity-90 active:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
-                    >
-                      {isSubmitting ? (
-                        <>
-                          <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
-                          </svg>
-                          Searching…
-                        </>
-                      ) : (
-                        <>
-                          <Search className="w-4 h-4" />
-                          Search {selectedPlatforms.length > 0 ? `(${selectedPlatforms.length})` : ""}
-                        </>
+                      {/* Custom number + unit */}
+                      <div className="flex gap-2">
+                        <input
+                          type="number"
+                          min={1}
+                          max={DURATION_UNITS.find((u) => u.id === durationUnit)?.max ?? 9999}
+                          value={durationAmount}
+                          onChange={(e) => {
+                            setDurationAmount(e.target.value);
+                            setError("");
+                          }}
+                          className="w-24 px-3 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent text-center bg-gray-50/50"
+                          placeholder="e.g. 48"
+                        />
+                        <div className="flex flex-1 gap-1.5">
+                          {DURATION_UNITS.map((u) => {
+                            const active = durationUnit === u.id;
+                            return (
+                              <motion.button
+                                key={u.id}
+                                type="button"
+                                whileTap={{ scale: 0.95 }}
+                                onClick={() => setDurationUnit(u.id)}
+                                className={`flex-1 py-2 rounded-xl border-2 text-xs transition-all duration-150 ${
+                                  active
+                                    ? "border-violet-500 bg-violet-50 text-violet-700"
+                                    : "border-gray-200 bg-white text-gray-500 hover:border-violet-300"
+                                }`}
+                              >
+                                {u.label}
+                              </motion.button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {durationAmount && parseInt(durationAmount, 10) > 0 && (
+                        <motion.p
+                          key={`${durationAmount}-${durationUnit}`}
+                          initial={{ opacity: 0, y: -4 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="text-xs text-violet-500 mt-2 ml-1"
+                        >
+                          Searching the last {durationAmount} {parseInt(durationAmount, 10) === 1 ? durationUnit.replace(/s$/, "") : durationUnit}
+                        </motion.p>
                       )}
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </motion.div>
-        </>
-      )}
-<Dialog
-  open={showXDialog}
-  onOpenChange={(open) => {
-    setShowXDialog(open);
-  }}
->
-  <DialogContent
-    onPointerDownOutside={(e) => e.preventDefault()}
-    onInteractOutside={(e) => e.preventDefault()}
-    className="w-[95vw] max-w-4xl max-h-[90vh] p-0 overflow-hidden z-[101]"
-  >
-   <div className="overflow-y-auto max-h-[90vh]">
-      <XAccountForm
-        user={user}
-        onSaved={async () => {
-          setShowXDialog(false);
+                    </div>
 
-        }}
+                    {/* Error */}
+                    <AnimatePresence>
+                      {error && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -4 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -4 }}
+                          className="p-3 bg-red-50 border border-red-200 rounded-xl"
+                        >
+                          <p className="text-sm text-red-600">{error}</p>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+
+                    {/* Form Actions */}
+                    <div className="flex gap-3 pt-1">
+                      <button
+                        type="button"
+                        onClick={handleClose}
+                        className="flex-1 py-3 rounded-2xl border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition-colors"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="flex-[2] py-3 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white text-sm shadow-md shadow-violet-200 hover:opacity-90 active:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+                      >
+                        {isSubmitting ? (
+                          <>
+                            <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+                            </svg>
+                            Searching…
+                          </>
+                        ) : (
+                          <>
+                            <Search className="w-4 h-4" />
+                            Search {selectedPlatforms.length > 0 ? `(${selectedPlatforms.length})` : ""}
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </form>
+
+                  {/* OPTION B: Fully Separate Extension Section */}
+                  <div className="p-4 bg-gradient-to-br from-violet-50 to-purple-50 border border-violet-200 rounded-2xl space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1.5 text-xs font-semibold text-violet-800 uppercase tracking-wider">
+                        <Sparkles className="w-4 h-4 text-violet-600" /> Option 2: Browser Extension
+                      </div>
+                      <span className="bg-violet-200/80 text-violet-800 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                        PREFERRED
+                      </span>
+                    </div>
+
+                    <div>
+                      <h4 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+                        <MonitorCheck className="w-4 h-4 text-violet-600" />
+                        Comprehensive Direct Analysis
+                      </h4>
+                      <p className="text-xs text-gray-600 mt-1 leading-relaxed">
+                        Using the extension provides significantly <strong>better methods</strong> and deeper extraction capabilities directly from your active browser session.
+                      </p>
+                    </div>
+
+                    <p className="text-xs text-violet-700 font-medium">
+                      <strong>Supported:</strong> X (Twitter), Facebook, TikTok
+                    </p>
+
+                    <Button
+                      type="button"
+                      onClick={() => {
+                        setGuideOpen(true);
+                        handleClose();
+                      }}
+                      className="w-full bg-gradient-to-r from-violet-600 to-purple-600 text-white rounded-xl shadow-sm hover:opacity-95 transition-opacity"
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Analyze by Extension
+                    </Button>
+                  </div>
+
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+
+        <Dialog
+          open={showXDialog}
+          onOpenChange={(open) => {
+            setShowXDialog(open);
+          }}
+        >
+          <DialogContent
+            onPointerDownOutside={(e) => e.preventDefault()}
+            onInteractOutside={(e) => e.preventDefault()}
+            className="w-[95vw] max-w-4xl max-h-[90vh] p-0 overflow-hidden z-[101]"
+          >
+            <div className="overflow-y-auto max-h-[90vh]">
+              <XAccountForm
+                user={user}
+                onSaved={async () => {
+                  setShowXDialog(false);
+                }}
+              />
+            </div>
+          </DialogContent>
+        </Dialog>
+      </AnimatePresence>
+
+      <GuideDialog
+        open={guideOpen}
+        setOpen={() => setGuideOpen(false)}
       />
-    </div>
-  </DialogContent>
-</Dialog>
-    </AnimatePresence>
+    </>
   );
 }

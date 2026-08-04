@@ -29,7 +29,15 @@ export function CampaignsList({ campaigns, onSelectCampaign, onBack }: Campaigns
   const avgAgreement = campaigns.length > 0
     ? Math.round(campaigns.reduce((sum, c) => sum + c.avgAgreement, 0) / campaigns.length)
     : 0;
+    const sanitizeName = (str) => 
+  String(str || '').replace(/^\[\s*["']?|["']?\s*\]$/g, '').replace(/^["']|["']$/g, '').trim();
 
+// Example Outputs:
+// '["Marketing"]'  -> "Marketing"
+// '["Marketing"]'  -> "Marketing"
+// 'Marketing'      -> "Marketing"
+// '"Marketing"'    -> "Marketing"
+// ["Marketing"]    -> "Marketing"
   return (
     <>
       {/* Back Button */}
@@ -144,7 +152,7 @@ export function CampaignsList({ campaigns, onSelectCampaign, onBack }: Campaigns
                   </div>
                 </div>
 
-                <h3 className="text-xl text-gray-900 mb-2">{(campaign.name).slice(2, -2)}</h3>
+                <h3 className="text-xl text-gray-900 mb-2">{sanitizeName(campaign.name)}</h3>
                 <p className="text-sm text-gray-600 mb-4 line-clamp-2">{campaign.description}</p>
 
                 <div className="flex items-center justify-between pt-4 border-t border-gray-100">
