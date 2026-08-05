@@ -8,6 +8,7 @@ export interface DurationValue {
 export interface SocialSearchPayload {
   query: string[];
   platforms: string[];
+  context: string;
   start_date: string;
   end_date: string;
 }
@@ -15,7 +16,8 @@ export interface SocialSearchPayload {
 export function buildSocialSearchPayload(
   keywords: string[],
   platforms: string[],
-  duration: DurationValue
+  duration: DurationValue,
+  context: string
 ): SocialSearchPayload {
   const endDate = new Date();
   const startDate = new Date();
@@ -47,5 +49,6 @@ export function buildSocialSearchPayload(
     platforms,
     start_date: startDate.toISOString(),
     end_date: endDate.toISOString(),
+    context: context
   };
 }
