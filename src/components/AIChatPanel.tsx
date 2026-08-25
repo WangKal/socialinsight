@@ -1,7 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Send, Bot, User, ChevronDown, ChevronUp, Copy, Check, MessageSquare, X } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
-import { fetchAIResponse, AIHistory } from "@/services/socialEcho"; // fetch calls from services
+import {
+  fetchAIResponse,
+  AIHistory,
+  fetchCampaignAIResponse,
+} from "@/services/socialEcho";
+ // fetch calls from services
 import {useAuth } from "@/hooks/use-auth"
 import { Link ,useNavigate} from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -23,13 +28,18 @@ interface Message {
 }
 
 interface AIChatPanelProps {
-  postContent: string;
-  replies: Reply[];
+  mode?: "post" | "campaign";
+
+  // Post mode
+  postContent?: any;
+  replies?: Reply[];
   postUsername?: string;
 
+  // Campaign mode
+  campaignId?: string;
 }
 
-export function AIChatPanel({ postContent, replies,  postUsername }: AIChatPanelProps) {
+export function AIChatPanel({ mode,postContent, replies,  postUsername,campaignId }: AIChatPanelProps) {
   const { user } = useAuth();
   const { toast } = useToast();
   const [messages, setMessages] = useState<Message[]>([]);
@@ -52,7 +62,13 @@ useEffect(() => {
     }
 
     try {
-      const data = await AIHistory(user.id, postContent.id);
+      let data;
+              if (mode === "campaign") {
+                  data = await AIHistory(user.id, campaignId, "campaign");
+                } else {
+                  data = await AIHistory(user.id, postContent.id, "post");
+                }
+     console.log(data)
       const hydratedMessages: Message[] = (data.chats || []).map((msg) => {
         const hydratedReplies: Reply[] = (msg.reply_mentions || [])
           .map((mentionId) => {
@@ -111,11 +127,22 @@ const sendMessage = async () => {
   setIsTyping(true);
 
   try {
-    const response: AIResponse = await fetchAIResponse(
-      user.id,
-      pendingMessage.question,
-      postContent
-    );
+   let response;
+
+if (mode === "campaign") {
+  response = await fetchCampaignAIResponse(
+    user.id,
+    campaignId!,
+    pendingMessage.question,
+    messages
+  );
+} else {
+  response = await fetchAIResponse(
+    user.id,
+    pendingMessage.question,
+    postContent.id
+  );
+}
 
     const hydratedMentions: Reply[] = (response.reply_mentions || [])
       .map((mentionId) => {
@@ -194,7 +221,7 @@ const sendMessage = async () => {
       setIsOpen(true);
     }}
     className="
-      fixed bottom-8 right-8 z-50
+      fixed bottom-8 right-8 z-[100]
       flex items-center gap-2
       bg-violet-600 hover:bg-violet-700
       text-white
@@ -219,7 +246,7 @@ const sendMessage = async () => {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 400 }}
             transition={{ type: "spring", damping: 25 }}
-            className="fixed top-0 right-0 h-screen w-full md:w-[480px] z-50 bg-white shadow-2xl flex flex-col"
+            className="fixed top-0 right-0 h-screen w-full md:w-[480px] z-[100] bg-white shadow-2xl flex flex-col"
           >
                         {/* Header */}
             <div className="bg-gradient-to-r from-violet-600 to-purple-600 p-6 text-white">
@@ -229,8 +256,15 @@ const sendMessage = async () => {
                     <Bot className="w-6 h-6" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold">AI Assistant</h2>
-                    <p className="text-sm text-white/90">Find insights within this post</p>
+<h2>
+  {mode === "campaign" ? "Campaign AI Assistant" : "AI Assistant"}
+</h2>
+
+<p>
+  {mode === "campaign"
+    ? "Explore insights across this campaign"
+    : "Find insights within this post"}
+</p>
                   </div>
                 </div>
                 <button
@@ -251,17 +285,32 @@ const sendMessage = async () => {
                     <p className="text-gray-600 mb-4">Ask me anything about this post!</p>
                     <div className="space-y-2">
                       <p className="text-xs font-semibold text-gray-700 mb-2">Try asking:</p>
-                      {["Who should I mention?", "List all key users", "What's the sentiment?", "Give me top contributors"].map(
-                        (q) => (
-                          <button
-                            key={q}
-                            onClick={() => { setInput(q); sendMessage(); }}
-                            className="block w-full text-left text-sm px-4 py-2 bg-violet-50 text-violet-700 rounded-lg hover:bg-violet-100 transition-colors"
-                          >
-                            {q}
-                          </button>
-                        )
-                      )}
+                     {(
+  mode === "campaign"
+    ? [
+        "What are the main themes across this campaign?",
+        "What are people most concerned about?",
+        "Which posts support the main findings?",
+        "How does sentiment differ across the campaign?",
+      ]
+    : [
+        "Who should I mention?",
+        "List all key users",
+        "What's the sentiment?",
+        "Give me top contributors",
+      ]
+).map((q) => (
+  <button
+    key={q}
+    onClick={() => {
+      setInput(q);
+      sendMessage();
+    }}
+    className="block w-full text-left text-sm px-4 py-2 bg-violet-50 text-violet-700 rounded-lg hover:bg-violet-100 transition-colors"
+  >
+    {q}
+  </button>
+))}
                     </div>
                   </div>
                 </div>

@@ -1,11 +1,24 @@
-import { useState } from "react"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
+import { useEffect, useMemo, useState } from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "./ui/table";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
-import { ExternalLink, FolderPlus,Trash2 } from "lucide-react";
+import {
+  ExternalLink,
+  FolderPlus,
+  Trash2,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { motion } from "motion/react";
 import { deletePost } from "@/services/socialEcho";
-import {useToast } from "@/hooks/use-toast"
+import { useToast } from "@/hooks/use-toast";
 
 export interface Post {
   id: string;
@@ -28,15 +41,43 @@ interface PostsTableProps {
   onPostDeleted?: (postId: string) => void;
 }
 
-export function PostsTable({ posts, onViewPost, onAssignPost, showAssignButton = false, onPostDeleted }: PostsTableProps) {
-  
- const { toast } = useToast();
+export function PostsTable({
+  posts,
+  onViewPost,
+  onAssignPost,
+  showAssignButton = false,
+  onPostDeleted,
+}: PostsTableProps) {
+  const { toast } = useToast();
 
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  const handleDelete = async (postId: string) => {
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const postsPerPage = 10;
 
-    if (deletingId) return; // Prevent multi-click madness
+  const completedPosts = useMemo(
+    () => posts.filter((post) => post.status === "completed"),
+    [posts]
+  );
+
+  const totalPages = Math.ceil(completedPosts.length / postsPerPage);
+
+  const paginatedPosts = useMemo(() => {
+    const startIndex = (currentPage - 1) * postsPerPage;
+    return completedPosts.slice(startIndex, startIndex + postsPerPage);
+  }, [completedPosts, currentPage]);
+
+  // If deleting/filtering causes the current page to disappear,
+  // move back to the last available page.
+  useEffect(() => {
+    if (currentPage > totalPages && totalPages > 0) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
+
+  const handleDelete = async (postId: string) => {
+    if (deletingId) return;
 
     try {
       setDeletingId(postId);
@@ -48,11 +89,8 @@ export function PostsTable({ posts, onViewPost, onAssignPost, showAssignButton =
         description: "The post and related analysis were removed successfully.",
       });
 
-      
-      onPostDeleted?.(postId); 
-
+      onPostDeleted?.(postId);
     } catch (error) {
-
       console.error(error);
 
       toast({
@@ -60,7 +98,6 @@ export function PostsTable({ posts, onViewPost, onAssignPost, showAssignButton =
         title: "Deletion failed",
         description: "Something went wrong while deleting the post.",
       });
-
     } finally {
       setDeletingId(null);
     }
@@ -77,7 +114,6 @@ export function PostsTable({ posts, onViewPost, onAssignPost, showAssignButton =
     if (agreement > 40) return "text-amber-600";
     return "text-red-600";
   };
-const completedPosts = posts.filter((post) => post.status === "completed");
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
@@ -93,8 +129,9 @@ const completedPosts = posts.filter((post) => post.status === "completed");
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
+
         <TableBody>
-          {completedPosts.map((post, index) => (
+          {paginatedPosts.map((post, index) => (
             <motion.tr
               key={post.id}
               initial={{ opacity: 0, y: 20 }}
@@ -104,7 +141,10 @@ const completedPosts = posts.filter((post) => post.status === "completed");
             >
               <TableCell>
                 <div>
-                  <div className="text-gray-900 max-w-[200px] ">{post.post_text?.content}</div>
+                  <div className="text-gray-900 max-w-[200px]">
+                    {post.post_text?.content}
+                  </div>
+
                   {post.campaignName && (
                     <div className="text-xs text-gray-500 mt-1">
                       Campaign: {post.campaignName}
@@ -112,18 +152,27 @@ const completedPosts = posts.filter((post) => post.status === "completed");
                   )}
                 </div>
               </TableCell>
-              <TableCell className="text-gray-600">{post.date}</TableCell>
+
+              <TableCell className="text-gray-600">
+                {post.date}
+              </TableCell>
+
               <TableCell>
                 <span className={getSentimentColor(post.sentiment)}>
                   {post.sentiment}%
                 </span>
               </TableCell>
+
               <TableCell>
                 <span className={getAgreementColor(post.agreement)}>
                   {post.agreement}%
                 </span>
               </TableCell>
-              <TableCell className="text-gray-900">{post.url}</TableCell>
+
+              <TableCell className="text-gray-900">
+                {post.url}
+              </TableCell>
+
               <TableCell>
                 <Badge
                   variant={
@@ -137,6 +186,7 @@ const completedPosts = posts.filter((post) => post.status === "completed");
                   {post.status}
                 </Badge>
               </TableCell>
+
               <TableCell className="text-right">
                 <div className="flex items-center justify-end gap-2">
                   {showAssignButton && onAssignPost && (
@@ -148,19 +198,24 @@ const completedPosts = posts.filter((post) => post.status === "completed");
                       <FolderPlus className="w-4 h-4" />
                     </Button>
                   )}
+
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => onViewPost(post.id)}
                   >
-                    View <ExternalLink className="w-4 h-4 ml-2" />
+                    View
+                    <ExternalLink className="w-4 h-4 ml-2" />
                   </Button>
+
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => deletePost(post.id)}
+                    disabled={deletingId === post.id}
+                    onClick={() => handleDelete(post.id)}
                   >
-                    Delete <Trash2 className="w-4 h-4 ml-2" />
+                    {deletingId === post.id ? "Deleting..." : "Delete"}
+                    <Trash2 className="w-4 h-4 ml-2" />
                   </Button>
                 </div>
               </TableCell>
@@ -168,6 +223,53 @@ const completedPosts = posts.filter((post) => post.status === "completed");
           ))}
         </TableBody>
       </Table>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200">
+          <div className="text-sm text-gray-500">
+            Showing{" "}
+            {(currentPage - 1) * postsPerPage + 1}–
+            {Math.min(
+              currentPage * postsPerPage,
+              completedPosts.length
+            )}{" "}
+            of {completedPosts.length} posts
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={currentPage === 1}
+              onClick={() =>
+                setCurrentPage((page) => Math.max(1, page - 1))
+              }
+            >
+              <ChevronLeft className="w-4 h-4 mr-1" />
+              Previous
+            </Button>
+
+            <span className="text-sm text-gray-600 px-2">
+              Page {currentPage} of {totalPages}
+            </span>
+
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={currentPage === totalPages}
+              onClick={() =>
+                setCurrentPage((page) =>
+                  Math.min(totalPages, page + 1)
+                )
+              }
+            >
+              Next
+              <ChevronRight className="w-4 h-4 ml-1" />
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

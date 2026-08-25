@@ -55,7 +55,7 @@ const [showPromoMenu, setShowPromoMenu] = useState(false);
         { id: "dashboard" as const, label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
         { id: "analyses" as const, label: "Analyses", icon: FileText, path: "/analytics-list/personal" },
    /* { id: "analytics" as const, label: "Analytics", icon: BarChart3, path: "/analytics" },*/
-    { id: "promos" as const, label: "Promos", icon: Gift, hasSubmenu: true },
+   /* { id: "promos" as const, label: "Promos", icon: Gift, hasSubmenu: true },*/
     { id: "notifications" as const, label: "Notifications", icon: Bell, path: "/notifications" },
     { id: "messaging" as const, label: "Messages", icon: MessageSquare, path: "/messages" },
 

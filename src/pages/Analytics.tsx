@@ -257,11 +257,12 @@ const sentiment = data.statistics?.sentiment_distribution || {};
       />
 
       {/* AI Chat Panel - Floating */}
-      <AIChatPanel
-        postContent={data}
-        replies={allReplies}
-        postUsername="techvisionary"
-      />
+     <AIChatPanel
+  mode="post"
+  postContent={data}
+  replies={allReplies}
+  postUsername="techvisionary"
+/>
     </div>
   );
 }

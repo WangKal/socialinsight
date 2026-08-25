@@ -657,12 +657,13 @@ export const deletePost = async (postId: string) => {
   return data;
 };
 
-export const AIHistory= async (userId: string,postId: string) => {
+export const AIHistory= async (userId: string,postId: string, type: string) => {
 
  const jwt = localStorage.getItem("internal_jwt") || "";
  const payload = {
     user_id: userId,
-    post_id:postId
+    post_id:postId,
+    type:type,
   };
   try {
   const res = await fetch(`https://socialinsightbackend.onrender.com/api/insights/ai_chat_history/`, {
@@ -687,11 +688,17 @@ export const AIHistory= async (userId: string,postId: string) => {
 
 
 export interface AIResponse {
-  text: string;
-  replyMentions: Reply[];
+  chat_id?: string;
+  answer: string;
+  reply_mentions: string[];
+  mention_usernames?: string[];
 }
 
-export const fetchAIResponse = async (userId: string, question: string, postId: string): Promise<AIResponse> => {
+export const fetchAIResponse = async (
+  userId: string,
+  question: string,
+  postId: string
+): Promise<AIResponse> => {
  
  const jwt = localStorage.getItem("internal_jwt") || "";
  const payload = {
@@ -719,6 +726,54 @@ export const fetchAIResponse = async (userId: string, question: string, postId: 
     return { text: "Sorry, I couldn't get a response. Try again.", replyMentions: [] };
   }
 };
+
+export interface CampaignAIResponse {
+  answer: string;
+  evidence: {
+    post_id?: string;
+    reply_id?: string;
+    type: "campaign" | "post" | "reply" | "external";
+    description: string;
+  }[];
+  external_context_used: boolean;
+  mode: string;
+  tokens_used?: number;
+}
+
+export const fetchCampaignAIResponse = async (
+  userId:string,
+  campaignId: string,
+  question: string,
+  history: any[] = []
+): Promise<CampaignAIResponse> => {
+  const jwt = localStorage.getItem("internal_jwt") || "";
+
+  const payload = {
+    user_id: userId,
+    campaign_id: campaignId,
+    question,
+    history,
+  };
+
+  const res = await fetch(
+    `https://socialinsightbackend.onrender.com/api/insights/campaign_chat/`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${jwt}`,
+      },
+      body: JSON.stringify({ data: [payload] }),
+    }
+  );
+
+  if (!res.ok) {
+    throw new Error(`Backend error: ${res.statusText}`);
+  }
+
+  return res.json();
+};
+
 
 export async function trackHomeView() {
   await supabase.rpc("increment_page_view", {
@@ -1550,4 +1605,23 @@ export async function checkXAccount(
   }
 
   return true;
+}
+export async function deleteCampaign(campaignId: number) {
+  const response = await fetch("https://socialinsightbackend.onrender.com/api/insights/delete_campaign/", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      campaign_id: campaignId,
+    }),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok || !data.success) {
+    throw new Error(data.error || "Failed to delete campaign");
+  }
+
+  return data;
 }
