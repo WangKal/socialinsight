@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { X, CalendarDays, CheckCircle2 } from "lucide-react";
-import { createConsultationRequest } from "@/services/socialecho";
+import { createConsultationRequest } from "@/services/socialEcho";
 
 type BookConsultationProps = {
   open: boolean;
