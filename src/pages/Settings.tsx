@@ -254,7 +254,7 @@ const handleResetPassword = async () => {
                   </div>
                   <div>
                     <Label htmlFor="confirm">Confirm New Password</Label>
-                    <Input id="confirm" type="password" className="mt-2"   type="password"
+                    <Input id="confirm" type="password" className="mt-2"   
                 placeholder="Confirm password"
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
