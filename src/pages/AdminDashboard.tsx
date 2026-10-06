@@ -1,7 +1,7 @@
 
 import { motion, AnimatePresence } from "motion/react";
 import { useNavigate } from "react-router-dom";
-import { Shield, Users, DollarSign, BarChart3, MessageSquare, Settings, Plus, X, Link as LinkIcon ,ClipboardList} from "lucide-react";
+import { Shield, Users, DollarSign, BarChart3, MessageSquare, Settings, Plus, X, Link as LinkIcon ,ClipboardList,CalendarDays} from "lucide-react";
 import { useState , useEffect } from "react";
 import { Button } from "../components/ui/button";
 import { AdminUserManagement } from "../components/AdminUserManagement";
@@ -9,6 +9,7 @@ import { AdminPayments } from "../components/AdminPayments";
 import { AdminManagement } from "../components/AdminManagement";
 import { AdminRequests } from "../components/AdminRequests";
 import { DailySOP } from "../components/DailySOP";
+import { AdminConsultations } from "../components/AdminConsultations";
 import {useAuth } from "@/hooks/use-auth"
 
 import { useQuery } from "@tanstack/react-query";
@@ -20,7 +21,7 @@ import {
 } from "@/services/socialEcho";
 
 
-type TabType = "overview" | "users" | "payments" | "admins" | "requests";
+type TabType = "overview" | "users" | "payments" | "admins" | "requests" | "consultations";;
 
 interface AddCreditsDialogProps {
   isOpen: boolean;
@@ -317,6 +318,7 @@ useEffect(() => {
             { id: "admins", label: "Admins", icon: Shield },
             { id: "requests", label: "Requests", icon: LinkIcon },
             { id: "sops", label: "Daily Sop", icon: ClipboardList },
+            {id: "consultations", label: "Consultations", icon: CalendarDays},
           ].map((tab) => {
             const Icon = tab.icon;
             return (
@@ -438,6 +440,9 @@ useEffect(() => {
           {currentTab === "sops" && (
             <DailySOP />
           )}
+          {currentTab === "consultations" && (
+  <AdminConsultations />
+)}
         </motion.div>
       </div>
 

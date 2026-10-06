@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { AuthButtons } from "@/components/AuthButtons";
 import { useAuth } from "@/hooks/use-auth";
 import { Link, useNavigate } from "react-router-dom";
+import BookConsultation from "@/components/BookConsultation";
 // ─── Data ───────────────────────────────────────────────────────────────────
 
 const problems = [
@@ -523,9 +524,16 @@ function UseCases() {
   )
 }
 
+
 // ─── Footer CTA ────────────────────────────────────────────────────────────────
 
-function FooterCTA() {
+function FooterCTA({
+  onBookConsultation,
+}: {
+  onBookConsultation: () => void
+}) {
+  const currentYear = new Date().getFullYear()
+
   return (
     <section className="py-28" style={{ backgroundColor: '#222222' }}>
       <div className="max-w-6xl mx-auto px-6 text-center flex flex-col items-center gap-8">
@@ -535,100 +543,161 @@ function FooterCTA() {
         >
           S
         </div>
+
         <h2
           className="text-4xl lg:text-5xl font-bold tracking-tight max-w-2xl leading-tight"
           style={{ color: '#F7F7F7' }}
         >
           Stop operating in the blind.
         </h2>
+
         <p className="text-lg max-w-xl" style={{ color: '#AAAAAA' }}>
-          Uncover the narrative ground-truth today. Your public has been speaking. It's time to actually listen.
+          Uncover the narrative ground-truth today. Your public has been
+          speaking. It's time to actually listen.
         </p>
+
         <button
+          type="button"
+          onClick={onBookConsultation}
           className="px-8 py-4 rounded-full text-sm font-semibold transition-all duration-200 hover:opacity-90 active:scale-95"
-          style={{ backgroundColor: '#C2622A', color: '#FFFFFF' }}
+          style={{
+            backgroundColor: '#C2622A',
+            color: '#FFFFFF',
+          }}
         >
           Book a Consultation
         </button>
-        <p className="text-xs" style={{ color: '#555555' }}>
-          © 2024 SocialInsight. All rights reserved.
+
+        <p
+          className="text-xs text-center"
+          style={{ color: '#999999' }}
+        >
+          © {currentYear} SocialInsight. All rights reserved.{' '}
+          <a
+            href="/terms"
+            className="underline hover:opacity-80"
+          >
+            Terms & Conditions
+          </a>
         </p>
       </div>
     </section>
   )
 }
 
+
 // ─── App ──────────────────────────────────────────────────────────────────────
 
 export default function Landing() {
+  const navigate = useNavigate()
 
-  const navigate = useNavigate();
+  const [consultationOpen, setConsultationOpen] = useState(false)
+
+  const onBookConsultation = () => {
+    setConsultationOpen(true)
+  }
 
 
+  // ─── Nav ────────────────────────────────────────────────────────────────────
 
+  function Nav() {
+    const [scrolled, setScrolled] = useState(false)
 
-// ─── Nav ─────────────────────────────────────────────────────────────────────
+    useEffect(() => {
+      const onScroll = () => setScrolled(window.scrollY > 20)
 
-function Nav() {
-  const [scrolled, setScrolled] = useState(false)
+      window.addEventListener('scroll', onScroll)
 
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20)
-    window.addEventListener('scroll', onScroll)
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
+      return () => {
+        window.removeEventListener('scroll', onScroll)
+      }
+    }, [])
 
-  return (
-    <nav
-      className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
-      style={{
-        backgroundColor: scrolled ? 'rgba(247,247,247,0.95)' : 'transparent',
-        backdropFilter: scrolled ? 'blur(12px)' : 'none',
-        borderBottom: scrolled ? '1px solid #E5E5E5' : '1px solid transparent',
-      }}
-    >
-      <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="w-11 h-11 rounded-xl  flex items-center justify-center shadow-lg shadow-primary/25 group-hover:shadow-primary/40 transition-shadow">
-              <img src="/images/SocialInsightLogo.png" alt="Logo" /> </div>
-          <span className="font-semibold text-base tracking-tight" style={{ color: '#222222' }}>
-            SocialInsight
-          </span>
-        </div>
-        <div className="flex items-center gap-4">
-          <a href="#use-cases" className="text-sm font-medium" style={{ color: '#888888' }}>
-            Use Cases
-          </a>
-          <a href="#audiences" className="text-sm font-medium" style={{ color: '#888888' }}>
-            Who It's For
-          </a>
-         {/**} <button
-            className="text-sm font-semibold px-4 py-2 rounded-full transition-all duration-200 hover:opacity-90 active:scale-95"
-            style={{ backgroundColor: '#222222', color: '#F7F7F7' }}
-          >
-            Request Audit
-          </button>**/}
+    return (
+      <nav
+        className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
+        style={{
+          backgroundColor: scrolled
+            ? 'rgba(247,247,247,0.95)'
+            : 'transparent',
+          backdropFilter: scrolled ? 'blur(12px)' : 'none',
+          borderBottom: scrolled
+            ? '1px solid #E5E5E5'
+            : '1px solid transparent',
+        }}
+      >
+        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-11 h-11 rounded-xl flex items-center justify-center shadow-lg shadow-primary/25 group-hover:shadow-primary/40 transition-shadow">
+              <img
+                src="/images/SocialInsightLogo.png"
+                alt="Logo"
+              />
+            </div>
 
-          <div className="flex items-center gap-3">
-            <AuthButtons/>
+            <span
+              className="font-semibold text-base tracking-tight"
+              style={{ color: '#222222' }}
+            >
+              SocialInsight
+            </span>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <a
+              href="#use-cases"
+              className="text-sm font-medium"
+              style={{ color: '#888888' }}
+            >
+              Use Cases
+            </a>
+
+            <a
+              href="#audiences"
+              className="text-sm font-medium"
+              style={{ color: '#888888' }}
+            >
+              Who It's For
+            </a>
+
+            <div className="flex items-center gap-3">
+              <AuthButtons />
+            </div>
           </div>
         </div>
-      </div>
-    </nav>
-  )
-}
+      </nav>
+    )
+  }
 
 
+  // ─── Render ─────────────────────────────────────────────────────────────────
 
   return (
-    <div style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}>
+    <div
+      style={{
+        fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+      }}
+    >
       <Nav />
+
       <Hero />
+
       <CoreProblem />
+
       <WhatWeDo />
+
       <Audiences />
+
       <UseCases />
-      <FooterCTA />
+
+      <FooterCTA
+        onBookConsultation={onBookConsultation}
+      />
+
+      <BookConsultation
+        open={consultationOpen}
+        onClose={() => setConsultationOpen(false)}
+      />
     </div>
   )
 }

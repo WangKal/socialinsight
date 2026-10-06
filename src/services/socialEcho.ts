@@ -663,7 +663,7 @@ export const AIHistory= async (userId: string,postId: string, type: string) => {
  const payload = {
     user_id: userId,
     post_id:postId,
-    type:type,
+    type:type
   };
   try {
   const res = await fetch(`https://socialinsightbackend.onrender.com/api/insights/ai_chat_history/`, {
@@ -707,7 +707,7 @@ export const fetchAIResponse = async (
     postId:postId
   };
   try {
-  const res = await fetch(`https://socialinsightbackend.onrender.com/api/insights/ai_chat/`, {
+  const res = await fetch(`https://127.0.0.1:8000/api/insights/ai_chat/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -756,7 +756,7 @@ export const fetchCampaignAIResponse = async (
   };
 
   const res = await fetch(
-    `https://socialinsightbackend.onrender.com/api/insights/campaign_chat/`,
+    `http://127.0.0.1:8000/api/insights/campaign_chat/`,
     {
       method: "POST",
       headers: {
@@ -1607,7 +1607,7 @@ export async function checkXAccount(
   return true;
 }
 export async function deleteCampaign(campaignId: number) {
-  const response = await fetch("https://socialinsightbackend.onrender.com/api/insights/delete_campaign/", {
+  const response = await fetch("http://127.0.0.1:8000/api/insights/delete_campaign/", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -1624,4 +1624,447 @@ export async function deleteCampaign(campaignId: number) {
   }
 
   return data;
+}
+
+// ============================================================
+// CONSULTATION REQUESTS
+// ============================================================
+
+export async function createConsultationRequest({
+  name,
+  email,
+  phone,
+  organisation,
+  job_title,
+  country,
+  consultation_type,
+  message,
+  preferred_date,
+  preferred_time,
+  source = "website",
+  source_page = "/",
+  metadata = {},
+}: {
+  name: string;
+  email: string;
+  phone?: string;
+  organisation?: string;
+  job_title?: string;
+  country?: string;
+  consultation_type?: string;
+  message?: string;
+  preferred_date?: string;
+  preferred_time?: string;
+  source?: string;
+  source_page?: string;
+  metadata?: Record<string, unknown>;
+}) {
+  const { data, error } = await supabase
+    .from("consultation_requests")
+    .insert({
+      name,
+      email,
+      phone: phone || null,
+      organisation: organisation || null,
+      job_title: job_title || null,
+      country: country || null,
+      consultation_type: consultation_type || null,
+      message: message || null,
+      preferred_date: preferred_date || null,
+      preferred_time: preferred_time || null,
+      source,
+      source_page,
+      metadata,
+    })
+    .select()
+    .single();
+
+  if (error) {
+    console.error(
+      "[Consultation] Failed to create request:",
+      error
+    );
+
+    throw new Error("Failed to submit consultation request.");
+  }
+
+  return data;
+}
+
+
+// ============================================================
+// GET ALL CONSULTATION REQUESTS
+// ============================================================
+
+export async function getConsultationRequests({
+  status,
+  consultationType,
+  search,
+  limit = 100,
+  offset = 0,
+}: {
+  status?: string;
+  consultationType?: string;
+  search?: string;
+  limit?: number;
+  offset?: number;
+} = {}) {
+  let query = supabase
+    .from("consultation_requests")
+    .select("*", { count: "exact" })
+    .order("created_at", { ascending: false })
+    .range(offset, offset + limit - 1);
+
+  if (status && status !== "all") {
+    query = query.eq("status", status);
+  }
+
+  if (consultationType && consultationType !== "all") {
+    query = query.eq("consultation_type", consultationType);
+  }
+
+  if (search?.trim()) {
+    const value = search.trim();
+
+    query = query.or(
+      `name.ilike.%${value}%,email.ilike.%${value}%,organisation.ilike.%${value}%`
+    );
+  }
+
+  const { data, error, count } = await query;
+
+  if (error) {
+    console.error(
+      "[Consultation] Failed to fetch requests:",
+      error
+    );
+
+    throw new Error("Failed to fetch consultation requests.");
+  }
+
+  return {
+    data: data || [],
+    count: count || 0,
+  };
+}
+
+
+// ============================================================
+// GET SINGLE CONSULTATION REQUEST
+// ============================================================
+
+export async function getConsultationRequest(id: string) {
+  if (!id) {
+    throw new Error("Consultation request ID is required.");
+  }
+
+  const { data, error } = await supabase
+    .from("consultation_requests")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (error) {
+    console.error(
+      "[Consultation] Failed to fetch request:",
+      error
+    );
+
+    throw new Error("Failed to fetch consultation request.");
+  }
+
+  return data;
+}
+
+
+// ============================================================
+// UPDATE CONSULTATION REQUEST
+// ============================================================
+
+export async function updateConsultationRequest(
+  id: string,
+  updates: {
+    status?: string;
+    admin_notes?: string | null;
+    assigned_to?: string | null;
+
+    // Response tracking
+    responded_at?: string | null;
+
+    // Scheduling
+    scheduled_at?: string | null;
+
+    // Completion
+    completed_at?: string | null;
+
+    // Onboarding
+    onboarded_at?: string | null;
+
+    // Optional workflow fields
+    response_notes?: string | null;
+    meeting_notes?: string | null;
+
+    // Allows future workflow metadata without
+    // changing this function.
+    metadata?: Record<string, unknown>;
+  }
+) {
+  if (!id) {
+    throw new Error("Consultation request ID is required.");
+  }
+
+  if (!updates || Object.keys(updates).length === 0) {
+    throw new Error("No consultation updates were provided.");
+  }
+
+  const { data, error } = await supabase
+    .from("consultation_requests")
+    .update({
+      ...updates,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error(
+      "[Consultation] Failed to update request:",
+      error
+    );
+
+    throw new Error("Failed to update consultation request.");
+  }
+
+  return data;
+}
+
+
+// ============================================================
+// MARK AS RESPONDED
+// ============================================================
+
+export async function markConsultationResponded(
+  id: string,
+  responseNotes?: string
+) {
+  if (!id) {
+    throw new Error("Consultation request ID is required.");
+  }
+
+  const now = new Date().toISOString();
+
+  const { data, error } = await supabase
+    .from("consultation_requests")
+    .update({
+      status: "responded",
+      responded_at: now,
+      response_notes: responseNotes || null,
+      updated_at: now,
+    })
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error(
+      "[Consultation] Failed to mark request as responded:",
+      error
+    );
+
+    throw new Error(
+      "Failed to mark consultation request as responded."
+    );
+  }
+
+  return data;
+}
+
+
+// ============================================================
+// SCHEDULE CONSULTATION
+// ============================================================
+
+export async function scheduleConsultation(
+  id: string,
+  scheduledAt: string,
+  meetingNotes?: string
+) {
+  if (!id) {
+    throw new Error("Consultation request ID is required.");
+  }
+
+  if (!scheduledAt) {
+    throw new Error("Scheduled consultation time is required.");
+  }
+
+  const now = new Date().toISOString();
+
+  const { data, error } = await supabase
+    .from("consultation_requests")
+    .update({
+      status: "scheduled",
+      scheduled_at: scheduledAt,
+      meeting_notes: meetingNotes || null,
+      updated_at: now,
+    })
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error(
+      "[Consultation] Failed to schedule consultation:",
+      error
+    );
+
+    throw new Error("Failed to schedule consultation.");
+  }
+
+  return data;
+}
+
+
+// ============================================================
+// MARK CONSULTATION COMPLETED
+// ============================================================
+
+export async function markConsultationCompleted(
+  id: string,
+  meetingNotes?: string
+) {
+  if (!id) {
+    throw new Error("Consultation request ID is required.");
+  }
+
+  const now = new Date().toISOString();
+
+  const { data, error } = await supabase
+    .from("consultation_requests")
+    .update({
+      status: "completed",
+      completed_at: now,
+      meeting_notes: meetingNotes || null,
+      updated_at: now,
+    })
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error(
+      "[Consultation] Failed to complete consultation:",
+      error
+    );
+
+    throw new Error("Failed to mark consultation as completed.");
+  }
+
+  return data;
+}
+
+
+// ============================================================
+// MARK CONSULTATION ONBOARDED
+// ============================================================
+
+export async function markConsultationOnboarded(
+  id: string,
+  onboardingNotes?: string
+) {
+  if (!id) {
+    throw new Error("Consultation request ID is required.");
+  }
+
+  const now = new Date().toISOString();
+
+  const { data, error } = await supabase
+    .from("consultation_requests")
+    .update({
+      status: "onboarded",
+      onboarded_at: now,
+      meeting_notes: onboardingNotes || null,
+      updated_at: now,
+    })
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error(
+      "[Consultation] Failed to mark request as onboarded:",
+      error
+    );
+
+    throw new Error(
+      "Failed to mark consultation request as onboarded."
+    );
+  }
+
+  return data;
+}
+
+
+// ============================================================
+// REJECT CONSULTATION REQUEST
+// ============================================================
+
+export async function rejectConsultationRequest(
+  id: string,
+  reason?: string
+) {
+  if (!id) {
+    throw new Error("Consultation request ID is required.");
+  }
+
+  const now = new Date().toISOString();
+
+  const { data, error } = await supabase
+    .from("consultation_requests")
+    .update({
+      status: "rejected",
+      admin_notes: reason || null,
+      updated_at: now,
+    })
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error(
+      "[Consultation] Failed to reject request:",
+      error
+    );
+
+    throw new Error("Failed to reject consultation request.");
+  }
+
+  return data;
+}
+
+
+// ============================================================
+// DELETE CONSULTATION REQUEST
+// ============================================================
+
+export async function deleteConsultationRequest(id: string) {
+  if (!id) {
+    throw new Error("Consultation request ID is required.");
+  }
+
+  const { error } = await supabase
+    .from("consultation_requests")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    console.error(
+      "[Consultation] Failed to delete request:",
+      error
+    );
+
+    throw new Error("Failed to delete consultation request.");
+  }
+
+  return true;
 }

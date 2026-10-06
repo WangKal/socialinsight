@@ -40,11 +40,11 @@ interface LayoutProps {
 const navigation = [
 { name: "Home", href: "/", icon: Home },
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Analytics", href: "/analytics", icon: BarChart3 },
+  /*{ name: "Analytics", href: "/analytics", icon: BarChart3 },
   { name: "Tutorial", href: "/guide", icon: BookOpen },
   { name: "Messages", href: "/messages", icon: MessageCircle},
-  { name: "Notifications", href: "/notifications", icon: Bell },
-  { name: "Payments", href: "/payments", icon: CreditCard },
+  { name: "Notifications", href: "/notifications", icon: Bell },*/
+  { name: "Balance", href: "/payments", icon: CreditCard },
   { name: "Settings", href: "/settings", icon: Settings },
 ];
 
@@ -55,6 +55,7 @@ export function Layout({ children }: LayoutProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [consultationOpen, setConsultationOpen] = useState(false);
   const [userName, setUserName] = useState("")
   const [credits, setCredits] =useState(0)
   const {user,signIn,signOut} = useAuth();
