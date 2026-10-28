@@ -6,60 +6,63 @@
 
 @layer base {
   :root {
-    --background: 210 20% 98%;
-    --foreground: 220 30% 15%;
+    --background: 0 0% 97%;
+    --foreground: 0 0% 13%;
 
     --card: 0 0% 100%;
-    --card-foreground: 220 30% 15%;
+    --card-foreground: 0 0% 13%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 30% 15%;
+    --popover-foreground: 0 0% 13%;
 
-    --primary: 213 72% 59%;
+    --primary: 22 64% 46%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 25% 95%;
-    --secondary-foreground: 220 20% 35%;
+    --secondary: 24 38% 94%;
+    --secondary-foreground: 0 0% 20%;
 
-    --muted: 210 20% 96%;
-    --muted-foreground: 215 15% 47%;
+    --muted: 0 0% 95%;
+    --muted-foreground: 0 0% 40%;
 
-    --accent: 174 62% 47%;
+    --accent: 17 75% 63%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 214 25% 90%;
-    --input: 214 25% 90%;
-    --ring: 213 72% 59%;
+    --border: 0 0% 90%;
+    --input: 0 0% 83%;
+    --ring: 22 64% 46%;
 
-    --radius: 0.75rem;
+    --radius: 1rem;
 
     /* Glow / feature colors */
-    --glow-primary: 213 72% 59%;
+    --glow-primary: 22 64% 46%;
     --glow-emerald: 160 84% 39%;
-    --glow-blue: 213 72% 59%;
+    --glow-blue: 22 64% 46%;
     --glow-rose: 350 89% 60%;
     --glow-amber: 38 92% 50%;
-    --glow-cyan: 174 62% 47%;
-    --glow-violet: 258 90% 66%;
+    --glow-cyan: 17 75% 63%;
+    --glow-violet: 22 64% 46%;
 
-    --gradient-primary: linear-gradient(135deg, hsl(213 72% 59%), hsl(174 62% 47%));
-    --gradient-hero: linear-gradient(135deg, hsl(213 72% 59%), hsl(258 70% 60%), hsl(174 62% 47%));
-    --gradient-promo: linear-gradient(135deg, hsl(258 70% 60%), hsl(213 72% 59%));
+    --gradient-primary: linear-gradient(135deg, hsl(22 64% 46%), hsl(17 75% 63%));
+    --gradient-hero: linear-gradient(135deg, hsl(22 64% 46%), hsl(17 75% 63%), hsl(22 64% 38%));
+    --gradient-promo: linear-gradient(135deg, hsl(22 64% 46%), hsl(17 75% 63%));
 
-    --shadow-glow: 0 8px 40px -8px hsl(213 72% 59% / 0.25);
-    --shadow-card: 0 1px 4px hsl(0 0% 0% / 0.08), 0 8px 24px hsl(0 0% 0% / 0.06);
+    --shadow-glow: 0 8px 40px -8px hsl(22 64% 46% / 0.24);
+    --shadow-card: 0 1px 3px hsl(0 0% 0% / 0.06), 0 12px 30px hsl(22 30% 20% / 0.07);
+    --shadow-sm: 0 1px 3px hsl(0 0% 0% / 0.06);
+    --shadow-md: 0 8px 22px hsl(22 30% 20% / 0.08);
+    --shadow-lg: 0 18px 44px hsl(22 30% 20% / 0.12);
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 220 20% 35%;
-    --sidebar-primary: 213 72% 59%;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 0 0% 33%;
+    --sidebar-primary: 22 64% 46%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 210 25% 95%;
-    --sidebar-accent-foreground: 220 20% 35%;
-    --sidebar-border: 214 25% 90%;
-    --sidebar-ring: 213 72% 59%;
+    --sidebar-accent: 24 38% 94%;
+    --sidebar-accent-foreground: 0 0% 20%;
+    --sidebar-border: 0 0% 90%;
+    --sidebar-ring: 22 64% 46%;
   }
 
   .dark {
@@ -124,11 +127,17 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    text-rendering: optimizeLegibility;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Plus Jakarta Sans', sans-serif;
+    letter-spacing: -0.025em;
+  }
+
+  ::selection {
+    @apply bg-primary/20 text-foreground;
   }
 }
 

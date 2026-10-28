@@ -7,7 +7,6 @@ import {
   History,
   Settings,
   CreditCard,
-  TrendingUp,
   Menu,
   X,
   User,
@@ -170,13 +169,17 @@ export function Layout({ children }: LayoutProps) {
   return (
     <div className="min-h-screen bg-background flex">
       {/* Desktop Sidebar - Hidden on mobile */}
-      <aside className="hidden lg:flex w-64 bg-card border-r border-border flex-col">
+      <aside className="hidden lg:flex w-72 bg-card border-r border-border flex-col">
         <div className="p-6 border-b border-border">
-          <div className="flex items-center gap-2">
-            <TrendingUp className="w-8 h-8 text-primary" />
+          <div className="flex items-center gap-3">
+            <img
+              src="/images/SocialInsightLogo.png"
+              alt="SocialInsight"
+              className="w-11 h-11 rounded-xl object-contain"
+            />
             <div>
-              <h1 className="text-xl font-bold text-foreground">SocialInsight</h1>
-              <p className="text-xs text-muted-foreground">Analytics Platform</p>
+              <h1 className="text-lg font-bold tracking-tight text-foreground">SocialInsight</h1>
+              <p className="text-xs text-muted-foreground">Ground-truth intelligence</p>
             </div>
           </div>
         </div>
@@ -186,8 +189,8 @@ export function Layout({ children }: LayoutProps) {
         </nav>
 
         <div className="p-4 border-t border-border">
-          <div className="px-4 py-3 bg-muted rounded-lg">
-            <p className="text-xs text-muted-foreground mb-1">Credits Remaining</p>
+          <div className="px-4 py-4 bg-secondary rounded-xl border border-primary/10">
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">Credits remaining</p>
             <p className="text-2xl font-bold text-foreground">{credits.remaining_credits}</p>
           </div>
         </div>
@@ -196,10 +199,14 @@ export function Layout({ children }: LayoutProps) {
       </aside>
 
       {/* Mobile Header */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-card border-b border-border">
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-xl border-b border-border">
         <div className="flex items-center justify-between p-4">
-          <div className="flex items-center gap-2">
-            <TrendingUp className="w-6 h-6 text-primary" />
+          <div className="flex items-center gap-3">
+            <img
+              src="/images/SocialInsightLogo.png"
+              alt="SocialInsight"
+              className="w-9 h-9 rounded-lg object-contain"
+            />
             <h1 className="text-lg font-bold text-foreground">SocialInsight</h1>
           </div>
 
@@ -212,11 +219,15 @@ export function Layout({ children }: LayoutProps) {
             <SheetContent side="right" className="w-80 p-0">
               <div className="flex flex-col h-full">
                 <div className="p-6 border-b border-border">
-                  <div className="flex items-center gap-2">
-                    <TrendingUp className="w-8 h-8 text-primary" />
+                  <div className="flex items-center gap-3">
+                    <img
+                      src="/images/SocialInsightLogo.png"
+                      alt="SocialInsight"
+                      className="w-11 h-11 rounded-xl object-contain"
+                    />
                     <div>
-                      <h1 className="text-xl font-bold text-foreground">Analytics</h1>
-                      <p className="text-xs text-muted-foreground">Insight Platform</p>
+                      <h1 className="text-xl font-bold text-foreground">SocialInsight</h1>
+                      <p className="text-xs text-muted-foreground">Ground-truth intelligence</p>
                     </div>
                   </div>
                 </div>
@@ -226,8 +237,8 @@ export function Layout({ children }: LayoutProps) {
                 </nav>
 
                 <div className="p-4 border-t border-border">
-                  <div className="px-4 py-3 bg-muted rounded-lg">
-                    <p className="text-xs text-muted-foreground mb-1">Credits Remaining</p>
+                  <div className="px-4 py-4 bg-secondary rounded-xl border border-primary/10">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">Credits remaining</p>
                     <p className="text-2xl font-bold text-foreground">{credits.remaining_credits}</p>
                   </div>
                 </div>
@@ -240,7 +251,7 @@ export function Layout({ children }: LayoutProps) {
       </div>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-auto lg:pt-0 pt-16">
+      <main className="flex-1 overflow-auto lg:pt-0 pt-16 bg-background">
         {children}
          <PageSwitcher />
       </main>
