@@ -5,7 +5,6 @@ import { useState, useMemo } from "react";
 interface Reply {
   id: string;
   content: string;
-  username: string;
   sentiment: string;
   agreement: string;
   tone: string;
@@ -30,15 +29,13 @@ export function RepliesSection({ replies }: RepliesSectionProps) {
     return safeReplies.filter((reply) => {
       const agreement = reply.agreement?.toLowerCase() || "";
       const content = reply.content?.toLowerCase() || "";
-      const username = reply.username?.toLowerCase() || "";
 
       const matchesFilter =
         activeFilter === "all" || agreement === activeFilter;
 
       const matchesSearch =
         term === "" ||
-        content.includes(term) ||
-        username.includes(term);
+        content.includes(term);
 
       return matchesFilter && matchesSearch;
     });
@@ -141,7 +138,7 @@ function groupDuplicateReplies(replies) {
       {/* Explanation */}
       <p className="text-sm text-gray-600 mb-6">
         Browse every reply individually. Use filters and search to quickly find
-        opinions, patterns, or specific users.
+        opinions or patterns.
       </p>
 
       {/* Search */}
@@ -150,7 +147,7 @@ function groupDuplicateReplies(replies) {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
           <input
             type="text"
-            placeholder="Search by user or reply text…"
+            placeholder="Search reply text…"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
@@ -197,17 +194,9 @@ function groupDuplicateReplies(replies) {
                   reply.agreement
                 )} bg-white hover:shadow-md transition-shadow`}
               >
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-400 to-purple-500 flex items-center justify-center text-white flex-shrink-0">
-                    {reply.username?.[0]?.toUpperCase() || "U"}
-                  </div>
-
+                <div className="flex items-start">
                   <div className="flex-1 min-w-0">
-                    <div className="text-gray-900 font-medium break-words">
-                      {reply.username || "Unknown User"}
-                    </div>
-
-                    <p className="text-gray-700 mt-1 mb-3 break-words">
+                    <p className="text-gray-700 mb-3 break-words">
                       {reply.content || "No content"}
                     </p>
 

@@ -3,7 +3,6 @@ import { Hash, ChevronDown, ChevronUp, Users,Copy,Sparkles } from "lucide-react"
 import { useState } from "react";
 
 interface Reply {
-  displayName?: string;
   content: string;
   sentiment?: string;
   agreement?: string;
@@ -15,7 +14,7 @@ interface Cluster {
   topic: string;
   replies: Reply[];
   replyable?: boolean;
-  reply_suggestions?: { ai_reply: string; mention_list?: string };
+  reply_suggestions?: { ai_reply: string };
 }
 
 interface Group {
@@ -214,32 +213,6 @@ export function TopicClusters({ groups }: TopicClustersProps) {
                           </div>
                         )}
 
-                        {/* Mentions */}
-                        {cluster.reply_suggestions?.mention_list && (
-                          <div className="bg-white border rounded-lg p-3">
-                            <div className="flex justify-between items-center mb-1">
-                              <span className="text-xs font-semibold text-gray-600">
-                                People to mention
-                              </span>
-                              <button
-                                onClick={() =>
-                                  copyText(
-                                    cluster.reply_suggestions?.mention_list
-                                  )
-                                }
-                                className="flex items-center gap-1 text-xs text-violet-600 hover:underline"
-                              >
-                                <Copy className="w-3 h-3" />
-                                Copy all
-                              </button>
-                            </div>
-                            <p className="text-xs text-gray-700 break-all max-w-full">
-                              {cluster.reply_suggestions.mention_list}
-                            </p>
-                          </div>
-                        )}
-
-                  
                         <div className="p-4 space-y-3">
                           {cluster.replies.map((reply, replyIndex) => (
                             <motion.div
@@ -249,12 +222,8 @@ export function TopicClusters({ groups }: TopicClustersProps) {
                               transition={{ delay: replyIndex * 0.05 }}
                               className="bg-white rounded-lg p-4 border border-gray-200"
                             >
-                              <div className="flex items-start gap-3">
-                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-cyan-500 flex items-center justify-center text-white text-sm flex-shrink-0">
-                                  {reply.displayName?.[0] ?? "?"}
-                                </div>
+                              <div className="flex items-start">
                                 <div className="flex-1">
-                                  <div className="text-gray-900 mb-1">{reply.displayName}</div>
                                   <p className="text-gray-700 mb-3">{reply.content}</p>
                                   <div className="flex flex-wrap gap-2">
                                     <span
