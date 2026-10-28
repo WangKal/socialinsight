@@ -115,18 +115,27 @@ export function PostsTable({
     return "text-red-600";
   };
 
+  if (completedPosts.length === 0) {
+    return (
+      <div className="bg-card border border-dashed border-border rounded-2xl p-10 text-center">
+        <p className="text-sm font-medium text-foreground">No completed analyses yet</p>
+        <p className="text-sm text-muted-foreground mt-1">
+          Completed post analyses will appear here.
+        </p>
+      </div>
+    );
+  }
+
   return (
-    <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+    <div className="bg-card border border-border rounded-2xl overflow-hidden">
       <Table>
         <TableHeader>
-          <TableRow className="bg-gray-50">
-            <TableHead>Post Title</TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead>Sentiment</TableHead>
-            <TableHead>Agreement</TableHead>
-            <TableHead>Post Url</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
+          <TableRow className="bg-muted/60 hover:bg-muted/60">
+            <TableHead className="text-xs font-semibold uppercase tracking-wider">Post</TableHead>
+            <TableHead className="text-xs font-semibold uppercase tracking-wider">Analyzed</TableHead>
+            <TableHead className="text-xs font-semibold uppercase tracking-wider">Response</TableHead>
+            <TableHead className="text-xs font-semibold uppercase tracking-wider">Status</TableHead>
+            <TableHead className="text-xs font-semibold uppercase tracking-wider text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
 
@@ -137,40 +146,36 @@ export function PostsTable({
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
-              className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+              className="border-b border-border hover:bg-muted/30 transition-colors"
             >
               <TableCell>
                 <div>
-                  <div className="text-gray-900 max-w-[200px]">
+                  <div className="text-sm font-medium text-foreground max-w-sm line-clamp-2">
                     {post.post_text?.content}
                   </div>
 
                   {post.campaignName && (
-                    <div className="text-xs text-gray-500 mt-1">
+                    <div className="text-xs text-muted-foreground mt-1">
                       Campaign: {post.campaignName}
                     </div>
                   )}
                 </div>
               </TableCell>
 
-              <TableCell className="text-gray-600">
+              <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
                 {post.date}
               </TableCell>
 
               <TableCell>
-                <span className={getSentimentColor(post.sentiment)}>
-                  {post.sentiment}%
-                </span>
-              </TableCell>
-
-              <TableCell>
-                <span className={getAgreementColor(post.agreement)}>
-                  {post.agreement}%
-                </span>
-              </TableCell>
-
-              <TableCell className="text-gray-900">
-                {post.url}
+                <div className="flex items-center gap-3 text-xs whitespace-nowrap">
+                  <span className={getSentimentColor(post.sentiment)}>
+                    {post.sentiment}% sentiment
+                  </span>
+                  <span className="text-border">/</span>
+                  <span className={getAgreementColor(post.agreement)}>
+                    {post.agreement}% agreement
+                  </span>
+                </div>
               </TableCell>
 
               <TableCell>
@@ -188,7 +193,7 @@ export function PostsTable({
               </TableCell>
 
               <TableCell className="text-right">
-                <div className="flex items-center justify-end gap-2">
+                <div className="flex items-center justify-end gap-1">
                   {showAssignButton && onAssignPost && (
                     <Button
                       variant="ghost"
@@ -196,6 +201,7 @@ export function PostsTable({
                       onClick={() => onAssignPost(post.id)}
                     >
                       <FolderPlus className="w-4 h-4" />
+                      <span className="sr-only">Assign post</span>
                     </Button>
                   )}
 
@@ -205,7 +211,7 @@ export function PostsTable({
                     onClick={() => onViewPost(post.id)}
                   >
                     View
-                    <ExternalLink className="w-4 h-4 ml-2" />
+                    <ExternalLink className="w-4 h-4" />
                   </Button>
 
                   <Button
@@ -214,8 +220,10 @@ export function PostsTable({
                     disabled={deletingId === post.id}
                     onClick={() => handleDelete(post.id)}
                   >
-                    {deletingId === post.id ? "Deleting..." : "Delete"}
-                    <Trash2 className="w-4 h-4 ml-2" />
+                    <Trash2 className="w-4 h-4" />
+                    <span className="sr-only">
+                      {deletingId === post.id ? "Deleting post" : "Delete post"}
+                    </span>
                   </Button>
                 </div>
               </TableCell>

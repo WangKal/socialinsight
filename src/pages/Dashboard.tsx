@@ -9,12 +9,10 @@ import { AssignPostDialog } from "@/components/AssignPostDialog";
 import { AddLinkDialog } from "@/components/analytics/AddLinkDialog";
 import { SearchDialog } from "@/components/analytics/SearchDialog";
 import { DailyAnalysisDialog } from "@/components/analytics/DailyAnalysisDialog";
-import { TrendChart } from "@/components/TrendChart";
-import { Globe, User, Briefcase, Link as LinkIcon, ArrowLeft } from "lucide-react";
+import { Globe, User, Briefcase, Link as LinkIcon, ArrowLeft, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getPostsByUser, assignPost, getCampaignsByUser, submitDailyRequest, createSocialCampaign,getCampaign } from "@/services/socialEcho"
 
-import { CreditsBanner } from "@/components/CreditsBanner";
 import {useAuth } from "@/hooks/use-auth"
 import {useToast } from "@/hooks/use-toast"
 import { encryptId } from "@/hooks/encrypt";
@@ -269,14 +267,22 @@ const handleDailyRequestSubmit = async (url: string) => {
       return (
         <>
           {/* Category Cards */}
-          <div className="grid md:grid-cols-3 gap-6 mb-8">
+          <div className="mb-10">
+            <div className="mb-4">
+              <p className="text-xs font-semibold uppercase tracking-widest text-primary mb-2">
+                Your library
+              </p>
+              <h2 className="text-xl font-semibold text-foreground">
+                Analysis collections
+              </h2>
+            </div>
+            <div className="grid md:grid-cols-3 gap-4">
             <CategoryCard
               title="General Posts"
               icon={Globe}
               count={generalPosts.length}
               avgSentiment={calculateAvg(generalPosts, "sentiment")}
               avgAgreement={calculateAvg(generalPosts, "agreement")}
-              color="from-blue-500 to-cyan-600"
               onClick={() => setCurrentView("general")}
             />
             <CategoryCard
@@ -285,7 +291,6 @@ const handleDailyRequestSubmit = async (url: string) => {
               count={personalPosts.length}
               avgSentiment={calculateAvg(personalPosts, "sentiment")}
               avgAgreement={calculateAvg(personalPosts, "agreement")}
-              color="from-green-500 to-emerald-600"
               onClick={() => setCurrentView("personal")}
             />
             <CategoryCard
@@ -294,27 +299,40 @@ const handleDailyRequestSubmit = async (url: string) => {
               count={userCampaigns.length}
               avgSentiment={calculateAvg(campaignPosts, "sentiment")}
               avgAgreement={calculateAvg(campaignPosts, "agreement")}
-              color="from-violet-500 to-purple-600"
               onClick={() => setCurrentView("campaigns-list")}
             />
+            </div>
           </div>
 
           {/* Quick Campaigns Preview */}
-          <div className="mb-8">
-             <CreditsBanner />
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-2xl bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
-                Active Campaigns
-              </h3>
+          <div className="mb-10">
+            <div className="flex items-end justify-between gap-4 mb-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-widest text-primary mb-2">
+                  Campaigns
+                </p>
+                <h2 className="text-xl font-semibold text-foreground">
+                  Active campaigns
+                </h2>
+              </div>
               <Button
                 variant="ghost"
                 onClick={() => setCurrentView("campaigns-list")}
+                className="text-muted-foreground"
               >
-                View All
+                View all
+                <ArrowRight className="w-4 h-4" />
               </Button>
             </div>
             <div className="grid md:grid-cols-3 gap-4">
-              {campaigns.map((campaign, index) => (
+              {campaigns.length === 0 ? (
+                <div className="md:col-span-3 bg-card border border-dashed border-border rounded-2xl p-8 text-center">
+                  <p className="text-sm font-medium text-foreground">No active campaigns</p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Campaigns will appear here after you group analyzed posts.
+                  </p>
+                </div>
+              ) : campaigns.slice(0, 3).map((campaign, index) => (
                 <motion.div
                   key={campaign.id}
                   initial={{ opacity: 0, scale: 0.9 }}
@@ -327,27 +345,27 @@ const handleDailyRequestSubmit = async (url: string) => {
             getCampaignData(campaign.id)
                     
                   }}
-                  className="bg-white rounded-xl p-5 shadow-md border border-gray-200 cursor-pointer group hover:shadow-xl transition-all hover:-translate-y-1"
+                  className="bg-card rounded-2xl p-5 border border-border cursor-pointer group hover:border-primary/30 hover:shadow-md transition-all"
                 >
                   <div className="flex items-start justify-between mb-3">
-                    <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${campaign.color} flex items-center justify-center`}>
-                      <Briefcase className="w-5 h-5 text-white" />
+                    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                      <Briefcase className="w-5 h-5 text-primary" />
                     </div>
-                    <div className="text-right text-sm text-gray-600">
+                    <div className="text-right text-xs text-muted-foreground">
                       {campaign.postsCount} posts
                     </div>
                   </div>
-                  <h4 className="text-gray-900 mb-3 line-clamp-2">{sanitizeName(campaign.name)}</h4>
-                  <div className="flex items-center justify-between text-sm">
+                  <h3 className="text-base font-semibold text-foreground mb-4 line-clamp-2">{sanitizeName(campaign.name)}</h3>
+                  <div className="flex items-center gap-6 pt-4 border-t border-border text-sm">
                     <div>
-                      <div className="text-xs text-gray-500">Sentiment</div>
-                      <div className={campaign.avgSentiment > 70 ? "text-green-600" : "text-amber-600"}>
+                      <div className="text-xs text-muted-foreground">Sentiment</div>
+                      <div className={`font-semibold tabular-nums ${campaign.avgSentiment > 70 ? "text-green-600" : "text-amber-600"}`}>
                         {campaign.avgSentiment}%
                       </div>
                     </div>
                     <div>
-                      <div className="text-xs text-gray-500">Agreement</div>
-                      <div className={campaign.avgAgreement > 60 ? "text-green-600" : "text-amber-600"}>
+                      <div className="text-xs text-muted-foreground">Agreement</div>
+                      <div className={`font-semibold tabular-nums ${campaign.avgAgreement > 60 ? "text-green-600" : "text-amber-600"}`}>
                         {campaign.avgAgreement}%
                       </div>
                     </div>
@@ -360,9 +378,12 @@ const handleDailyRequestSubmit = async (url: string) => {
 
           {/* Recent Posts */}
           <div>
-            <h3 className="text-2xl mb-4 bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
-              Recent Posts
-            </h3>
+            <p className="text-xs font-semibold uppercase tracking-widest text-primary mb-2">
+              Latest activity
+            </p>
+            <h2 className="text-xl font-semibold text-foreground mb-4">
+              Recent analyses
+            </h2>
             <PostsTable
               posts={posts.slice(0, 5)}
               onViewPost={handleViewPost}
@@ -483,9 +504,9 @@ const handleDailyRequestSubmit = async (url: string) => {
 <CampaignView campaign={campaignData}/>)}
           {/* Posts Table */}
           <div>
-            <h3 className="text-2xl mb-4 bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
+            <h2 className="text-xl font-semibold text-foreground mb-4">
               Campaign Posts
-            </h3>
+            </h2>
             {campaignPostsList.length == 0 ? (
               <div className="bg-white rounded-xl p-12 text-center border border-gray-200">
                 <Briefcase className="w-12 h-12 mx-auto mb-3 text-gray-400" />
@@ -524,23 +545,23 @@ const handleDailyRequestSubmit = async (url: string) => {
           Back to Overview
         </Button>
 
-        <div className="grid md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
-            <p className="text-sm text-gray-600 mb-1">Total Posts</p>
-            <p className="text-3xl bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
+        <div className="grid grid-cols-2 md:grid-cols-4 bg-card border border-border rounded-2xl divide-x divide-y md:divide-y-0 divide-border overflow-hidden mb-8">
+          <div className="p-5">
+            <p className="text-xs font-medium text-muted-foreground mb-2">Total posts</p>
+            <p className="text-2xl font-semibold text-foreground tabular-nums">
               {filteredPosts.length}
             </p>
           </div>
-          <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
-            <p className="text-sm text-gray-600 mb-1">Total Replies</p>
-            <p className="text-3xl text-gray-900">
+          <div className="p-5">
+            <p className="text-xs font-medium text-muted-foreground mb-2">Total replies</p>
+            <p className="text-2xl font-semibold text-foreground tabular-nums">
               {filteredPosts.reduce((sum, p) => sum + p.replies, 0)}
             </p>
           </div>
-          <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
-            <p className="text-sm text-gray-600 mb-1">Avg Sentiment</p>
+          <div className="p-5">
+            <p className="text-xs font-medium text-muted-foreground mb-2">Avg. sentiment</p>
             <p
-              className={`text-3xl ${
+              className={`text-2xl font-semibold tabular-nums ${
                 avgSentiment > 70
                   ? "text-green-600"
                   : avgSentiment > 40
@@ -551,10 +572,10 @@ const handleDailyRequestSubmit = async (url: string) => {
               {avgSentiment}%
             </p>
           </div>
-          <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
-            <p className="text-sm text-gray-600 mb-1">Avg Agreement</p>
+          <div className="p-5">
+            <p className="text-xs font-medium text-muted-foreground mb-2">Avg. agreement</p>
             <p
-              className={`text-3xl ${
+              className={`text-2xl font-semibold tabular-nums ${
                 avgAgreement > 60
                   ? "text-green-600"
                   : avgAgreement > 40
@@ -568,9 +589,9 @@ const handleDailyRequestSubmit = async (url: string) => {
         </div>
 
         <div>
-          <h3 className="text-2xl mb-4 bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
+          <h2 className="text-xl font-semibold text-foreground mb-4">
             {currentView.charAt(0).toUpperCase() + currentView.slice(1)} Posts
-          </h3>
+          </h2>
           {filteredPosts.length === 0 ? (
             <div className="bg-white rounded-xl p-12 text-center border border-gray-200">
               <Globe className="w-12 h-12 mx-auto mb-3 text-gray-400" />
@@ -592,36 +613,26 @@ const handleDailyRequestSubmit = async (url: string) => {
   const selectedPost = posts.find((p) => p.id === selectedPostId);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-violet-50 via-white to-blue-50">
-      <div className="max-w-7xl mx-auto px-6 py-12">
+    <div className="min-h-screen bg-background">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+        {currentView === "overview" && (
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="mb-8"
+          className="mb-10"
         >
-         <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
             <div>
-              <h1 className="text-5xl mb-3 bg-gradient-to-r from-violet-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
-                Analytics Dashboard
+              <p className="text-xs font-semibold uppercase tracking-widest text-primary mb-3">
+                Workspace overview
+              </p>
+              <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight text-foreground">
+                Dashboard
               </h1>
-             <p className="mt-2 text-gray-600 max-w-3xl">
-  Track how people respond to your posts, group conversations into campaigns,
-  and understand sentiment and agreement trends at a glance.
-</p>
-
-<div className="mt-4 flex flex-wrap gap-2 text-sm">
-  <span className="px-3 py-1 bg-green-50 text-green-700 rounded-full">
-    ✔ Analyze public reactions
-  </span>
-  <span className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full">
-    ✔ Organize posts into campaigns
-  </span>
-  <span className="px-3 py-1 bg-purple-50 text-purple-700 rounded-full">
-    ✔ Identify sentiment & agreement patterns
-  </span>
-</div>
-
+             <p className="mt-3 text-sm sm:text-base leading-relaxed text-muted-foreground max-w-2xl">
+                Monitor public response, organize analyses, and move from signal to action.
+              </p>
             </div>
 {/**<Button
   onClick={() => setIsDailyRequestOpen(true)}
@@ -631,13 +642,15 @@ const handleDailyRequestSubmit = async (url: string) => {
 </Button>**/}
             <Button
               onClick={() => setIsAddLinkOpen(true)}
-              className="bg-gradient-to-r from-violet-600 to-purple-600 text-white hover:from-violet-700 hover:to-purple-700"
+              size="lg"
+              className="shadow-md"
             >
-              <LinkIcon className="w-4 h-4 mr-2" />
-              Analyze
+              <LinkIcon className="w-4 h-4" />
+              New analysis
             </Button>
           </div>
         </motion.div>
+        )}
 
         <motion.div
           initial={{ opacity: 0 }}

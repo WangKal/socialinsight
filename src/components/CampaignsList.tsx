@@ -52,22 +52,25 @@ export function CampaignsList({ campaigns, onSelectCampaign, onBack }: Campaigns
 
       {/* Header */}
       <div className="mb-6">
-        <h2 className="text-3xl mb-2 bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
+        <p className="text-xs font-semibold uppercase tracking-widest text-primary mb-2">
+          Campaign library
+        </p>
+        <h2 className="text-2xl font-semibold text-foreground mb-2">
           All Campaigns
         </h2>
-        <p className="text-gray-600">Manage and analyze your marketing campaigns</p>
+        <p className="text-sm text-muted-foreground">Manage and analyze your grouped conversations.</p>
       </div>
 
       {/* Overall Stats */}
-      <div className="grid md:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 max-w-xl bg-card border border-border rounded-2xl divide-x divide-border overflow-hidden mb-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm"
+          className="p-5"
         >
-          <p className="text-sm text-gray-600 mb-1">Total Campaigns</p>
-          <p className="text-3xl bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
+          <p className="text-xs font-medium text-muted-foreground mb-2">Total campaigns</p>
+          <p className="text-2xl font-semibold text-foreground tabular-nums">
             {campaigns.length}
           </p>
         </motion.div>
@@ -75,10 +78,10 @@ export function CampaignsList({ campaigns, onSelectCampaign, onBack }: Campaigns
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm"
+          className="p-5"
         >
-          <p className="text-sm text-gray-600 mb-1">Total Posts</p>
-          <p className="text-3xl text-gray-900">{totalPosts}</p>
+          <p className="text-xs font-medium text-muted-foreground mb-2">Total posts</p>
+          <p className="text-2xl font-semibold text-foreground tabular-nums">{totalPosts}</p>
         </motion.div>
      {/**   <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -122,12 +125,13 @@ export function CampaignsList({ campaigns, onSelectCampaign, onBack }: Campaigns
 
       {/* Campaigns Grid */}
       {campaigns.length === 0 ? (
-        <div className="bg-white rounded-xl p-12 text-center border border-gray-200">
-          <Briefcase className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-          <p className="text-gray-600">No campaigns yet. Assign posts to campaigns to get started.</p>
+        <div className="bg-card rounded-2xl p-10 text-center border border-dashed border-border">
+          <Briefcase className="w-10 h-10 mx-auto mb-3 text-muted-foreground" />
+          <p className="text-sm font-medium text-foreground">No campaigns yet</p>
+          <p className="text-sm text-muted-foreground mt-1">Assign posts to campaigns to get started.</p>
         </div>
       ) : (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           {campaigns.map((campaign, index) => (
             <motion.div
               key={campaign.id}
@@ -137,11 +141,11 @@ export function CampaignsList({ campaigns, onSelectCampaign, onBack }: Campaigns
             >
               <div
                 onClick={() => onSelectCampaign(campaign.id)}
-                className="bg-white rounded-xl p-6 shadow-md border border-gray-200 cursor-pointer group hover:shadow-xl transition-all hover:-translate-y-1"
+                className="bg-card rounded-2xl p-5 border border-border cursor-pointer group hover:border-primary/30 hover:shadow-md transition-all"
               >
                 <div className="flex items-start justify-between mb-4">
-                  <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${campaign.color} flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                    <Briefcase className="w-6 h-6 text-white" />
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                    <Briefcase className="w-5 h-5 text-primary" />
                   </div>
                   <div className="text-right">
                     <div className="flex items-center gap-1 text-gray-600 mb-1">
@@ -152,8 +156,8 @@ export function CampaignsList({ campaigns, onSelectCampaign, onBack }: Campaigns
                   </div>
                 </div>
 
-                <h3 className="text-xl text-gray-900 mb-2">{sanitizeName(campaign.name)}</h3>
-                <p className="text-sm text-gray-600 mb-4 line-clamp-2">{campaign.description}</p>
+                <h3 className="text-base font-semibold text-foreground mb-2">{sanitizeName(campaign.name)}</h3>
+                <p className="text-sm text-muted-foreground mb-4 line-clamp-2">{campaign.description}</p>
 
                 <div className="flex items-center justify-between pt-4 border-t border-gray-100">
                   <div>
