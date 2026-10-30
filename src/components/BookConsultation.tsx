@@ -127,14 +127,14 @@ export default function BookConsultation({
                 className="text-xs font-semibold uppercase tracking-widest"
                 style={{ color: "#C2622A" }}
               >
-                Consultation
+                Product Demonstration
               </p>
 
               <h2
                 className="text-2xl font-bold tracking-tight"
                 style={{ color: "#222222" }}
               >
-                Book a Consultation
+                Request a Product Demonstration
               </h2>
             </div>
           </div>
@@ -143,8 +143,8 @@ export default function BookConsultation({
             className="text-sm leading-relaxed max-w-xl"
             style={{ color: "#666666" }}
           >
-            Tell us what you are trying to understand. We'll review your
-            requirements and arrange the most appropriate consultation.
+            Tell us what you need to understand. We’ll tailor the demonstration
+            around your audience, reputation and strategic intelligence needs.
           </p>
         </div>
 
@@ -164,15 +164,15 @@ export default function BookConsultation({
               className="text-2xl font-bold mb-3"
               style={{ color: "#222222" }}
             >
-              Consultation request received
+              Demonstration request received
             </h3>
 
             <p
               className="text-sm leading-relaxed max-w-md mx-auto mb-8"
               style={{ color: "#666666" }}
             >
-              Thank you. We've received your request and will get back to you
-              with the consultation details.
+              Thank you. We’ve received your request and will get back to you
+              with the next steps.
             </p>
 
             <button
@@ -222,7 +222,7 @@ export default function BookConsultation({
                 className="block text-sm font-semibold mb-2"
                 style={{ color: "#222222" }}
               >
-                What would you like to discuss?
+                What would you like to explore?
                 <span style={{ color: "#C2622A" }}> *</span>
               </label>
 
@@ -238,21 +238,24 @@ export default function BookConsultation({
                   color: "#333333",
                 }}
               >
-                <option value="">Select a consultation type</option>
-                <option value="Brand & Market Intelligence">
-                  Brand & Market Intelligence
+                <option value="">Select an area of interest</option>
+                <option value="Audience Intelligence">
+                  Audience Intelligence
                 </option>
-                <option value="Risk & Reputation">
-                  Risk & Reputation
+                <option value="Sentiment & Perception Analysis">
+                  Sentiment & Perception Analysis
                 </option>
-                <option value="Research & Verification">
-                  Research & Verification
+                <option value="Narrative Intelligence">
+                  Narrative Intelligence
                 </option>
-                <option value="Public Sector Strategy">
-                  Public Sector Strategy
+                <option value="Reputation Intelligence">
+                  Reputation Intelligence
                 </option>
-                <option value="Commercial Strategy">
-                  Commercial Strategy
+                <option value="Emerging Trends & Signals">
+                  Emerging Trends & Signals
+                </option>
+                <option value="Actionable Insights">
+                  Actionable Insights
                 </option>
                 <option value="Custom / Other">
                   Custom / Other
@@ -266,7 +269,7 @@ export default function BookConsultation({
                 className="text-sm font-semibold mb-3"
                 style={{ color: "#222222" }}
               >
-                Preferred consultation time
+                Preferred demonstration time
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -296,7 +299,7 @@ export default function BookConsultation({
                 className="block text-sm font-semibold mb-2"
                 style={{ color: "#222222" }}
               >
-                Tell us about your needs
+                Tell us about your goals
               </label>
 
               <textarea
@@ -305,7 +308,7 @@ export default function BookConsultation({
                   updateField("message", event.target.value)
                 }
                 rows={5}
-                placeholder="What are you trying to understand, monitor or solve?"
+                placeholder="Which audiences, perceptions or narratives do you need to understand?"
                 className="w-full px-4 py-3 rounded-xl border text-sm outline-none resize-none transition focus:ring-2"
                 style={{
                   borderColor: "#D9D9D9",
@@ -323,14 +326,14 @@ export default function BookConsultation({
                 color: "#FFFFFF",
               }}
             >
-              {loading ? "Sending request..." : "Request Consultation"}
+              {loading ? "Sending request..." : "Request Demonstration"}
             </button>
 
             <p
               className="text-xs text-center"
               style={{ color: "#999999" }}
             >
-              Your information will only be used to arrange your consultation.
+              Your information will only be used to arrange your product demonstration.
             </p>
           </form>
         )}

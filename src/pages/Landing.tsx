@@ -8,117 +8,159 @@ import BookConsultation from "@/components/BookConsultation";
 const problems = [
   {
     number: '01',
-    title: 'The Challenge',
-    body: 'Brands and governments suffer from a critical perception gap between internal beliefs and public sentiment, operating in a blind state that costs them trust and relevance.',
+    title: 'Surface metrics stop short',
+    body: 'Engagement, mentions and sentiment tell you what happened, but rarely explain why people are responding the way they are.',
   },
   {
     number: '02',
-    title: 'The Disconnect',
-    body: 'Acting on assumptions rather than reality leads to a total failure to connect with citizens and product users—strategies built on air rather than ground truth.',
+    title: 'Context remains hidden',
+    body: 'The motivations, perceptions and concerns influencing audience decisions are often buried inside the conversation.',
   },
   {
     number: '03',
-    title: 'The Volume Barrier',
-    body: 'Millions of high-frequency social media data streams make it impossible for manual teams to diagnose the why behind public discourse at the speed decisions require.',
+    title: 'Narratives move quickly',
+    body: 'Recurring themes and emerging narratives can gain momentum before organisations understand what they mean or how to respond.',
   },
 ]
 
 const differentiators = [
   {
-    label: 'Beyond Vanity Metrics',
-    traditional: 'Surface-level reach, impressions, and follower counts that tell you nothing about what people actually think.',
-    groundTruth: 'Deep dives into public comment and post streams to surface the real emotional drivers behind every number.',
+    label: 'Audience motivation',
+    traditional: 'Measures engagement.',
+    groundTruth: 'Explores the motivations influencing audience behaviour.',
   },
   {
-    label: 'Localized Linguistic Intent',
-    traditional: 'Generic Western sentiment models that miss code-switching, sarcasm, and regional nuance entirely.',
-    groundTruth: 'Built to decode Sheng, Pidgin, and complex regional contexts—so nothing gets lost in translation.',
+    label: 'Conversation patterns',
+    traditional: 'Counts mentions.',
+    groundTruth: 'Examines recurring themes and patterns across conversations.',
   },
   {
-    label: 'Actionable Ground Truth',
-    traditional: 'Reports full of charts and jargon that leave you with more questions than answers.',
-    groundTruth: 'Unstructured regional chatter transformed into audited intelligence that eliminates strategic blind spots.',
+    label: 'Audience perception',
+    traditional: 'Tracks positive or negative sentiment.',
+    groundTruth: 'Investigates the perceptions and emotions behind sentiment.',
+  },
+  {
+    label: 'Narrative intelligence',
+    traditional: 'Identifies trending topics.',
+    groundTruth: 'Explores emerging narratives and the concerns shaping them.',
+  },
+  {
+    label: 'Strategic action',
+    traditional: 'Reports performance.',
+    groundTruth: 'Translates conversation data into intelligence for better decisions.',
   },
 ]
 
 const audiences = [
   {
     icon: '◈',
-    title: 'Local & Foreign Brands',
-    body: 'Consumer enterprises navigating fast-moving markets and real-time public forums.',
+    title: 'Corporate Communications & PR',
+    body: 'Understand public perception, monitor emerging narratives and make more informed communications decisions.',
   },
   {
     icon: '◉',
-    title: 'Governments & Public Sector',
-    body: 'Public institutions tracking policy reception, citizen understanding, and regulatory feedback.',
+    title: 'Marketing & Brand Management',
+    body: 'Discover what audiences care about and identify opportunities for more relevant engagement.',
   },
   {
     icon: '◫',
-    title: 'Research Teams',
-    body: 'Analysts cross-validating official surveys against organic public comment threads.',
+    title: 'Government & Public Institutions',
+    body: 'Identify community concerns and understand issues influencing public perception.',
   },
   {
     icon: '◧',
-    title: 'Communications & PR',
-    body: 'Strategy teams auditing client brand health and identifying hidden reputational risks.',
+    title: 'NGOs & Development Organisations',
+    body: 'Explore community feedback and understand public responses to programmes and initiatives.',
   },
   {
     icon: '◦',
-    title: 'Business Development',
-    body: 'Commercial professionals using data-driven shadow audits to secure high-value contracts.',
+    title: 'Customer Experience Teams',
+    body: 'Understand recurring frustrations, expectations and motivations to improve customer relationships.',
+  },
+  {
+    icon: '◇',
+    title: 'Business & Strategy Leaders',
+    body: 'Use audience intelligence to inform decisions, identify opportunities and understand operating environments.',
   },
 ]
 
 const useCaseTabs = [
   {
-    label: 'Brand & Market',
-    title: 'Brand & Market Intelligence',
+    label: 'Audience',
+    title: 'Audience Intelligence',
     items: [
-      'Competitor tracking across social platforms in real time',
-      'Product and feature reaction audits from organic comment streams',
-      'Campaign messaging validation before and after launch',
-      'Unmet friction discovery hidden in public discourse',
+      'Understand audience interests, concerns and preferences',
+      'Explore behavioural patterns in public conversations',
+      'Build a clearer picture of the people behind the data',
     ],
   },
   {
-    label: 'Risk & Reputation',
-    title: 'Risk & Reputation Management',
+    label: 'Perception',
+    title: 'Sentiment & Perception Analysis',
     items: [
-      'Early crisis warning signals surfaced before they escalate',
-      'Narrative disconnect diagnosis between brand and public',
-      'Long-term brand trust auditing across market cycles',
-      'Reputational risk mapping tied to specific content or policy',
+      'Examine perceptions of brands, institutions, products and issues',
+      'Identify the emotions and opinions shaping those perceptions',
+      'Move beyond a score to understand what sentiment could mean',
     ],
   },
   {
-    label: 'Research & Verification',
-    title: 'Research & Ground-Truth Verification',
+    label: 'Narratives',
+    title: 'Narrative Intelligence',
     items: [
-      'Survey cross-validation against organic comment reality',
-      'Localized slang and sarcasm decoding for accurate sentiment',
-      'Academic and institutional research support',
-      'Media coverage analysis vs. actual public response',
+      'Identify emerging narratives and recurring themes',
+      'Recognise conversation patterns influencing public discourse',
+      'See which ideas and concerns are gaining momentum',
     ],
   },
   {
-    label: 'Public Sector',
-    title: 'Public Sector & Institutional Strategy',
+    label: 'Reputation',
+    title: 'Reputation Intelligence',
     items: [
-      'Policy pulse audits across citizen platforms',
-      'Platform-specific discourse analysis on TikTok and Reels',
-      'Public sector friction mapping for communication reform',
-      'Regulatory feedback aggregation and intent classification',
+      'Understand how conversations shape organisational reputation',
+      'Identify potential concerns in the public conversation',
+      'Support more informed reputation management',
     ],
   },
   {
-    label: 'Commercial Strategy',
-    title: 'Commercial Strategy',
+    label: 'Signals',
+    title: 'Emerging Trends & Signals',
     items: [
-      'Diagnostic pitching with shadow audit evidence packages',
-      'High-value account acquisition through data-backed proposals',
-      'Consulting contract support with proprietary ground-truth data',
-      'Competitive intelligence positioning for growth teams',
+      'Recognise changing audience interests',
+      'Surface recurring concerns and emerging discussion themes',
+      'Spot meaningful signals before they become significant issues',
     ],
+  },
+  {
+    label: 'Action',
+    title: 'Actionable Insights',
+    items: [
+      'Translate complex conversation data into meaningful intelligence',
+      'Support communications, marketing and customer experience teams',
+      'Give decision-makers clearer evidence for strategic action',
+    ],
+  },
+]
+
+const processSteps = [
+  {
+    number: '01',
+    title: 'Discover',
+    body: 'Identify relevant public conversations, topics and audience discussions across supported digital sources.',
+  },
+  {
+    number: '02',
+    title: 'Analyse',
+    body: 'Examine sentiment, recurring themes, contextual signals and patterns within the conversations.',
+  },
+  {
+    number: '03',
+    title: 'Understand',
+    body: 'Explore the motivations, perceptions and underlying issues influencing audience responses.',
+  },
+  {
+    number: '04',
+    title: 'Act',
+    body: 'Translate the findings into actionable insights that support better communications and strategic decisions.',
   },
 ]
 
@@ -232,7 +274,7 @@ function DataPulse() {
 
 // ─── Hero ─────────────────────────────────────────────────────────────────────
 
-function Hero() {
+function Hero({ onRequestDemo }: { onRequestDemo: () => void }) {
   return (
     <section className="min-h-screen flex items-center pt-20" style={{ backgroundColor: '#F7F7F7' }}>
       <div className="max-w-6xl mx-auto px-6 py-24 w-full">
@@ -242,47 +284,47 @@ function Hero() {
             <div className="inline-flex items-center gap-2 self-start">
               <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#C2622A' }} />
               <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: '#C2622A' }}>
-                Ground-Truth Intelligence
+                Audience Intelligence Engine
               </span>
             </div>
             <h1
               className="text-5xl lg:text-6xl font-bold leading-[1.05] tracking-tight"
               style={{ color: '#222222' }}
             >
-              Bridging the Reality Gap Between Leadership and Public Sentiment.
+              Beyond Listening. Into Understanding.
             </h1>
             <p className="text-lg leading-relaxed max-w-lg" style={{ color: '#555555' }}>
-              SocialInsight decodes high-volume public comment streams, slang, and localized nuances to reveal the unvarnished ground-truth intelligence brands and governments miss.
+              SocialInsight helps organisations understand the motivations, perceptions, emotions and underlying narratives shaping public conversations.
             </p>
             <div className="flex flex-wrap items-center gap-3 pt-2">
               <button
+                type="button"
+                onClick={onRequestDemo}
                 className="px-7 py-3.5 rounded-full text-sm font-semibold transition-all duration-200 hover:opacity-90 active:scale-95"
                 style={{ backgroundColor: '#C2622A', color: '#FFFFFF' }}
               >
-                Request a Diagnostic Audit
+                Request a Product Demonstration
               </button>
               <a
-                href="#use-cases"
+                href="#capabilities"
                 className="px-7 py-3.5 rounded-full text-sm font-semibold border transition-all duration-200 hover:border-neutral-400"
                 style={{ borderColor: '#D4D4D4', color: '#222222' }}
               >
-                Explore Use Cases
+                Explore the Platform
               </a>
             </div>
-            {/* Stat bar */}
-            <div className="flex gap-8 pt-4 border-t" style={{ borderColor: '#E5E5E5' }}>
+            {/* Promise bar */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-5 border-t" style={{ borderColor: '#E5E5E5' }}>
               {[
-                { value: '40M+', label: 'Comments Analyzed' },
-                { value: '12', label: 'Local Languages Decoded' },
-                { value: '98%', label: 'Narrative Accuracy' },
+                'Understand your audience',
+                'Anticipate narratives',
+                'Make smarter decisions',
               ].map(s => (
-                <div key={s.label}>
-                  <div className="text-2xl font-bold" style={{ color: '#222222' }}>
-                    {s.value}
-                  </div>
-                  <div className="text-xs font-medium mt-0.5" style={{ color: '#888888' }}>
-                    {s.label}
-                  </div>
+                <div key={s} className="flex items-start gap-2">
+                  <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: '#C2622A' }} />
+                  <span className="text-xs font-semibold leading-relaxed" style={{ color: '#555555' }}>
+                    {s}
+                  </span>
                 </div>
               ))}
             </div>
@@ -302,7 +344,7 @@ function Hero() {
                 className="absolute bottom-5 left-5 px-4 py-2 rounded-2xl border text-xs font-semibold"
                 style={{ backgroundColor: '#FFFFFF', borderColor: '#E5E5E5', color: '#222222' }}
               >
-                Live Sentiment Pulse ·{' '}
+                Audience intelligence ·{' '}
                 <span style={{ color: '#C2622A' }}>Active</span>
               </div>
             </div>
@@ -321,10 +363,10 @@ function CoreProblem() {
       <div className="max-w-6xl mx-auto px-6">
         <div className="mb-16">
           <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#C2622A' }}>
-            The Perception Gap
+            The Challenge
           </p>
           <h2 className="text-4xl font-bold tracking-tight" style={{ color: '#222222' }}>
-            Why organizations operate blind.
+            You’re seeing the conversation. But are you understanding it?
           </h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x" style={{ borderColor: '#E5E5E5', border: '1px solid #E5E5E5', borderRadius: '16px', overflow: 'hidden' }}>
@@ -355,10 +397,10 @@ function WhatWeDo() {
       <div className="max-w-6xl mx-auto px-6">
         <div className="mb-16">
           <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#C2622A' }}>
-            What We Do
+            Why SocialInsight
           </p>
           <h2 className="text-4xl font-bold tracking-tight" style={{ color: '#222222' }}>
-            Ground truth, not guesswork.
+            Because engagement is not understanding.
           </h2>
         </div>
         <div className="flex flex-col gap-6">
@@ -389,7 +431,7 @@ function WhatWeDo() {
               {/* Ground truth */}
               <div className="lg:col-span-2 p-6" style={{ backgroundColor: '#FFFAF7' }}>
                 <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: '#C2622A' }}>
-                  SocialInsight Ground Truth
+                  SocialInsight
                 </p>
                 <p className="text-sm leading-relaxed" style={{ color: '#222222' }}>
                   {d.groundTruth}
@@ -411,13 +453,13 @@ function Audiences() {
       <div className="max-w-6xl mx-auto px-6">
         <div className="mb-16">
           <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#C2622A' }}>
-            Who Uses It
+            Who We Serve
           </p>
           <h2 className="text-4xl font-bold tracking-tight" style={{ color: '#222222' }}>
-            Built for those who need the truth.
+            Intelligence for organisations that need to understand people.
           </h2>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {audiences.map((a, i) => (
             <div
               key={i}
@@ -451,14 +493,14 @@ function UseCases() {
   const tab = useCaseTabs[active]
 
   return (
-    <section id="use-cases" className="py-28" style={{ backgroundColor: '#F7F7F7' }}>
+    <section id="capabilities" className="py-28" style={{ backgroundColor: '#F7F7F7' }}>
       <div className="max-w-6xl mx-auto px-6">
         <div className="mb-12">
           <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#C2622A' }}>
-            Comprehensive Use Cases
+            Core Capabilities
           </p>
           <h2 className="text-4xl font-bold tracking-tight" style={{ color: '#222222' }}>
-            Five domains. One intelligence layer.
+            Intelligence that goes beyond the numbers.
           </h2>
         </div>
 
@@ -491,14 +533,14 @@ function UseCases() {
             <div className="p-10 lg:p-12 flex flex-col justify-between" style={{ backgroundColor: '#222222' }}>
               <div>
                 <span className="text-xs font-mono" style={{ color: '#C2622A' }}>
-                  0{active + 1} / 05
+                  0{active + 1} / 06
                 </span>
                 <h3 className="text-2xl font-bold mt-4 leading-snug" style={{ color: '#F7F7F7' }}>
                   {tab.title}
                 </h3>
               </div>
               <p className="text-xs mt-8" style={{ color: '#888888' }}>
-                Navigate tabs to explore all five operational categories.
+                Explore the intelligence capabilities available across the platform.
               </p>
             </div>
             {/* Right: items */}
@@ -518,6 +560,40 @@ function UseCases() {
               ))}
             </div>
           </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// ─── How It Works ─────────────────────────────────────────────────────────────
+
+function HowItWorks() {
+  return (
+    <section className="py-28" style={{ backgroundColor: '#FFFFFF' }}>
+      <div className="max-w-6xl mx-auto px-6">
+        <div className="mb-16">
+          <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#C2622A' }}>
+            How It Works
+          </p>
+          <h2 className="text-4xl font-bold tracking-tight" style={{ color: '#222222' }}>
+            Turning conversations into clarity.
+          </h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px rounded-2xl overflow-hidden border" style={{ backgroundColor: '#E5E5E5', borderColor: '#E5E5E5' }}>
+          {processSteps.map((step) => (
+            <div key={step.number} className="p-8" style={{ backgroundColor: '#FAFAFA' }}>
+              <span className="text-xs font-mono font-semibold" style={{ color: '#C2622A' }}>
+                {step.number}
+              </span>
+              <h3 className="text-xl font-bold mt-5 mb-3" style={{ color: '#222222' }}>
+                {step.title}
+              </h3>
+              <p className="text-sm leading-relaxed" style={{ color: '#666666' }}>
+                {step.body}
+              </p>
+            </div>
+          ))}
         </div>
       </div>
     </section>
@@ -548,12 +624,11 @@ function FooterCTA({
           className="text-4xl lg:text-5xl font-bold tracking-tight max-w-2xl leading-tight"
           style={{ color: '#F7F7F7' }}
         >
-          Stop operating in the blind.
+          The conversation is happening. Are you listening beyond the surface?
         </h2>
 
         <p className="text-lg max-w-xl" style={{ color: '#AAAAAA' }}>
-          Uncover the narrative ground-truth today. Your public has been
-          speaking. It's time to actually listen.
+          Gain a deeper understanding of the audiences, perceptions and narratives influencing your organisation.
         </p>
 
         <button
@@ -565,7 +640,7 @@ function FooterCTA({
             color: '#FFFFFF',
           }}
         >
-          Book a Consultation
+          Request a Product Demonstration
         </button>
 
         <p
@@ -645,11 +720,11 @@ export default function Landing() {
 
           <div className="flex items-center gap-4">
             <a
-              href="#use-cases"
+              href="#capabilities"
               className="text-sm font-medium"
               style={{ color: '#888888' }}
             >
-              Use Cases
+              Platform
             </a>
 
             <a
@@ -657,7 +732,7 @@ export default function Landing() {
               className="text-sm font-medium"
               style={{ color: '#888888' }}
             >
-              Who It's For
+              Who We Serve
             </a>
 
             <div className="flex items-center gap-3">
@@ -680,7 +755,7 @@ export default function Landing() {
     >
       <Nav />
 
-      <Hero />
+      <Hero onRequestDemo={onBookConsultation} />
 
       <CoreProblem />
 
@@ -689,6 +764,8 @@ export default function Landing() {
       <Audiences />
 
       <UseCases />
+
+      <HowItWorks />
 
       <FooterCTA
         onBookConsultation={onBookConsultation}
